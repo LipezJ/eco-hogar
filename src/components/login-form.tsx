@@ -1,0 +1,82 @@
+'use client';
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { redirect, useSearchParams } from "next/navigation"
+// import { useActionState, useEffect } from "react"
+// import { authenticate } from "@/lib/actions"
+import { ArrowRightIcon } from "lucide-react"
+// import { useTopLoader } from "nextjs-toploader";
+
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  const searchParams = useSearchParams();
+  // const loader = useTopLoader()
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  // const [errorMessage, formAction, isPending] = useActionState(
+  //   authenticate,
+  //   undefined,
+  // );
+
+  // useEffect(() => {
+  //   if (isPending) {
+  //     loader.start()
+  //   } else {
+  //     loader.done()
+  //   }
+  // }, [ isPending, loader ])
+
+  const auth = () => {
+    redirect("/dashboard")
+  }
+  
+  return (
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card className="overflow-hidden p-0">
+        <CardContent className="grid p-0">
+          <form onClick={auth} className="p-6 md:p-8 pb-8 md:pb-10">
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col items-center text-center">
+                <h1 className="text-2xl font-bold">Bienvenido</h1>
+                <p className="text-muted-foreground text-balance">
+                  Inicia sesión en tu cuenta
+                </p>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="username">Usuario</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="Nombre de usuario"
+                  required
+                />
+              </div>
+              <div className="grid gap-3">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Contraseña</Label>
+                </div>
+                <Input id="password" name="password" minLength={6} type="password" placeholder="Contraseña" required />
+              </div>
+              <input type="hidden" name="redirectTo" value={callbackUrl} />
+              <Button className="w-full">
+                Iniciar sesión <ArrowRightIcon className="ml-auto h-5 w-5" />
+              </Button>
+              {/* {errorMessage && (
+                <div className="flex gap-2">
+                  <AlertCircleIcon className="h-5 w-5 text-red-500" />
+                  <p className="text-sm text-red-500">{errorMessage}</p>
+                </div>
+              )} */}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
