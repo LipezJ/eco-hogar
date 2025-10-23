@@ -23,6 +23,11 @@ const items = [
         title: "Movimientos",
         url: "/dashboard/movements",
         icon: FileText,
+      },
+      {
+        title: "Deudas",
+        url: "/dashboard/debts",
+        icon: FileText,
       }
     ]
   }
