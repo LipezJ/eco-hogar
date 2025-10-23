@@ -73,18 +73,6 @@ export function BillsStats({ bills }: BillsStatsProps) {
   // Porcentaje de pago
   const paymentRate = totalBills > 0 ? (paidBills / totalBills) * 100 : 0
 
-  // Gastos por categoría
-  const categoryTotals = bills
-    .filter(b => b.status === "pagado")
-    .reduce((acc, bill) => {
-      acc[bill.category] = (acc[bill.category] || 0) + bill.amount
-      return acc
-    }, {} as Record<string, number>)
-
-  const topCategories = Object.entries(categoryTotals)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-
   // Recibos más próximos
   const nextBills = bills
     .filter(b => b.status === "pendiente")
