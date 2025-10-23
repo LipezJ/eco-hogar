@@ -4,10 +4,13 @@ import { SiteHeader } from "@/components/site-header";
 import { MovementsStats } from "@/components/stats/movements";
 import { MovementsReports } from "@/components/reports/movements-reports";
 import { DebtsStats } from "@/components/stats/debts";
+import { BillsStats } from "@/components/stats/bills";
+import { BillsReports } from "@/components/reports/bills-reports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Movement } from "@/types/movements";
 import { Debt, Payment, generateAmortizationTable } from "@/types/debts";
-import { Wallet, CreditCard } from "lucide-react";
+import { Bill } from "@/types/bills";
+import { Wallet, CreditCard, FileText } from "lucide-react";
 
 // Datos de ejemplo para la UI
 const mockMovements: Movement[] = [
@@ -119,6 +122,81 @@ const mockPayments: Payment[] = mockDebts.flatMap(debt => {
   })
 })
 
+// Datos de ejemplo de recibos
+const mockBills: Bill[] = [
+  {
+    id: "1",
+    provider: "Edenor",
+    category: "electricidad",
+    cycle: "bimestral",
+    amount: 45000,
+    dueDate: "2025-10-25",
+    status: "pendiente",
+    autoRenew: true,
+    description: "Servicio eléctrico residencial",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "2",
+    provider: "Aysa",
+    category: "agua",
+    cycle: "mensual",
+    amount: 12000,
+    dueDate: "2025-10-28",
+    status: "pendiente",
+    autoRenew: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "3",
+    provider: "Telecom",
+    category: "internet",
+    cycle: "mensual",
+    amount: 25000,
+    dueDate: "2025-10-15",
+    status: "pagado",
+    paymentDate: "2025-10-14",
+    autoRenew: true,
+    description: "Internet 300 Mbps",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "4",
+    provider: "Netflix",
+    category: "streaming",
+    cycle: "mensual",
+    amount: 8500,
+    dueDate: "2025-10-20",
+    status: "vencido",
+    autoRenew: true,
+    description: "Plan Premium",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "5",
+    provider: "Metrogas",
+    category: "gas",
+    cycle: "bimestral",
+    amount: 35000,
+    dueDate: "2025-11-05",
+    status: "pendiente",
+    autoRenew: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "6",
+    provider: "Seguros Rivadavia",
+    category: "seguro",
+    cycle: "mensual",
+    amount: 18000,
+    dueDate: "2025-10-30",
+    status: "pendiente",
+    autoRenew: true,
+    description: "Seguro de hogar",
+    createdAt: new Date().toISOString()
+  }
+]
+
 export default function Home() {
   // const { data: movements } = useQuery<Movement[]>({
   //   queryKey: ['movements'],
@@ -133,7 +211,7 @@ export default function Home() {
       <SiteHeader title="Dashboard" />
       <section className="container mx-auto pt-4 px-4">
         <Tabs defaultValue="movements" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsList className="grid w-full grid-cols-3 max-w-2xl">
             <TabsTrigger value="movements" className="flex items-center gap-2">
               <Wallet className="h-4 w-4" />
               Movimientos
@@ -142,6 +220,10 @@ export default function Home() {
               <CreditCard className="h-4 w-4" />
               Deudas
             </TabsTrigger>
+            <TabsTrigger value="bills" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Recibos
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="movements" className="my-4 space-y-4">
             <MovementsStats movements={mockMovements} />
@@ -149,6 +231,10 @@ export default function Home() {
           </TabsContent>
           <TabsContent value="debts" className="my-4">
             <DebtsStats debts={mockDebts} payments={mockPayments} />
+          </TabsContent>
+          <TabsContent value="bills" className="my-4 space-y-4">
+            <BillsStats bills={mockBills} />
+            <BillsReports bills={mockBills} />
           </TabsContent>
         </Tabs>
       </section>
