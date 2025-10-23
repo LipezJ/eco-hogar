@@ -2,6 +2,7 @@
 
 import { SiteHeader } from "@/components/site-header";
 import { MovementsStats } from "@/components/stats/movements";
+import { MovementsReports } from "@/components/reports/movements-reports";
 import { DebtsStats } from "@/components/stats/debts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Movement } from "@/types/movements";
@@ -142,8 +143,9 @@ export default function Home() {
               Deudas
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="movements" className="my-4">
+          <TabsContent value="movements" className="my-4 space-y-4">
             <MovementsStats movements={mockMovements} />
+            <MovementsReports movements={mockMovements} />
           </TabsContent>
           <TabsContent value="debts" className="my-4">
             <DebtsStats debts={mockDebts} payments={mockPayments} />

@@ -1,6 +1,6 @@
 "use client"
 
-import { FileText, Home } from "lucide-react"
+import { CreditCard, FileText, Home } from "lucide-react"
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -27,7 +27,7 @@ const items = [
       {
         title: "Deudas",
         url: "/dashboard/debts",
-        icon: FileText,
+        icon: CreditCard,
       }
     ]
   }
