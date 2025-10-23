@@ -20,13 +20,16 @@ import { LogOut } from "lucide-react"
 import { Button } from "./ui/button"
 // import { signOut } from "next-auth/react"
 
-export type AppSidebarItem = {
-  title: string
-  url: string
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+export type AppSidebar = {
+  name?: string;
+  items: {
+    title: string;
+    url: string;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  }[]
 }
 
-export function AppSidebar({ title, items }: { title: string; items: AppSidebarItem[] }) {
+export function AppSidebar({ sidebar }: { sidebar: AppSidebar[] }) {
   const handleSignOut = () => {
     // signOut({ callbackUrl: '/login' })
   }
@@ -36,24 +39,30 @@ export function AppSidebar({ title, items }: { title: string; items: AppSidebarI
       <SidebarHeader>
         <NavUser />
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>{title}</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url} prefetch={true}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="gap-0">
+        {
+          sidebar.map((group, index) => 
+            <SidebarGroup key={index}>
+              {
+                group.name && <SidebarGroupLabel>{group.name}</SidebarGroupLabel>
+              }
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {group.items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link href={item.url} prefetch={true}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )
+        }
       </SidebarContent>
       <SidebarFooter>
         <section className="space-y-2 grid">

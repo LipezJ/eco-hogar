@@ -1,6 +1,6 @@
 "use client"
 
-import { FileText } from "lucide-react"
+import { FileText, Home } from "lucide-react"
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -8,10 +8,24 @@ import NextTopLoader from "nextjs-toploader"
 
 const items = [
   {
-    title: "Movimientos",
-    url: "/dashboard/movements",
-    icon: FileText,
+    items: [
+      {
+        title: "Home",
+        url: "/dashboard",
+        icon: Home,
+      }
+    ]
   },
+  {
+    name: "Administrar",
+    items: [
+      {
+        title: "Movimientos",
+        url: "/dashboard/movements",
+        icon: FileText,
+      }
+    ]
+  }
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -25,7 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
     >
       <NextTopLoader color="var(--primary)" />
-      <AppSidebar title="Administrar" items={items} />
+      <AppSidebar sidebar={items} />
       <main className="flex-1 overflow-y-auto w-full h-full">
         {children}
       </main>
