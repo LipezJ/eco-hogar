@@ -32,6 +32,7 @@ export type AppSidebar = {
 export function AppSidebar({ sidebar }: { sidebar: AppSidebar[] }) {
   const handleSignOut = () => {
     // signOut({ callbackUrl: '/login' })
+    window.location.href = "/"
   }
 
   return (

@@ -9,6 +9,7 @@ import { redirect, useSearchParams } from "next/navigation"
 // import { useActionState, useEffect } from "react"
 // import { authenticate } from "@/lib/actions"
 import { ArrowRightIcon } from "lucide-react"
+import Link from "next/link"
 // import { useTopLoader } from "nextjs-toploader";
 
 export function LoginForm({
@@ -73,6 +74,13 @@ export function LoginForm({
                   <p className="text-sm text-red-500">{errorMessage}</p>
                 </div>
               )} */}
+
+              <div className="text-center text-sm">
+                ¿No tienes cuenta?{" "}
+                <Link href="/register" className="underline underline-offset-4 hover:text-primary">
+                  Regístrate
+                </Link>
+              </div>
             </div>
           </form>
         </CardContent>

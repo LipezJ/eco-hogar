@@ -38,7 +38,9 @@ export const CreateBillSchema = BillSchema.omit({
   createdAt: true
 })
 
-export const UpdateBillSchema = BillSchema.partial().required({ id: true })
+export const UpdateBillSchema = BillSchema.omit({
+  createdAt: true
+})
 
 export type Bill = z.infer<typeof BillSchema>
 export type CreateBill = z.infer<typeof CreateBillSchema>

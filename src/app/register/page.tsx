@@ -1,13 +1,13 @@
 "use client"
 
-import { LoginForm } from "@/components/login-form"
+import { RegisterForm } from "@/components/register-form"
 import { useQueryClient } from "@tanstack/react-query"
 import NextTopLoader from "nextjs-toploader"
 import { Suspense, useEffect } from "react"
 import Link from "next/link"
 import { PiggyBank } from "lucide-react"
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function LoginPage() {
           <span className="font-bold text-2xl">EcoHogar</span>
         </Link>
         <Suspense>
-          <LoginForm />
+          <RegisterForm />
         </Suspense>
       </div>
     </div>

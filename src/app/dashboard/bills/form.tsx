@@ -91,7 +91,7 @@ function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[
   ]
 }
 
-function getUpdateBillFormDef(): FormFieldDef<z.infer<typeof UpdateBillSchema>>[] {
+function getUpdateBillFormDef(): FormFieldDef<any>[] {
   return getCreateBillFormDef()
 }
 

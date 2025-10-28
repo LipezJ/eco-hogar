@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "",
-  description: "",
+  title: "EcoHogar - Gestiona tus finanzas personales con inteligencia",
+  description: "Toma el control total de tu dinero con EcoHogar. Organiza ingresos, gastos, deudas, inversiones y cuentas bancarias en un solo lugar. Plataforma completa de gestión financiera personal.",
 };
 
 export default function RootLayout({
