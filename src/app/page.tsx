@@ -3,170 +3,31 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { MarketingHeader } from "@/components/layout/marketing-header"
 import {
   ArrowRight,
   BarChart3,
   Building2,
   Check,
   CreditCard,
+  Facebook,
   FileText,
   Landmark,
-  Menu,
+  Linkedin,
   PiggyBank,
   Shield,
   Smartphone,
   TrendingUp,
-  Users,
-  Zap,
-  Facebook,
   Twitter,
-  Linkedin
+  Users,
+  Zap
 } from "lucide-react"
-import { useState } from "react"
 import { FAQAccordion } from "@/components/faq-accordion"
 
 export default function LandingPage() {
-  const [open, setOpen] = useState(false)
-
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <header className="border-b sticky top-0 z-50 bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex h-16 items-center">
-            {/* Logo */}
-            <div className="flex-1">
-              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit">
-                <div className="h-8 w-8 md:h-9 md:w-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <PiggyBank className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                </div>
-                <span className="font-bold text-lg md:text-xl">EcoHogar</span>
-              </Link>
-            </div>
-
-            {/* Desktop Navigation - Centered */}
-            <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-              <a
-                href="#features"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Características
-              </a>
-              <a
-                href="#benefits"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Beneficios
-              </a>
-              <a
-                href="#pricing"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Precios
-              </a>
-              <a
-                href="#faq"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Preguntas frecuentes
-              </a>
-            </nav>
-
-            {/* Desktop CTA Buttons */}
-            <div className="flex-1 flex items-center justify-end gap-3">
-              <div className="hidden lg:flex items-center gap-3">
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Iniciar sesión
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm">
-                    Registrate
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Mobile Menu */}
-              <div className="flex lg:hidden items-center gap-2">
-                <Link href="/login" className="hidden sm:inline-block">
-                  <Button variant="ghost" size="sm" className="text-xs">
-                    Iniciar sesión
-                  </Button>
-                </Link>
-
-                <Sheet open={open} onOpenChange={setOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="sm" className="lg:hidden">
-                      <Menu className="h-5 w-5" />
-                      <span className="sr-only">Toggle menu</span>
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                    <div className="flex flex-col gap-6 pt-6">
-                      {/* Logo in Mobile Menu */}
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <PiggyBank className="h-5 w-5 text-primary" />
-                        </div>
-                        <span className="font-bold text-lg">EcoHogar</span>
-                      </div>
-
-                      {/* Mobile Navigation Links */}
-                      <nav className="flex flex-col gap-4">
-                        <a
-                          href="#features"
-                          onClick={() => setOpen(false)}
-                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                        >
-                          Características
-                        </a>
-                        <a
-                          href="#benefits"
-                          onClick={() => setOpen(false)}
-                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                        >
-                          Beneficios
-                        </a>
-                        <a
-                          href="#pricing"
-                          onClick={() => setOpen(false)}
-                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                        >
-                          Precios
-                        </a>
-                        <a
-                          href="#faq"
-                          onClick={() => setOpen(false)}
-                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                        >
-                          Preguntas frecuentes
-                        </a>
-                      </nav>
-
-                      {/* Mobile CTA Buttons */}
-                      <div className="flex flex-col gap-3 pt-4 border-t">
-                        <Link href="/login" onClick={() => setOpen(false)}>
-                          <Button variant="outline" className="w-full">
-                            Iniciar sesión
-                          </Button>
-                        </Link>
-                        <Link href="/register" onClick={() => setOpen(false)}>
-                          <Button className="w-full">
-                            Registrate
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -651,10 +512,18 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Guías</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Soporte</a></li>
+                <li><Link href="/contactenos" className="hover:text-primary transition-colors">Contáctenos</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Privacidad</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Términos</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Cookies</a></li>
               </ul>
             </div>
           </div>
-          {/* Socials */}
           <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-4 border-t pt-8">
             <p className="text-sm text-muted-foreground">© 2025 EcoHogar. Todos los derechos reservados.</p>
             <div className="flex items-center gap-4 text-muted-foreground">
