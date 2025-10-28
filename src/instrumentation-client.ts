@@ -13,9 +13,5 @@ initBotId({
       path: '/register',
       method: 'POST',
     },
-  ],
-  developmentOptions: {
-    // En desarrollo, siempre permitir (para testing)
-    bypass: true,
-  },
+  ]
 });
