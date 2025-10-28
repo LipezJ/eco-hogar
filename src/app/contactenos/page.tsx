@@ -7,28 +7,47 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { MarketingHeader } from "@/components/layout/marketing-header"
 
-type MemberId = "ana" | "carlos"
+type MemberId = "anderson" | "juan" | "david" | "rances"
 
 const MEMBERS: Array<{
   id: MemberId
   name: string
   role: string
+  code: string
   email: string
   photo: string
 }> = [
   {
-    id: "ana",
-    name: "Ana Martínez",
-    role: "Estudiante - Frontend",
-    email: "ana.martinez@example.com",
-    photo: "/img/team-ana.svg",
+    id: "anderson",
+    name: "ANDERSON NICOLAS DÍAZ CAMACHO",
+    role: "Líder del Grupo",
+    code: "2214105",
+    email: "",
+    photo: "/img/team-anderson.svg",
   },
   {
-    id: "carlos",
-    name: "Carlos López",
-    role: "Estudiante - Backend",
-    email: "carlos.lopez@example.com",
-    photo: "/img/team-carlos.svg",
+    id: "juan",
+    name: "JUAN DAVID LIPEZ GUEVARA",
+    role: "Estudiante",
+    code: "2223102",
+    email: "",
+    photo: "/img/team-juan.svg",
+  },
+  {
+    id: "david",
+    name: "DAVID FERNANDO MUÑOZ ORTIZ",
+    role: "Estudiante",
+    code: "2234504",
+    email: "",
+    photo: "/img/team-david.svg",
+  },
+  {
+    id: "rances",
+    name: "RANCES ALEJANDRO RAMÍREZ MORILLO",
+    role: "Estudiante",
+    code: "2234514",
+    email: "",
+    photo: "/img/team-rances.svg",
   },
 ]
 
@@ -108,7 +127,10 @@ export default function ContactoPage() {
                 <div className="text-sm">
                   <p className="mb-1"><span className="text-muted-foreground">Nombre:</span> {active.name}</p>
                   <p className="mb-1"><span className="text-muted-foreground">Rol:</span> {active.role}</p>
-                  <p className="mb-1"><span className="text-muted-foreground">Email:</span> <a className="underline" href={`mailto:${active.email}`}>{active.email}</a></p>
+                  <p className="mb-1"><span className="text-muted-foreground">Código:</span> {active.code}</p>
+                  {active.email && (
+                    <p className="mb-1"><span className="text-muted-foreground">Email:</span> <a className="underline" href={`mailto:${active.email}`}>{active.email}</a></p>
+                  )}
                 </div>
               </div>
             </>

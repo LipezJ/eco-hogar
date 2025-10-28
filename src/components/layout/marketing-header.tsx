@@ -57,26 +57,18 @@ export function MarketingHeader() {
                     <span className="sr-only">Toggle menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                  <div className="flex flex-col gap-6 pt-6">
-                    {/* Logo in Mobile Menu */}
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <PiggyBank className="h-5 w-5 text-primary" />
-                      </div>
-                      <span className="font-bold text-lg">EcoHogar</span>
-                    </div>
-
+                <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0">
+                  <div className="flex flex-col h-full p-6 pt-12">
                     {/* Mobile Navigation Links */}
-                    <nav className="flex flex-col gap-4">
-                      <a href="#features" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2">Características</a>
-                      <a href="#benefits" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2">Beneficios</a>
-                      <a href="#pricing" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2">Precios</a>
-                      <a href="#faq" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2">Preguntas frecuentes</a>
-                      <Link href="/contactenos" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2">Contáctenos</Link>
+                    <nav className="flex flex-col gap-1 mb-8">
+                      <a href="/#features" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-3 px-2 rounded-md hover:bg-accent">Características</a>
+                      <a href="/#benefits" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-3 px-2 rounded-md hover:bg-accent">Beneficios</a>
+                      <a href="/#pricing" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-3 px-2 rounded-md hover:bg-accent">Precios</a>
+                      <a href="/#faq" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-3 px-2 rounded-md hover:bg-accent">Preguntas frecuentes</a>
+                      <Link href="/contactenos" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-3 px-2 rounded-md hover:bg-accent">Contáctenos</Link>
                     </nav>
 
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 mt-auto">
                       <Link href="/register" className="block" onClick={() => setOpen(false)}>
                         <Button className="w-full">Comenzar gratis</Button>
                       </Link>

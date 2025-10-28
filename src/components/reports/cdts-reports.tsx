@@ -181,24 +181,27 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
             <CardTitle>Inversión por Institución</CardTitle>
             <CardDescription>Capital inicial vs Interés esperado</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-2 sm:px-6">
             <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <BarChart data={institutionData}>
+              <BarChart data={institutionData} margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis
                   dataKey="institution"
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
+                  tick={{ fontSize: 12 }}
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  width={40}
+                  tick={{ fontSize: 12 }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <ChartLegend content={<ChartLegendContent payload={undefined} />} />
+                <ChartLegend content={<ChartLegendContent payload={undefined} />} wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <Bar dataKey="initialAmount" fill="var(--color-initialAmount)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="interest" fill="var(--color-interest)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -216,16 +219,19 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
               <CardTitle>Distribución de Capital</CardTitle>
               <CardDescription>Por institución financiera</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center">
-              <ChartContainer config={chartConfig} className="h-[250px] w-full">
+            <CardContent className="flex justify-center px-2 sm:px-6">
+              <ChartContainer config={chartConfig} className="h-[250px] w-full max-w-[300px]">
                 <PieChart>
                   <Pie
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
-                    outerRadius={70}
+                    label={({ name, percent }) => {
+                      const p = ((percent as number) * 100).toFixed(0);
+                      return `${name} ${p}%`;
+                    }}
+                    outerRadius={60}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -250,8 +256,8 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
             <CardTitle>Estado de CDTs</CardTitle>
             <CardDescription>Cantidad por estado</CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <ChartContainer config={chartConfig} className="h-[250px] w-full">
+          <CardContent className="flex justify-center px-2 sm:px-6">
+            <ChartContainer config={chartConfig} className="h-[250px] w-full max-w-[300px]">
               <PieChart>
                 <Pie
                   data={statusData}
@@ -259,7 +265,7 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
                   cy="50%"
                   labelLine={false}
                   label={({ name, value }) => `${name}: ${value}`}
-                  outerRadius={70}
+                  outerRadius={60}
                   fill="#8884d8"
                   dataKey="value"
                 >

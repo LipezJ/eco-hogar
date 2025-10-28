@@ -260,21 +260,22 @@ export default function Home() {
       <SiteHeader title="Dashboard" />
       <section className="container mx-auto pt-4 px-4">
         <Tabs defaultValue="movements" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
-            <TabsTrigger value="movements" className="flex items-center gap-2">
-              <Wallet className="h-4 w-4" />
-              Movimientos
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto">
+            <TabsTrigger value="movements" className="flex items-center gap-2 text-xs sm:text-sm">
+              <Wallet className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Movimientos</span>
+              <span className="sm:hidden">Movim.</span>
             </TabsTrigger>
-            <TabsTrigger value="debts" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
+            <TabsTrigger value="debts" className="flex items-center gap-2 text-xs sm:text-sm">
+              <CreditCard className="h-4 w-4 shrink-0" />
               Deudas
             </TabsTrigger>
-            <TabsTrigger value="bills" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
+            <TabsTrigger value="bills" className="flex items-center gap-2 text-xs sm:text-sm">
+              <FileText className="h-4 w-4 shrink-0" />
               Recibos
             </TabsTrigger>
-            <TabsTrigger value="cdts" className="flex items-center gap-2">
-              <PiggyBank className="h-4 w-4" />
+            <TabsTrigger value="cdts" className="flex items-center gap-2 text-xs sm:text-sm">
+              <PiggyBank className="h-4 w-4 shrink-0" />
               CDTs
             </TabsTrigger>
           </TabsList>

@@ -169,24 +169,27 @@ export function MovementsReports({ movements }: MovementsReportsProps) {
           <CardTitle>Tendencia de Flujo</CardTitle>
           <CardDescription>Comparación mensual de ingresos vs egresos</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            <LineChart data={monthlyArray}>
+            <LineChart data={monthlyArray} margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
                 dataKey="month"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
+                tick={{ fontSize: 12 }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
                 tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                width={40}
+                tick={{ fontSize: 12 }}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent payload={undefined} />} />
+              <ChartLegend content={<ChartLegendContent payload={undefined} />} wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <Line
                 type="monotone"
                 dataKey="ingresos"
@@ -214,24 +217,27 @@ export function MovementsReports({ movements }: MovementsReportsProps) {
             <CardTitle>Gastos por Categoría</CardTitle>
             <CardDescription>Desglose mensual</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-2 sm:px-6">
             <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <BarChart data={monthlyArray}>
+              <BarChart data={monthlyArray} margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis
                   dataKey="month"
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
+                  tick={{ fontSize: 12 }}
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  width={40}
+                  tick={{ fontSize: 12 }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <ChartLegend content={<ChartLegendContent payload={undefined} />} />
+                <ChartLegend content={<ChartLegendContent payload={undefined} />} wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <Bar dataKey="comida" stackId="a" fill="var(--color-comida)" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="transporte" stackId="a" fill="var(--color-transporte)" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="servicios" stackId="a" fill="var(--color-servicios)" radius={[0, 0, 0, 0]} />

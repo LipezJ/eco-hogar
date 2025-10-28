@@ -236,24 +236,27 @@ export function BillsReports({ bills }: BillsReportsProps) {
           <CardTitle>Estado de Recibos Mensual</CardTitle>
           <CardDescription>Seguimiento de pagos, pendientes y vencidos</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6">
           <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            <BarChart data={monthlyArray}>
+            <BarChart data={monthlyArray} margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
                 dataKey="month"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
+                tick={{ fontSize: 12 }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
                 tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                width={40}
+                tick={{ fontSize: 12 }}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent payload={undefined} />} />
+              <ChartLegend content={<ChartLegendContent payload={undefined} />} wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <Bar dataKey="pagado" fill="var(--color-pagado)" radius={[4, 4, 0, 0]} />
               <Bar dataKey="pendiente" fill="var(--color-pendiente)" radius={[4, 4, 0, 0]} />
               <Bar dataKey="vencido" fill="var(--color-vencido)" radius={[4, 4, 0, 0]} />
@@ -271,16 +274,19 @@ export function BillsReports({ bills }: BillsReportsProps) {
               <CardTitle>Gastos por Categoría</CardTitle>
               <CardDescription>Distribución de recibos pagados</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center">
-              <ChartContainer config={chartConfig} className="h-[250px] w-full">
+            <CardContent className="flex justify-center px-2 sm:px-6">
+              <ChartContainer config={chartConfig} className="h-[250px] w-full max-w-[300px]">
                 <PieChart>
                   <Pie
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
-                    outerRadius={70}
+                    label={({ name, percent }) => {
+                      const p = ((percent as number) * 100).toFixed(0);
+                      return `${name} ${p}%`;
+                    }}
+                    outerRadius={60}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -305,8 +311,8 @@ export function BillsReports({ bills }: BillsReportsProps) {
             <CardTitle>Estado de Recibos</CardTitle>
             <CardDescription>Cantidad por estado</CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center">
-            <ChartContainer config={chartConfig} className="h-[250px] w-full">
+          <CardContent className="flex justify-center px-2 sm:px-6">
+            <ChartContainer config={chartConfig} className="h-[250px] w-full max-w-[300px]">
               <PieChart>
                 <Pie
                   data={statusData}
@@ -314,7 +320,7 @@ export function BillsReports({ bills }: BillsReportsProps) {
                   cy="50%"
                   labelLine={false}
                   label={({ name, value }) => `${name}: ${value}`}
-                  outerRadius={70}
+                  outerRadius={60}
                   fill="#8884d8"
                   dataKey="value"
                 >
