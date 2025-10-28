@@ -73,8 +73,7 @@ export default function LandingPage() {
                 </Link>
                 <Link href="/register">
                   <Button size="sm">
-                    Comenzar gratis
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    Registrate
                   </Button>
                 </Link>
               </div>
@@ -138,8 +137,7 @@ export default function LandingPage() {
                         </Link>
                         <Link href="/register" onClick={() => setOpen(false)}>
                           <Button className="w-full">
-                            Comenzar gratis
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            Registrate
                           </Button>
                         </Link>
                       </div>
@@ -180,16 +178,16 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 items-center">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span>Sin tarjeta de crédito</span>
+                </div>
                 <Link href="/register">
                   <Button size="lg">
                     Comenzar gratis
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Check className="h-4 w-4 text-primary" />
-                  <span>Sin tarjeta de crédito</span>
-                </div>
               </div>
 
               <div className="pt-12 w-full max-w-6xl">
