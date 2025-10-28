@@ -94,9 +94,28 @@ interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
 }
 
 function FormField<TFieldValues extends FieldValues = FieldValues>(
-  { control, field: { name, type, label, description, placeholder, variant, options } }: FormFieldProps<TFieldValues>
+  { control, field: { name, type, label, description, placeholder, variant, options, custom } }: FormFieldProps<TFieldValues>
 ) {
-  if (variant === "select") {
+  if (custom) {
+    return (
+      <FormFieldUI
+        control={control}
+        name={name}
+        render={(props) => (
+          <FormItem>
+            <FormLabel>{label}</FormLabel>
+            <FormControl>
+              {custom(props)}
+            </FormControl>
+            <FormDescription>
+              {description}
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    )
+  } else if (variant === "select") {
     return (
       <FormFieldUI
         control={control}

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Debt, Payment, generateAmortizationTable } from "@/types/debts"
-import { Check, X, AlertCircle, Calendar } from "lucide-react"
+import { Check, AlertCircle, Calendar } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 

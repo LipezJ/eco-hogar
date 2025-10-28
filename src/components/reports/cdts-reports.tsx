@@ -24,7 +24,6 @@ import {
 import {
   TrendingUp,
   Building2,
-  Calendar
 } from "lucide-react"
 
 interface CdtsReportsProps {
@@ -37,6 +36,18 @@ const COLORS = {
   vencido: "hsl(45, 93%, 47%)",
   cancelado: "hsl(0, 84%, 60%)",
 }
+
+// Paleta de colores determinista para gráficos de torta
+const PIE_COLORS = [
+  "hsl(200, 70%, 50%)",
+  "hsl(150, 70%, 50%)",
+  "hsl(280, 70%, 50%)",
+  "hsl(30, 70%, 50%)",
+  "hsl(340, 70%, 50%)",
+  "hsl(60, 70%, 50%)",
+  "hsl(180, 70%, 50%)",
+  "hsl(240, 70%, 50%)",
+]
 
 const chartConfig = {
   activo: {
@@ -94,16 +105,15 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
       acc[cdt.institution] = (acc[cdt.institution] || 0) + cdt.initialAmount
       return acc
     }, {} as Record<string, number>)
-  ).map(([name, value]) => ({
+  ).map(([name, value], index) => ({
     name,
     value,
-    fill: `hsl(${Math.random() * 360}, 70%, 50%)`
+    fill: PIE_COLORS[index % PIE_COLORS.length]
   }))
 
   // KPIs
   const totalInvested = activeCdts.reduce((sum, c) => sum + c.initialAmount, 0)
   const totalReturn = activeCdts.reduce((sum, c) => sum + c.finalAmount, 0)
-  const totalInterest = totalReturn - totalInvested
   const avgRate = activeCdts.length > 0
     ? activeCdts.reduce((sum, c) => sum + c.interestRate, 0) / activeCdts.length
     : 0

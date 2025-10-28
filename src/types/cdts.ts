@@ -12,7 +12,7 @@ export const CdtSchema = z.object({
   dueDate: z.string(), // Fecha de vencimiento
   finalAmount: z.number().positive(), // Monto final (con intereses)
   status: CdtStatus,
-  autoRenew: z.boolean().default(false), // Si se renueva automáticamente
+  autoRenew: z.boolean().optional(), // Si se renueva automáticamente
   description: z.string().optional(),
   createdAt: z.string()
 })

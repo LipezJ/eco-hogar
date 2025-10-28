@@ -10,7 +10,6 @@ import { logout } from "@/lib/actions/auth-actions"
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from "@/components/ui/avatar"
 import {
   DropdownMenu,

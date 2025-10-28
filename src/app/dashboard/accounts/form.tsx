@@ -92,7 +92,74 @@ function getCreateAccountFormDef(): FormFieldDef<z.infer<typeof CreateAccountSch
 }
 
 function getUpdateAccountFormDef(): FormFieldDef<z.infer<typeof UpdateAccountSchema>>[] {
-  return getCreateAccountFormDef() as unknown as FormFieldDef<z.infer<typeof UpdateAccountSchema>>[]
+  return [
+    {
+      name: "id",
+      label: "ID",
+      type: "hidden"
+    },
+    {
+      name: "name",
+      label: "Nombre de la Cuenta",
+      description: "Nombre descriptivo para identificar la cuenta.",
+      placeholder: "Ej: Cuenta Principal, Caja de Ahorro Dólares"
+    },
+    {
+      name: "institution",
+      label: "Institución/Banco",
+      description: "Nombre del banco o institución financiera.",
+      placeholder: "Ej: Banco Nación, BBVA, PayPal"
+    },
+    {
+      name: "accountType",
+      label: "Tipo de Cuenta",
+      description: "Tipo de cuenta bancaria.",
+      variant: "select",
+      placeholder: "Seleccione tipo",
+      options: accountTypeOptions
+    },
+    {
+      name: "accountNumber",
+      label: "Número de Cuenta",
+      description: "Número de cuenta (opcional, últimos 4 dígitos por seguridad).",
+      placeholder: "Ej: ****1234"
+    },
+    {
+      name: "currency",
+      label: "Moneda",
+      description: "Moneda en que está la cuenta.",
+      variant: "select",
+      placeholder: "Seleccione moneda",
+      options: currencyOptions
+    },
+    {
+      name: "balance",
+      label: "Saldo Actual",
+      description: "Saldo disponible en la cuenta.",
+      placeholder: "0.00",
+      type: "number"
+    },
+    {
+      name: "owner",
+      label: "Titular",
+      description: "Nombre del titular de la cuenta.",
+      placeholder: "Ej: Juan Pérez, María García"
+    },
+    {
+      name: "status",
+      label: "Estado",
+      description: "Estado de la cuenta.",
+      variant: "select",
+      placeholder: "Seleccione estado",
+      options: statusOptions
+    },
+    {
+      name: "description",
+      label: "Descripción",
+      description: "Notas o descripción adicional (opcional).",
+      placeholder: "Ej: Cuenta para gastos del hogar"
+    }
+  ]
 }
 
 export function CreateAccountForm() {

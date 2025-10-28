@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Fragment, useContext, useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Edit, MoreVertical, Trash2, Calendar, DollarSign } from "lucide-react"
+import { Edit, MoreVertical, Trash2, Calendar } from "lucide-react"
 import { Form, FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { Debt, CreateDebtSchema, UpdateDebtSchema, DebtType } from "@/types/debts"
@@ -75,7 +75,67 @@ function getCreateDebtFormDef(): FormFieldDef<z.infer<typeof CreateDebtSchema>>[
 }
 
 function getUpdateDebtFormDef(): FormFieldDef<z.infer<typeof UpdateDebtSchema>>[] {
-  return getCreateDebtFormDef()
+  return [
+    {
+      name: "id",
+      label: "ID",
+      type: "hidden"
+    },
+    {
+      name: "type",
+      label: "Tipo",
+      description: "Seleccione si es una deuda o un préstamo.",
+      variant: "select",
+      placeholder: "Tipo",
+      options: typeOptions
+    },
+    {
+      name: "origin",
+      label: "Origen/Destino",
+      description: "Banco, persona o entidad.",
+      placeholder: "Ej: Banco Nacional, Juan Pérez"
+    },
+    {
+      name: "amount",
+      label: "Monto Total",
+      description: "Monto total del préstamo o deuda.",
+      placeholder: "0.00",
+      type: "number"
+    },
+    {
+      name: "interestRate",
+      label: "Tasa de Interés Anual (%)",
+      description: "Tasa de interés anual en porcentaje.",
+      placeholder: "0.00",
+      type: "number"
+    },
+    {
+      name: "installments",
+      label: "Número de Cuotas",
+      description: "Cantidad de cuotas a pagar.",
+      placeholder: "12",
+      type: "number"
+    },
+    {
+      name: "startDate",
+      label: "Fecha de Inicio",
+      description: "Fecha en que inicia el préstamo.",
+      variant: "date"
+    },
+    {
+      name: "paymentDay",
+      label: "Día de Pago",
+      description: "Día del mes para realizar los pagos (1-31).",
+      placeholder: "15",
+      type: "number"
+    },
+    {
+      name: "description",
+      label: "Descripción",
+      description: "Descripción o notas adicionales (opcional).",
+      placeholder: "Ej: Préstamo para compra de auto"
+    }
+  ]
 }
 
 export function CreateDebtForm() {

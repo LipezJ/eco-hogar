@@ -75,54 +75,14 @@ function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementS
 function getUpdateMovementFormDef(): FormFieldDef<z.infer<typeof UpdateMovementSchema>>[] {
   return [
     {
-      name: "type",
-      label: "Tipo",
-      description: "Seleccione si es un ingreso o egreso.",
-      variant: "select",
-      placeholder: "Tipo de movimiento",
-      options: typeOptions
+      name: "id",
+      label: "ID",
+      type: "hidden"
     },
-    {
-      name: "category",
-      label: "Categoría",
-      description: "Seleccione la categoría del movimiento.",
-      variant: "select",
-      placeholder: "Categoría",
-      options: categoryOptions
-    },
-    {
-      name: "amount",
-      label: "Monto",
-      description: "Ingrese el monto del movimiento.",
-      placeholder: "0.00",
-      type: "number"
-    },
-    {
-      name: "description",
-      label: "Descripción",
-      description: "Describa el motivo del movimiento.",
-      placeholder: "Ej: Compra de alimentos"
-    },
-    {
-      name: "date",
-      label: "Fecha",
-      description: "Fecha del movimiento.",
-      variant: "date"
-    },
-    {
-      name: "tags",
-      label: "Etiquetas",
-      description: "Etiquetas separadas por comas (opcional).",
-      placeholder: "Ej: supermercado, mensual"
-    },
-    {
-      name: "attachment",
-      label: "Adjunto",
-      description: "URL del adjunto (opcional).",
-      placeholder: "https://..."
-    }
-  ]
+    ...getCreateMovementFormDef()
+  ] as unknown as FormFieldDef<z.infer<typeof UpdateMovementSchema>>[]
 }
+
 
 export function CreateMovementForm() {
   const { setOpen } = useContext(FormDialogContext)

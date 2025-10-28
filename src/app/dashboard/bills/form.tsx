@@ -83,6 +83,22 @@ function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[
       placeholder: "https://..."
     },
     {
+      name: "autoRenew",
+      label: "Renovación Automática",
+      description: "Si se debe generar automáticamente el próximo recibo.",
+      custom: ({ field }: { field: { value: unknown; onChange: (value: unknown) => void } }) => (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="autoRenew"
+            checked={!!field.value}
+            onChange={(e) => field.onChange(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+        </div>
+      )
+    },
+    {
       name: "description",
       label: "Descripción",
       description: "Notas adicionales (opcional).",
@@ -91,8 +107,91 @@ function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[
   ]
 }
 
-function getUpdateBillFormDef(): FormFieldDef<any>[] {
-  return getCreateBillFormDef()
+function getUpdateBillFormDef(): FormFieldDef<z.infer<typeof UpdateBillSchema>>[] {
+  return [
+    {
+      name: "id",
+      label: "ID",
+      type: "hidden"
+    },
+    {
+      name: "provider",
+      label: "Proveedor",
+      description: "Nombre de la empresa o proveedor del servicio.",
+      placeholder: "Ej: Edenor, Aysa, Telecom"
+    },
+    {
+      name: "category",
+      label: "Categoría",
+      description: "Tipo de servicio.",
+      variant: "select",
+      placeholder: "Seleccione categoría",
+      options: categoryOptions
+    },
+    {
+      name: "cycle",
+      label: "Ciclo de Facturación",
+      description: "Frecuencia del servicio.",
+      variant: "select",
+      placeholder: "Seleccione ciclo",
+      options: cycleOptions
+    },
+    {
+      name: "amount",
+      label: "Monto",
+      description: "Monto a pagar.",
+      placeholder: "0.00",
+      type: "number"
+    },
+    {
+      name: "dueDate",
+      label: "Fecha de Vencimiento",
+      description: "Fecha límite de pago.",
+      variant: "date"
+    },
+    {
+      name: "status",
+      label: "Estado",
+      description: "Estado del recibo.",
+      variant: "select",
+      placeholder: "Seleccione estado",
+      options: statusOptions
+    },
+    {
+      name: "paymentDate",
+      label: "Fecha de Pago",
+      description: "Fecha en que se realizó el pago (opcional).",
+      variant: "date"
+    },
+    {
+      name: "attachment",
+      label: "Comprobante",
+      description: "URL del comprobante o factura (opcional).",
+      placeholder: "https://..."
+    },
+    {
+      name: "autoRenew",
+      label: "Renovación Automática",
+      description: "Si se debe generar automáticamente el próximo recibo.",
+      custom: ({ field }: { field: { value: unknown; onChange: (value: unknown) => void } }) => (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="autoRenew-update"
+            checked={!!field.value}
+            onChange={(e) => field.onChange(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+        </div>
+      )
+    },
+    {
+      name: "description",
+      label: "Descripción",
+      description: "Notas adicionales (opcional).",
+      placeholder: "Ej: Incluye internet + cable"
+    }
+  ]
 }
 
 export function CreateBillForm() {

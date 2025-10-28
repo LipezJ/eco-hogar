@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Edit, MoreVertical, Trash2, Calculator } from "lucide-react"
 import { Form, FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
-import { Cdt, CreateCdtSchema, UpdateCdtSchema, CdtStatus, calculateFinalAmount, calculateDueDate } from "@/types/cdts"
+import { Cdt, CreateCdtSchema, UpdateCdtSchema, CdtStatus } from "@/types/cdts"
 import { z } from "zod/v4"
 
 const statusOptions = CdtStatus.options.map(status => ({
@@ -59,6 +59,22 @@ function getCreateCdtFormDef(): FormFieldDef<z.infer<typeof CreateCdtSchema>>[] 
       options: statusOptions
     },
     {
+      name: "autoRenew",
+      label: "Renovación Automática",
+      description: "Si se debe renovar automáticamente al vencimiento.",
+      custom: ({ field }: { field: { value: unknown; onChange: (value: unknown) => void } }) => (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="autoRenew"
+            checked={!!field.value}
+            onChange={(e) => field.onChange(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+        </div>
+      )
+    },
+    {
       name: "description",
       label: "Descripción",
       description: "Notas adicionales (opcional).",
@@ -69,6 +85,11 @@ function getCreateCdtFormDef(): FormFieldDef<z.infer<typeof CreateCdtSchema>>[] 
 
 function getUpdateCdtFormDef(): FormFieldDef<z.infer<typeof UpdateCdtSchema>>[] {
   return [
+    {
+      name: "id",
+      label: "ID",
+      type: "hidden"
+    },
     {
       name: "institution",
       label: "Institución Financiera",
@@ -109,6 +130,22 @@ function getUpdateCdtFormDef(): FormFieldDef<z.infer<typeof UpdateCdtSchema>>[] 
       variant: "select",
       placeholder: "Seleccione estado",
       options: statusOptions
+    },
+    {
+      name: "autoRenew",
+      label: "Renovación Automática",
+      description: "Si se debe renovar automáticamente al vencimiento.",
+      custom: ({ field }: { field: { value: unknown; onChange: (value: unknown) => void } }) => (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="autoRenew-update"
+            checked={!!field.value}
+            onChange={(e) => field.onChange(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+        </div>
+      )
     },
     {
       name: "description",

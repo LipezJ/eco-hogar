@@ -29,7 +29,7 @@ export const BillSchema = z.object({
   paymentDate: z.string().optional(), // Fecha en que se pagó
   attachment: z.string().optional(), // URL del comprobante
   description: z.string().optional(),
-  autoRenew: z.boolean().default(true), // Si se renueva automáticamente
+  autoRenew: z.boolean().optional(), // Si se renueva automáticamente
   createdAt: z.string()
 })
 
