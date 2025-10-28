@@ -197,12 +197,13 @@ export default function LandingPage() {
                   <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
 
                   <div className="relative aspect-video bg-linear-to-br from-primary/10 via-primary/5 to-background flex items-center justify-center">
+                    <img className="absolute inset-0 w-full" src="/img/dashboard.png" alt="Dashboard" />
                     <div className="text-center space-y-6 p-8">
                       <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
                         <BarChart3 className="relative h-24 w-24 mx-auto text-primary" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="relative space-y-2 z-10">
                         <p className="text-lg font-semibold">Dashboard de EcoHogar</p>
                         <p className="text-sm text-muted-foreground">Visualiza tus finanzas en tiempo real</p>
                       </div>
