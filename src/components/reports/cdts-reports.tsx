@@ -198,7 +198,7 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <ChartLegend content={<ChartLegendContent />} />
+                <ChartLegend content={<ChartLegendContent payload={undefined} />} />
                 <Bar dataKey="initialAmount" fill="var(--color-initialAmount)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="interest" fill="var(--color-interest)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -224,7 +224,7 @@ export function CdtsReports({ cdts }: CdtsReportsProps) {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
                     outerRadius={70}
                     fill="#8884d8"
                     dataKey="value"
