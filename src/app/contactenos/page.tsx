@@ -49,6 +49,14 @@ const MEMBERS: Array<{
     email: "",
     photo: "/img/team-rances.svg",
   },
+  {
+    id: "rances",
+    name: "FERNANDO VARGAS QUINTERO",
+    role: "Estudiante",
+    code: "2200347",
+    email: "",
+    photo: "/img/team-fer.svg",
+  }
 ]
 
 export default function ContactoPage() {
