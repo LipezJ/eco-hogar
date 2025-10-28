@@ -29,6 +29,7 @@
     "@tanstack/react-query-persist-client": "^5.90.7",
     "@tanstack/react-table": "^8.21.3",
     "bcryptjs": "^3.0.2",
+    "botid": "^1.5.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

@@ -4,12 +4,13 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyCredentials, registerUser, initializeDefaultUsers } from '@/lib/auth';
 import { SignJWT, jwtVerify } from 'jose';
+import { checkBotId } from 'botid/server';
 
 // Inicializar usuarios por defecto al cargar el módulo
 initializeDefaultUsers();
 
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.SESSION_SECRET || 'tu-secreto-super-seguro-cambialo-en-produccion'
+  process.env.SESSION_SECRET || 'secret'
 );
 
 const SESSION_DURATION = 60 * 60 * 24 * 7; // 7 días en segundos
@@ -50,7 +51,14 @@ export async function deleteSession() {
   cookieStore.delete('session');
 }
 
-export async function login(prevState: { error: string } | undefined, formData: FormData) {
+export async function login(_prevState: { error: string } | undefined, formData: FormData) {
+  // Verificar Bot Protection
+  const { isBot } = await checkBotId();
+
+  if (isBot) {
+    return { error: 'Verificación de seguridad fallida. Por favor, intenta nuevamente.' };
+  }
+
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   const redirectTo = formData.get('redirectTo') as string || '/dashboard';
@@ -74,7 +82,14 @@ export async function logout() {
   redirect('/login');
 }
 
-export async function register(prevState: { error?: string } | undefined, formData: FormData) {
+export async function register(_prevState: { error?: string } | undefined, formData: FormData) {
+  // Verificar Bot Protection
+  const { isBot } = await checkBotId();
+
+  if (isBot) {
+    return { error: 'Verificación de seguridad fallida. Por favor, intenta nuevamente.' };
+  }
+
   const username = formData.get('username') as string;
   const password = formData.get('password') as string;
   const name = formData.get('name') as string;
