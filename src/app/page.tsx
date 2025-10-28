@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   ArrowRight,
   BarChart3,
@@ -18,9 +19,13 @@ import {
   Smartphone,
   TrendingUp,
   Users,
-  Zap
+  Zap,
+  Facebook,
+  Twitter,
+  Linkedin
 } from "lucide-react"
 import { useState } from "react"
+import { FAQAccordion } from "@/components/faq-accordion"
 
 export default function LandingPage() {
   const [open, setOpen] = useState(false)
@@ -60,6 +65,12 @@ export default function LandingPage() {
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Precios
+              </a>
+              <a
+                href="#faq"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Preguntas frecuentes
               </a>
             </nav>
 
@@ -125,6 +136,13 @@ export default function LandingPage() {
                           className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                         >
                           Precios
+                        </a>
+                        <a
+                          href="#faq"
+                          onClick={() => setOpen(false)}
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                        >
+                          Preguntas frecuentes
                         </a>
                       </nav>
 
@@ -560,6 +578,25 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* FAQ Section */}
+        <section id="faq" className="py-20 md:py-32">
+          <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+            <div className="text-center space-y-4 mb-10">
+              <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium bg-background">
+                🤔 Preguntas frecuentes
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold">Resolvemos tus dudas</h2>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                Todo lo que necesitas saber para empezar a usar EcoHogar
+              </p>
+            </div>
+
+            {/* Accordion */}
+            {/* shadcn/ui accordion */}
+            <FAQAccordion />
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-20">
           <div className="container mx-auto px-4 md:px-6">
@@ -616,17 +653,21 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-primary transition-colors">Soporte</a></li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Privacidad</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Términos</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Cookies</a></li>
-              </ul>
-            </div>
           </div>
-          <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
-            <p>© 2025 EcoHogar. Todos los derechos reservados.</p>
+          {/* Socials */}
+          <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-4 border-t pt-8">
+            <p className="text-sm text-muted-foreground">© 2025 EcoHogar. Todos los derechos reservados.</p>
+            <div className="flex items-center gap-4 text-muted-foreground">
+              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-primary flex items-center gap-2 text-sm">
+                <Facebook className="h-4 w-4" /> Facebook
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:text-primary flex items-center gap-2 text-sm">
+                <Twitter className="h-4 w-4" /> Twitter
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-primary flex items-center gap-2 text-sm">
+                <Linkedin className="h-4 w-4" /> LinkedIn
+              </a>
+            </div>
           </div>
         </div>
       </footer>
