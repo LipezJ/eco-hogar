@@ -167,18 +167,31 @@ function FormField<TFieldValues extends FieldValues = FieldValues>(
       <FormFieldUI
         control={control}
         name={name}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{label}</FormLabel>
-            <FormControl>
-              <Input {...field} type={type} className="w-full"/>
-            </FormControl>
-            <FormDescription>
-              {description}
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
+        render={({ field }) => {
+          // Para inputs numéricos, convertir el valor a número
+          const fieldProps = type === "number"
+            ? {
+                ...field,
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value === '' ? undefined : Number(e.target.value)
+                  field.onChange(value)
+                }
+              }
+            : field
+
+          return (
+            <FormItem>
+              <FormLabel>{label}</FormLabel>
+              <FormControl>
+                <Input {...fieldProps} type={type} className="w-full"/>
+              </FormControl>
+              <FormDescription>
+                {description}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )
+        }}
       />
     )
   }

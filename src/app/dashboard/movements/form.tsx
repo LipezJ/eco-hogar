@@ -61,7 +61,26 @@ function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementS
       name: "tags",
       label: "Etiquetas",
       description: "Etiquetas separadas por comas (opcional).",
-      placeholder: "Ej: supermercado, mensual"
+      placeholder: "Ej: supermercado, mensual",
+      custom: ({ field }) => {
+        // Convertir array a string para mostrar en el input
+        const stringValue = Array.isArray(field.value) ? field.value.join(', ') : field.value || ''
+
+        return (
+          <input
+            type="text"
+            value={stringValue}
+            onChange={(e) => {
+              // Convertir string a array al cambiar
+              const value = e.target.value
+              const tagsArray = value ? value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : []
+              field.onChange(tagsArray.length > 0 ? tagsArray : undefined)
+            }}
+            placeholder="Ej: supermercado, mensual"
+            className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          />
+        )
+      }
     },
     {
       name: "attachment",
@@ -97,7 +116,7 @@ export function CreateMovementForm() {
         amount: 0,
         description: "",
         date: new Date().toISOString().split('T')[0],
-        tags: [],
+        tags: undefined,
         attachment: ""
       }}
       queryKey={['movements']}
