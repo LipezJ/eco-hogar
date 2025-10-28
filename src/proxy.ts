@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function proxy(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   // Obtener el token de sesión de las cookies
   const session = request.cookies.get('session')?.value;
@@ -18,8 +18,7 @@ export function proxy(request: NextRequest) {
   // Si está intentando acceder a una ruta protegida sin sesión
   if (isProtectedRoute && !session) {
     const url = new URL('/login', request.url);
-    const callback = `${pathname}${search ?? ''}`;
-    url.searchParams.set('callbackUrl', callback);
+    url.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(url);
   }
 
@@ -30,8 +29,6 @@ export function proxy(request: NextRequest) {
 
   return NextResponse.next();
 }
-
-export default proxy;
 
 export const config = {
   matcher: [
