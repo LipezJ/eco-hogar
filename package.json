@@ -1,0 +1,34 @@
+{
+  "name": "web-project",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" --names \"frontend,backend\" --prefix-colors \"cyan,green\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "preview": "concurrently \"npm run preview:frontend\" \"npm run start:backend\" --names \"frontend,backend\" --prefix-colors \"cyan,green\"",
+    "preview:frontend": "npm run preview --prefix frontend",
+    "start:backend": "npm run start --prefix backend",
+    "type-check": "npm run type-check --prefix frontend && npm run type-check --prefix backend",
+    "lint": "npm run lint --prefix frontend",
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
+    "clean": "npm run clean:frontend && npm run clean:backend",
+    "clean:frontend": "cd frontend && rm -rf node_modules dist",
+    "clean:backend": "cd backend && rm -rf node_modules dist"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
