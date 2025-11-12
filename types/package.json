@@ -1,0 +1,45 @@
+{
+  "name": "@web-project/types",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./accounts": {
+      "types": "./dist/accounts.d.ts",
+      "default": "./dist/accounts.js"
+    },
+    "./bills": {
+      "types": "./dist/bills.d.ts",
+      "default": "./dist/bills.js"
+    },
+    "./cdts": {
+      "types": "./dist/cdts.d.ts",
+      "default": "./dist/cdts.js"
+    },
+    "./debts": {
+      "types": "./dist/debts.d.ts",
+      "default": "./dist/debts.js"
+    },
+    "./movements": {
+      "types": "./dist/movements.d.ts",
+      "default": "./dist/movements.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "zod": "^4.1.12"
+  }
+}

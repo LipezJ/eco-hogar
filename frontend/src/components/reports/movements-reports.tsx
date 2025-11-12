@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { type Movement } from "@/types/movements"
+import { type Movement } from "@web-project/types/movements"
 import {
   BarChart,
   Bar,

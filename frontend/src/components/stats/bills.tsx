@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
-import { type Bill, getUpcomingBills, getOverdueBills, getDaysUntilDue } from "@/types/bills"
+import { type Bill, getUpcomingBills, getOverdueBills, getDaysUntilDue } from "@web-project/types/bills"
 import {
   FileText,
   AlertTriangle,

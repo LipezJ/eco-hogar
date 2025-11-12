@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { type Bill, getTotalByCategory } from "@/types/bills"
+import { type Bill, getTotalByCategory } from "@web-project/types/bills"
 import {
   PieChart,
   Pie,

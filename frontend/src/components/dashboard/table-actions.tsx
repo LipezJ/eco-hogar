@@ -10,6 +10,6 @@ export function TableActions() {
   
 }
 
-export function TableAction({ }: TableAction) {
+export function TableAction() {
 
 }

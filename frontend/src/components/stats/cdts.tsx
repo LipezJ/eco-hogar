@@ -13,7 +13,7 @@ import {
   calculateProgress,
   getDaysRemaining,
   calculateAccruedInterest
-} from "@/types/cdts"
+} from "@web-project/types/cdts"
 import {
   TrendingUp,
   Wallet,

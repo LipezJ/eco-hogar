@@ -2,7 +2,7 @@
 
 import { DataTable } from "@/components/ui/data-table"
 import { SiteHeader } from "@/components/site-header"
-import { ColumnDef } from "@tanstack/react-table"
+import { type ColumnDef } from "@tanstack/react-table"
 import { useQueryFetch } from "@/hooks/user-query-fetch"
 
 interface TablePageProps<TData, TValue> {

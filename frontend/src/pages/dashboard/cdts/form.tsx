@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Edit, MoreVertical, Trash2, Calculator } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
-import { type Cdt, CreateCdtSchema, UpdateCdtSchema, CdtStatus } from "@/types/cdts"
+import { type Cdt, CreateCdtSchema, UpdateCdtSchema, CdtStatus } from "@web-project/types/cdts"
 import { z } from "zod/v4"
 
 const statusOptions = CdtStatus.options.map(status => ({

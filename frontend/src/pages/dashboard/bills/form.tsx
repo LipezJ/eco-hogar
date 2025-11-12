@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Edit, MoreVertical, Trash2, Paperclip, CheckCircle } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
-import { type Bill, CreateBillSchema, UpdateBillSchema, BillCycle, BillCategory, BillStatus } from "@/types/bills"
+import { type Bill, CreateBillSchema, UpdateBillSchema, BillCycle, BillCategory, BillStatus } from "@web-project/types/bills"
 import { z } from "zod/v4"
 
 const categoryOptions = BillCategory.options.map(cat => ({

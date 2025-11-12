@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { type Movement } from "@/types/movements"
+import { type Movement } from "@web-project/types/movements"
 import {
   TrendingUp,
   TrendingDown,

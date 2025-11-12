@@ -2,10 +2,10 @@
 
 import { DataTable } from "@/components/ui/data-table"
 import { SiteHeader } from "@/components/site-header"
-import { ColumnDef } from "@tanstack/react-table"
+import { type ColumnDef } from "@tanstack/react-table"
 import { useQueryFetch } from "@/hooks/user-query-fetch"
 import { useState } from "react"
-import { DatePickerRange } from "../../../../frontend-old/src/components/ui/date-picker"
+import { DatePickerRange } from "@/components/ui/date-picker"
 import { getCurrentFullMonthRange } from "@/lib/utils"
 
 interface TableDatePageProps<TData, TValue> {

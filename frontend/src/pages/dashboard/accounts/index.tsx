@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { FormDialog } from "@/components/form-dialog"
 import { CreateAccountForm } from "./form"
-import { type Account } from "@/types/accounts"
+import { type Account } from "@web-project/types/accounts"
 import { AccountsStats } from "@/components/stats/accounts"
 import DashboardLayout from "@/layouts/dashboard"
 

@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { type Cdt, calculateInterestEarned } from "@/types/cdts"
+import { type Cdt, calculateInterestEarned } from "@web-project/types/cdts"
 import {
   PieChart,
   Pie,

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { type Debt, type Payment, calculateRemainingBalance, getUpcomingPayments } from "@/types/debts"
+import { type Debt, type Payment, calculateRemainingBalance, getUpcomingPayments } from "@web-project/types/debts"
 import { CreditCard, HandCoins, Calendar, Percent, Clock } from "lucide-react"
 
 interface DebtsStatsProps {

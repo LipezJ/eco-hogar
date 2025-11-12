@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { FormDialog } from "@/components/form-dialog"
 import { CreateCdtForm } from "./form"
-import { type Cdt, calculateFinalAmount, calculateDueDate } from "@/types/cdts"
+import { type Cdt, calculateFinalAmount, calculateDueDate } from "@web-project/types/cdts"
 import DashboardLayout from "@/layouts/dashboard"
 
 // Datos de ejemplo para la UI

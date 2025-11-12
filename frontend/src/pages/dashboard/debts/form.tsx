@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Edit, MoreVertical, Trash2, Calendar } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
-import { type Debt, CreateDebtSchema, UpdateDebtSchema, DebtType } from "@/types/debts"
+import { type Debt, CreateDebtSchema, UpdateDebtSchema, DebtType } from "@web-project/types/debts"
 import { z } from "zod/v4"
 
 const typeOptions = DebtType.options.map(type => ({

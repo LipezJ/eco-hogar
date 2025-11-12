@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { type Debt, type Payment, generateAmortizationTable } from "@/types/debts"
+import { type Debt, type Payment, generateAmortizationTable } from "@web-project/types/debts"
 import { Check, AlertCircle, Calendar } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"

@@ -7,8 +7,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Edit, MoreVertical, Trash2, Eye, EyeOff } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
-import { CreateAccountSchema, UpdateAccountSchema, AccountType, Currency, AccountStatus } from "@/types/accounts"
-import type { Account } from "@/types/accounts"
+import { CreateAccountSchema, UpdateAccountSchema, AccountType, Currency, AccountStatus } from "@web-project/types/accounts"
+import type { Account } from "@web-project/types/accounts"
 import { z } from "zod/v4"
 
 const accountTypeOptions = AccountType.options.map(type => ({

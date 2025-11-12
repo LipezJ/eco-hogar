@@ -9,10 +9,10 @@ import { BillsReports } from "@/components/reports/bills-reports";
 import { CdtsStats } from "@/components/stats/cdts";
 import { CdtsReports } from "@/components/reports/cdts-reports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { type Movement } from "@/types/movements";
-import { type Debt, type Payment, generateAmortizationTable } from "@/types/debts";
-import { type Bill } from "@/types/bills";
-import { type Cdt, calculateDueDate, calculateFinalAmount } from "@/types/cdts";
+import { type Movement } from "@web-project/types/movements";
+import { type Debt, type Payment, generateAmortizationTable } from "@web-project/types/debts";
+import { type Bill } from "@web-project/types/bills";
+import { type Cdt, calculateDueDate, calculateFinalAmount } from "@web-project/types/cdts";
 import { Wallet, CreditCard, FileText, PiggyBank } from "lucide-react";
 import DashboardLayout from "@/layouts/dashboard";
 

@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Edit, MoreVertical, Trash2, Paperclip } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
-import { type Movement, CreateMovementSchema, UpdateMovementSchema, MovementCategory, MovementType } from "@/types/movements"
+import { type Movement, CreateMovementSchema, UpdateMovementSchema, MovementCategory, MovementType } from "@web-project/types/movements"
 import { z } from "zod/v4"
 
 const categoryOptions = MovementCategory.options.map(cat => ({

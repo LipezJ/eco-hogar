@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { type Account, getTotalByCurrency, getTotalInBase, getTotalByLocation, formatCurrency } from "@/types/accounts"
+import { type Account, getTotalByCurrency, getTotalInBase, getTotalByLocation, formatCurrency } from "@web-project/types/accounts"
 import { Wallet, MapPin, Globe, Coins } from "lucide-react"
 
 interface AccountsStatsProps {

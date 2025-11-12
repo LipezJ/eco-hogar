@@ -1,7 +1,7 @@
 "use client"
 
 import { type ColumnDef } from "@tanstack/react-table"
-import { type Account, formatCurrency, convertToBase, getCurrencyName } from "@/types/accounts"
+import { type Account, formatCurrency, convertToBase, getCurrencyName } from "@web-project/types/accounts"
 import { TableBadge } from "@/components/id-badge"
 import { AccountsActions } from "./form"
 import { Globe, MapPin, User } from "lucide-react"

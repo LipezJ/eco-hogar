@@ -1,7 +1,7 @@
 "use client"
 
 import { type ColumnDef } from "@tanstack/react-table"
-import { type Bill, getDaysUntilDue, isDueSoon, isOverdue } from "@/types/bills"
+import { type Bill, getDaysUntilDue, isDueSoon, isOverdue } from "@web-project/types/bills"
 import { TableBadge } from "@/components/id-badge"
 import { BillsActions } from "./form"
 import { AlertCircle, Clock, CheckCircle } from "lucide-react"

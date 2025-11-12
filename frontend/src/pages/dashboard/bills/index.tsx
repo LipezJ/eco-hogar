@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { FormDialog } from "@/components/form-dialog"
 import { CreateBillForm } from "./form"
-import { type Bill } from "@/types/bills"
+import { type Bill } from "@web-project/types/bills"
 import DashboardLayout from "@/layouts/dashboard"
 
 // Datos de ejemplo para la UI
