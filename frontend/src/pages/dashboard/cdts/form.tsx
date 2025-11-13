@@ -7,6 +7,8 @@ import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Cdt, CreateCdtSchema, UpdateCdtSchema, CdtStatus } from "@web-project/types/cdts"
 import { z } from "zod/v4"
+import { useDeleteResource } from "@/hooks/use-delete-resource"
+import { API_ENDPOINTS } from "@/lib/api-config"
 
 const statusOptions = CdtStatus.options.map(status => ({
   id: status,
@@ -213,11 +215,17 @@ export function CdtsActions({ cdt }: { cdt: Cdt }) {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [calculatorOpen, setCalculatorOpen] = useState(false)
+  const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
+    queryKeysToInvalidate: [['cdts']]
+  })
 
-  const handleDelete = () => {
-    // Aquí iría la lógica de eliminación cuando conectes el backend
-    console.log("Eliminar CDT:", cdt.id)
-    setDeleteOpen(false)
+  const handleDelete = async () => {
+    try {
+      await deleteResource(`${API_ENDPOINTS.cdts}/${cdt.id}`)
+      setDeleteOpen(false)
+    } catch (error) {
+      console.error('Error deleting CDT:', error)
+    }
   }
 
   const interestEarned = cdt.finalAmount - cdt.initialAmount
@@ -241,12 +249,15 @@ export function CdtsActions({ cdt }: { cdt: Cdt }) {
         title="Eliminar CDT"
         description="¿Está seguro que desea eliminar este CDT? Esta acción no se puede deshacer."
       >
+        {deleteError && (
+          <p className="mb-3 text-sm text-destructive">{deleteError.message}</p>
+        )}
         <div className="flex gap-2 justify-end">
           <Button variant="outline" onClick={() => setDeleteOpen(false)}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Eliminar
+          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            {isDeleting ? "Eliminando..." : "Eliminar"}
           </Button>
         </div>
       </FormDialogStandalone>

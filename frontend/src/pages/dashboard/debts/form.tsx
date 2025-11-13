@@ -7,6 +7,8 @@ import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Debt, CreateDebtSchema, UpdateDebtSchema, DebtType } from "@web-project/types/debts"
 import { z } from "zod/v4"
+import { useDeleteResource } from "@/hooks/use-delete-resource"
+import { API_ENDPOINTS } from "@/lib/api-config"
 
 const typeOptions = DebtType.options.map(type => ({
   id: type,
@@ -196,11 +198,17 @@ export function UpdateDebtForm({ debt }: { debt: Debt }) {
 export function DebtsActions({ debt, onViewPayments }: { debt: Debt, onViewPayments: (debt: Debt) => void }) {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
+    queryKeysToInvalidate: [['debts'], ['payments'], ['debt-payments', debt.id]]
+  })
 
-  const handleDelete = () => {
-    // Aquí iría la lógica de eliminación cuando conectes el backend
-    console.log("Eliminar deuda:", debt.id)
-    setDeleteOpen(false)
+  const handleDelete = async () => {
+    try {
+      await deleteResource(`${API_ENDPOINTS.debts}/${debt.id}`)
+      setDeleteOpen(false)
+    } catch (error) {
+      console.error('Error deleting debt:', error)
+    }
   }
 
   return (
@@ -221,12 +229,15 @@ export function DebtsActions({ debt, onViewPayments }: { debt: Debt, onViewPayme
         title="Eliminar deuda/préstamo"
         description="¿Está seguro que desea eliminar esta deuda/préstamo? Esta acción no se puede deshacer."
       >
+        {deleteError && (
+          <p className="mb-3 text-sm text-destructive">{deleteError.message}</p>
+        )}
         <div className="flex gap-2 justify-end">
           <Button variant="outline" onClick={() => setDeleteOpen(false)}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Eliminar
+          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            {isDeleting ? "Eliminando..." : "Eliminar"}
           </Button>
         </div>
       </FormDialogStandalone>

@@ -7,6 +7,8 @@ import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Bill, CreateBillSchema, UpdateBillSchema, BillCycle, BillCategory, BillStatus } from "@web-project/types/bills"
 import { z } from "zod/v4"
+import { useDeleteResource } from "@/hooks/use-delete-resource"
+import { API_ENDPOINTS } from "@/lib/api-config"
 
 const categoryOptions = BillCategory.options.map(cat => ({
   id: cat,
@@ -287,11 +289,17 @@ export function BillsActions({ bill }: { bill: Bill }) {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [markPaidOpen, setMarkPaidOpen] = useState(false)
+  const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
+    queryKeysToInvalidate: [['bills']]
+  })
 
-  const handleDelete = () => {
-    // Aquí iría la lógica de eliminación cuando conectes el backend
-    console.log("Eliminar recibo:", bill.id)
-    setDeleteOpen(false)
+  const handleDelete = async () => {
+    try {
+      await deleteResource(`${API_ENDPOINTS.bills}/${bill.id}`)
+      setDeleteOpen(false)
+    } catch (error) {
+      console.error('Error deleting bill:', error)
+    }
   }
 
   const handleMarkAsPaid = () => {
@@ -318,12 +326,15 @@ export function BillsActions({ bill }: { bill: Bill }) {
         title="Eliminar recibo"
         description="¿Está seguro que desea eliminar este recibo? Esta acción no se puede deshacer."
       >
+        {deleteError && (
+          <p className="mb-3 text-sm text-destructive">{deleteError.message}</p>
+        )}
         <div className="flex gap-2 justify-end">
           <Button variant="outline" onClick={() => setDeleteOpen(false)}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Eliminar
+          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            {isDeleting ? "Eliminando..." : "Eliminar"}
           </Button>
         </div>
       </FormDialogStandalone>

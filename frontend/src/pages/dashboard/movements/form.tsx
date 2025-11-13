@@ -7,6 +7,8 @@ import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Movement, CreateMovementFormSchema, UpdateMovementFormSchema, MovementCategory, MovementType } from "@web-project/types/movements"
 import { z } from "zod/v4"
+import { useDeleteResource } from "@/hooks/use-delete-resource"
+import { API_ENDPOINTS } from "@/lib/api-config"
 
 const categoryOptions = MovementCategory.options.map(cat => ({
   id: cat,
@@ -151,11 +153,17 @@ export function UpdateMovementForm({ movement }: { movement: Movement }) {
 export function MovementsActions({ movement }: { movement: Movement }) {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
+    queryKeysToInvalidate: [['movements']]
+  })
 
-  const handleDelete = () => {
-    // Aquí iría la lógica de eliminación cuando conectes el backend
-    console.log("Eliminar movimiento:", movement.id)
-    setDeleteOpen(false)
+  const handleDelete = async () => {
+    try {
+      await deleteResource(`${API_ENDPOINTS.movements}/${movement.id}`)
+      setDeleteOpen(false)
+    } catch (error) {
+      console.error('Error deleting movement:', error)
+    }
   }
 
   return (
@@ -176,12 +184,15 @@ export function MovementsActions({ movement }: { movement: Movement }) {
         title="Eliminar movimiento"
         description="¿Está seguro que desea eliminar este movimiento? Esta acción no se puede deshacer."
       >
+        {deleteError && (
+          <p className="mb-3 text-sm text-destructive">{deleteError.message}</p>
+        )}
         <div className="flex gap-2 justify-end">
           <Button variant="outline" onClick={() => setDeleteOpen(false)}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            Eliminar
+          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            {isDeleting ? "Eliminando..." : "Eliminar"}
           </Button>
         </div>
       </FormDialogStandalone>
