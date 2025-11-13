@@ -11,8 +11,11 @@ import { type Debt } from "@web-project/types/debts"
 import { useState } from "react"
 import { PaymentsView } from "./payments"
 import DashboardLayout from "@/layouts/dashboard"
+import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { API_ENDPOINTS } from "@/lib/api-config"
+import { transformDebts } from "@/lib/api-transformers"
 
-// Datos de ejemplo para la UI
+// Datos de ejemplo para la UI (fallback)
 const mockDebts: Debt[] = [
   {
     id: "1",
@@ -56,6 +59,13 @@ export default function Debts() {
   const [selectedDebt, setSelectedDebt] = useState<Debt | null>(null)
   const [paymentsOpen, setPaymentsOpen] = useState(false)
 
+  const { data, isLoading, error } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.debts,
+    queryKey: ['debts']
+  })
+
+  const debts = data ? transformDebts(data) : mockDebts;
+
   const handleViewPayments = (debt: Debt) => {
     setSelectedDebt(debt)
     setPaymentsOpen(true)
@@ -63,18 +73,17 @@ export default function Debts() {
 
   const columns = createColumns(handleViewPayments)
 
-  // const { data, refetch } = useQuery<Debt[]>({
-  //   queryKey: ['debts'],
-  //   queryFn: () => {
-  //     return fetch('/api/debts').then(res => res.json());
-  //   },
-  //   staleTime: 1000*60*60*24
-  // })
-
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="Deudas y Préstamos" />
+        {error && (
+          <div className="container mx-auto px-4 pt-4">
+            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
+              Error al cargar las deudas. Usando datos de ejemplo.
+            </div>
+          </div>
+        )}
         <section className="container mx-auto pt-4 px-4 space-y-4">
           <div className="flex justify-end">
             <FormDialog
@@ -89,7 +98,13 @@ export default function Debts() {
               </Button>
             </FormDialog>
           </div>
-          <DataTable columns={columns} data={mockDebts} />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Cargando deudas...</div>
+            </div>
+          ) : (
+            <DataTable columns={columns} data={debts} />
+          )}
         </section>
 
         {/* Modal de Pagos */}

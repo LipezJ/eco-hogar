@@ -9,8 +9,11 @@ import { FormDialog } from "@/components/form-dialog"
 import { CreateCdtForm } from "./form"
 import { type Cdt, calculateFinalAmount, calculateDueDate } from "@web-project/types/cdts"
 import DashboardLayout from "@/layouts/dashboard"
+import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { API_ENDPOINTS } from "@/lib/api-config"
+import { transformCdts } from "@/lib/api-transformers"
 
-// Datos de ejemplo para la UI
+// Datos de ejemplo para la UI (fallback)
 const mockCdts: Cdt[] = [
   {
     id: "1",
@@ -84,18 +87,24 @@ const mockCdts: Cdt[] = [
 ]
 
 export default function Cdts() {
-  // const { data, refetch } = useQuery<Cdt[]>({
-  //   queryKey: ['cdts'],
-  //   queryFn: () => {
-  //     return fetch('/api/cdts').then(res => res.json());
-  //   },
-  //   staleTime: 1000*60*60*24
-  // })
+  const { data, isLoading, error } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.cdts,
+    queryKey: ['cdts']
+  })
+
+  const cdts = data ? transformCdts(data) : mockCdts;
 
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="CDTs - Certificados de Depósito a Término" />
+        {error && (
+          <div className="container mx-auto px-4 pt-4">
+            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
+              Error al cargar los CDTs. Usando datos de ejemplo.
+            </div>
+          </div>
+        )}
         <section className="container mx-auto pt-4 px-4 space-y-4">
           <div className="flex justify-end">
             <FormDialog
@@ -110,7 +119,13 @@ export default function Cdts() {
               </Button>
             </FormDialog>
           </div>
-          <DataTable columns={columns} data={mockCdts} />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Cargando CDTs...</div>
+            </div>
+          ) : (
+            <DataTable columns={columns} data={cdts} />
+          )}
         </section>
       </div>
     </DashboardLayout>

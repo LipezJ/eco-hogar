@@ -15,8 +15,11 @@ import { type Bill } from "@web-project/types/bills";
 import { type Cdt, calculateDueDate, calculateFinalAmount } from "@web-project/types/cdts";
 import { Wallet, CreditCard, FileText, PiggyBank } from "lucide-react";
 import DashboardLayout from "@/layouts/dashboard";
+import { useQueryFetch } from "@/hooks/user-query-fetch";
+import { API_ENDPOINTS } from "@/lib/api-config";
+import { transformMovements, transformDebts, transformBills, transformCdts } from "@/lib/api-transformers";
 
-// Datos de ejemplo para la UI
+// Datos de ejemplo para la UI (fallback)
 const mockMovements: Movement[] = [
   {
     id: "1",
@@ -248,13 +251,33 @@ const mockCdts: Cdt[] = [
 ]
 
 export default function Home() {
-  // const { data: movements } = useQuery<Movement[]>({
-  //   queryKey: ['movements'],
-  //   queryFn: () => {
-  //     return fetch('/api/movements').then(res => res.json());
-  //   },
-  //   staleTime: 1000*60*60*24
-  // })
+  const { data: movementsData } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.movements,
+    queryKey: ['movements']
+  })
+
+  const { data: debtsData } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.debts,
+    queryKey: ['debts']
+  })
+
+  const { data: billsData } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.bills,
+    queryKey: ['bills']
+  })
+
+  const { data: cdtsData } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.cdts,
+    queryKey: ['cdts']
+  })
+
+  const movements = movementsData ? transformMovements(movementsData) : mockMovements;
+  const debts = debtsData ? transformDebts(debtsData) : mockDebts;
+  const bills = billsData ? transformBills(billsData) : mockBills;
+  const cdts = cdtsData ? transformCdts(cdtsData) : mockCdts;
+
+  // Generar tabla de amortización para cada deuda
+  const allPayments: Payment[] = debts.flatMap(debt => generateAmortizationTable(debt));
 
   return (
     <DashboardLayout>
@@ -282,19 +305,19 @@ export default function Home() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="movements" className="my-4 space-y-4">
-              <MovementsStats movements={mockMovements} />
-              <MovementsReports movements={mockMovements} />
+              <MovementsStats movements={movements} />
+              <MovementsReports movements={movements} />
             </TabsContent>
             <TabsContent value="debts" className="my-4">
-              <DebtsStats debts={mockDebts} payments={mockPayments} />
+              <DebtsStats debts={debts} payments={allPayments} />
             </TabsContent>
             <TabsContent value="bills" className="my-4 space-y-4">
-              <BillsStats bills={mockBills} />
-              <BillsReports bills={mockBills} />
+              <BillsStats bills={bills} />
+              <BillsReports bills={bills} />
             </TabsContent>
             <TabsContent value="cdts" className="my-4 space-y-4">
-              <CdtsStats cdts={mockCdts} />
-              <CdtsReports cdts={mockCdts} />
+              <CdtsStats cdts={cdts} />
+              <CdtsReports cdts={cdts} />
             </TabsContent>
           </Tabs>
         </section>

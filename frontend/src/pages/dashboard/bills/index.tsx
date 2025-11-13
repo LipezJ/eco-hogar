@@ -9,8 +9,11 @@ import { FormDialog } from "@/components/form-dialog"
 import { CreateBillForm } from "./form"
 import { type Bill } from "@web-project/types/bills"
 import DashboardLayout from "@/layouts/dashboard"
+import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { API_ENDPOINTS } from "@/lib/api-config"
+import { transformBills } from "@/lib/api-transformers"
 
-// Datos de ejemplo para la UI
+// Datos de ejemplo para la UI (fallback)
 const mockBills: Bill[] = [
   {
     id: "1",
@@ -87,19 +90,23 @@ const mockBills: Bill[] = [
 ]
 
 export default function Bills() {
-  // const { data, refetch } = useQuery<Bill[]>({
-  //   queryKey: ['bills'],
-  //   queryFn: () => {
-  //     return fetch('/api/bills').then(res => res.json());
-  //   },
-  //   staleTime: 1000*60*60*24
-  // })
+  const { data, isLoading, error } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.bills,
+    queryKey: ['bills']
+  })
+
+  const bills = data ? transformBills(data) : mockBills;
 
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="Recibos y Servicios" />
         <section className="container mx-auto pt-4 px-4 space-y-4">
+          {error && (
+            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
+              Error al cargar los recibos. Usando datos de ejemplo.
+            </div>
+          )}
           <div className="flex justify-end">
             <FormDialog
               title="Nuevo recibo"
@@ -113,7 +120,13 @@ export default function Bills() {
               </Button>
             </FormDialog>
           </div>
-          <DataTable columns={columns} data={mockBills} />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Cargando recibos...</div>
+            </div>
+          ) : (
+            <DataTable columns={columns} data={bills} />
+          )}
         </section>
       </div>
     </DashboardLayout>

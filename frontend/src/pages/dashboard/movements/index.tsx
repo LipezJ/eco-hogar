@@ -9,8 +9,11 @@ import { FormDialog } from "@/components/form-dialog"
 import { CreateMovementForm } from "./form"
 import { type Movement } from "@web-project/types/movements"
 import DashboardLayout from "@/layouts/dashboard"
+import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { API_ENDPOINTS } from "@/lib/api-config"
+import { transformMovements } from "@/lib/api-transformers"
 
-// Datos de ejemplo para la UI
+// Datos de ejemplo para la UI (fallback)
 const mockMovements: Movement[] = [
   {
     id: "1",
@@ -66,18 +69,24 @@ const mockMovements: Movement[] = [
 ]
 
 export default function Movements() {
-  // const { data, refetch } = useQuery<Movement[]>({
-  //   queryKey: ['movements'],
-  //   queryFn: () => {
-  //     return fetch('/api/movements').then(res => res.json());
-  //   },
-  //   staleTime: 1000*60*60*24
-  // })
+  const { data, isLoading, error } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.movements,
+    queryKey: ['movements']
+  })
+
+  const movements = data ? transformMovements(data) : mockMovements;
 
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="Movimientos" />
+        {error && (
+          <div className="container mx-auto px-4 pt-4">
+            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
+              Error al cargar los movimientos. Usando datos de ejemplo.
+            </div>
+          </div>
+        )}
         <section className="container mx-auto pt-4 px-4 space-y-4">
           <div className="flex justify-end">
             <FormDialog
@@ -92,7 +101,13 @@ export default function Movements() {
               </Button>
             </FormDialog>
           </div>
-          <DataTable columns={columns} data={mockMovements} />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Cargando movimientos...</div>
+            </div>
+          ) : (
+            <DataTable columns={columns} data={movements} />
+          )}
         </section>
       </div>
     </DashboardLayout>

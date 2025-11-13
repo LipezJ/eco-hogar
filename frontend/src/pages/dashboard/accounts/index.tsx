@@ -10,8 +10,11 @@ import { CreateAccountForm } from "./form"
 import { type Account } from "@web-project/types/accounts"
 import { AccountsStats } from "@/components/stats/accounts"
 import DashboardLayout from "@/layouts/dashboard"
+import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { API_ENDPOINTS } from "@/lib/api-config"
+import { transformAccounts } from "@/lib/api-transformers"
 
-// Datos de ejemplo para la UI
+// Datos de ejemplo para la UI (fallback)
 const mockAccounts: Account[] = [
   {
     id: "1",
@@ -111,20 +114,30 @@ const mockAccounts: Account[] = [
 ]
 
 export default function Accounts() {
-  // const { data, refetch } = useQuery<Account[]>({
-  //   queryKey: ['accounts'],
-  //   queryFn: () => {
-  //     return fetch('/api/accounts').then(res => res.json());
-  //   },
-  //   staleTime: 1000*60*60*24
-  // })
+  const { data, isLoading, error } = useQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.accounts,
+    queryKey: ['accounts']
+  })
+
+  const accounts = data ? transformAccounts(data) : mockAccounts;
 
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="Cuentas Bancarias" />
         <section className="container mx-auto pt-4 px-4 space-y-4">
-          <AccountsStats accounts={mockAccounts} />
+          {error && (
+            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
+              Error al cargar las cuentas. Usando datos de ejemplo.
+            </div>
+          )}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Cargando cuentas...</div>
+            </div>
+          ) : (
+            <AccountsStats accounts={accounts} />
+          )}
 
           <div className="flex justify-end">
             <FormDialog
@@ -139,7 +152,7 @@ export default function Accounts() {
               </Button>
             </FormDialog>
           </div>
-          <DataTable columns={columns} data={mockAccounts} />
+          {!isLoading && <DataTable columns={columns} data={accounts} />}
         </section>
       </div>
     </DashboardLayout>
