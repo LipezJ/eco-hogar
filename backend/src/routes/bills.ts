@@ -43,6 +43,8 @@ router.post('/', async (req, res) => {
     const validatedData = insertBillSchema.parse({
       ...req.body,
       amount: String(req.body.amount), // Convert number to string for decimal field
+      dueDate: new Date(req.body.dueDate), // Convert string to Date
+      paymentDate: req.body.paymentDate ? new Date(req.body.paymentDate) : undefined, // Convert string to Date if exists
       id: billId,
       createdAt: new Date(),
     });

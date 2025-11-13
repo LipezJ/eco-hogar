@@ -153,6 +153,7 @@ router.post('/', async (req, res) => {
       ...req.body,
       amount: String(req.body.amount), // Convert number to string for decimal field
       interestRate: String(req.body.interestRate), // Convert number to string for decimal field
+      startDate: new Date(req.body.startDate), // Convert string to Date
       id: debtId,
       createdAt: new Date(),
     });

@@ -68,7 +68,8 @@ router.post('/', async (req, res) => {
       initialAmount: String(req.body.initialAmount), // Convert number to string for decimal field
       interestRate: String(req.body.interestRate), // Convert number to string for decimal field
       finalAmount: String(finalAmount), // Convert number to string for decimal field
-      dueDate,
+      openingDate: new Date(req.body.openingDate), // Convert string to Date
+      dueDate: new Date(dueDate), // Convert string to Date
       id: cdtId,
       createdAt: new Date(),
     });

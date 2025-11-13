@@ -26,7 +26,16 @@ export function useMutateForm<TFieldValues extends FieldValues = FieldValues, TC
     mutationFn: (data) => {
       // loader.start()
       setIsLoading(true)
-      return fetch(url, { method, body: JSON.stringify(data) })
+      return fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${url}`, 
+        { 
+          method, 
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+         }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey })
