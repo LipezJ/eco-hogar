@@ -32,24 +32,39 @@ export const CreateMovementSchema = MovementSchema.omit({
 
 export const UpdateMovementSchema = MovementSchema.partial().required({ id: true })
 
-// Esquema con preprocesamiento para transformar tags de string a array en formularios
-const tagsPreprocessor = z.preprocess((val) => {
+// Esquema para tags que acepta string o array y lo transforma a array opcional
+const tagsField: z.ZodOptional<z.ZodArray<z.ZodString>> = z.preprocess((val) => {
+  // Si es undefined o null, devolver undefined
+  if (val === undefined || val === null) return undefined
   // Si ya es un array, devolverlo tal cual
   if (Array.isArray(val)) return val
   // Si es string, convertir a array
-  if (typeof val === 'string' && val.length > 0) {
-    return val.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0)
+  if (typeof val === 'string') {
+    if (val.length === 0) return undefined
+    return val.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
   }
-  // Si está vacío o es undefined, devolver undefined
   return undefined
-}, z.array(z.string()).optional())
+}, z.array(z.string()).optional()) as unknown as z.ZodOptional<z.ZodArray<z.ZodString>>
 
-export const CreateMovementFormSchema = CreateMovementSchema.extend({
-  tags: tagsPreprocessor
+export const CreateMovementFormSchema = z.object({
+  type: MovementType,
+  category: MovementCategory,
+  amount: z.number().positive(),
+  description: z.string(),
+  tags: tagsField,
+  attachment: z.string().nullable().optional(),
+  date: z.string()
 })
 
-export const UpdateMovementFormSchema = UpdateMovementSchema.extend({
-  tags: tagsPreprocessor
+export const UpdateMovementFormSchema = z.object({
+  id: z.string(),
+  type: MovementType.optional(),
+  category: MovementCategory.optional(),
+  amount: z.number().positive().optional(),
+  description: z.string().optional(),
+  tags: tagsField,
+  attachment: z.string().nullable().optional(),
+  date: z.string().optional()
 })
 
 export type Movement = z.infer<typeof MovementSchema>

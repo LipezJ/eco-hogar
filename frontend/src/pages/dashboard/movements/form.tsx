@@ -196,7 +196,7 @@ export function MovementsActions({ movement }: { movement: Movement }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           {movement.attachment && (
-            <DropdownMenuItem onClick={() => window.open(movement.attachment, '_blank')}>
+            <DropdownMenuItem onClick={() => window.open(movement.attachment || "", '_blank')}>
               <Paperclip />
               Ver adjunto
             </DropdownMenuItem>
