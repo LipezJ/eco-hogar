@@ -100,8 +100,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/movements/:id - Actualizar movimiento
-router.put('/:id', async (req, res) => {
+// PUT /api/movements - Actualizar movimiento
+router.put('/', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
 
@@ -115,15 +115,20 @@ router.put('/:id', async (req, res) => {
       updateData.tags = JSON.stringify(updateData.tags);
     }
 
+    // Convert date to Date object if it exists and is a string
+    if (updateData.date !== undefined && typeof updateData.date === 'string') {
+      updateData.date = new Date(updateData.date);
+    }
+
     await db
       .update(movements)
       .set(updateData)
-      .where(eq(movements.id, req.params.id));
+      .where(eq(movements.id, req.body.id));
 
     const [updated] = await db
       .select()
       .from(movements)
-      .where(eq(movements.id, req.params.id));
+      .where(eq(movements.id, req.body.id));
 
     if (!updated) {
       return res.status(404).json({ error: 'Movement not found' });

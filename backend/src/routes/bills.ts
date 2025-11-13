@@ -63,8 +63,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/bills/:id - Actualizar recibo
-router.put('/:id', async (req, res) => {
+// PUT /api/bills - Actualizar recibo
+router.put('/', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
 
@@ -72,16 +72,23 @@ router.put('/:id', async (req, res) => {
     if (updateData.amount !== undefined) {
       updateData.amount = String(updateData.amount);
     }
+    // Convert date fields to Date objects if they exist and are strings
+    if (updateData.dueDate !== undefined && typeof updateData.dueDate === 'string') {
+      updateData.dueDate = new Date(updateData.dueDate);
+    }
+    if (updateData.paymentDate !== undefined && typeof updateData.paymentDate === 'string') {
+      updateData.paymentDate = new Date(updateData.paymentDate);
+    }
 
     await db
       .update(bills)
       .set(updateData)
-      .where(eq(bills.id, req.params.id));
+      .where(eq(bills.id, req.body.id));
 
     const [updated] = await db
       .select()
       .from(bills)
-      .where(eq(bills.id, req.params.id));
+      .where(eq(bills.id, req.body.id));
 
     if (!updated) {
       return res.status(404).json({ error: 'Bill not found' });

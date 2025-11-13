@@ -61,8 +61,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/accounts/:id - Actualizar cuenta
-router.put('/:id', async (req, res) => {
+// PUT /api/accounts - Actualizar cuenta
+router.put('/', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
 
@@ -74,12 +74,12 @@ router.put('/:id', async (req, res) => {
     await db
       .update(accounts)
       .set(updateData)
-      .where(eq(accounts.id, req.params.id));
+      .where(eq(accounts.id, req.body.id));
 
     const [updated] = await db
       .select()
       .from(accounts)
-      .where(eq(accounts.id, req.params.id));
+      .where(eq(accounts.id, req.body.id));
 
     if (!updated) {
       return res.status(404).json({ error: 'Account not found' });

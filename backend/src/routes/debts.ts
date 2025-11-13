@@ -178,8 +178,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/debts/:id - Actualizar deuda
-router.put('/:id', async (req, res) => {
+// PUT /api/debts - Actualizar deuda
+router.put('/', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
 
@@ -190,16 +190,20 @@ router.put('/:id', async (req, res) => {
     if (updateData.interestRate !== undefined) {
       updateData.interestRate = String(updateData.interestRate);
     }
+    // Convert startDate to Date object if it exists and is a string
+    if (updateData.startDate !== undefined && typeof updateData.startDate === 'string') {
+      updateData.startDate = new Date(updateData.startDate);
+    }
 
     await db
       .update(debts)
       .set(updateData)
-      .where(eq(debts.id, req.params.id));
+      .where(eq(debts.id, req.body.id));
 
     const [updated] = await db
       .select()
       .from(debts)
-      .where(eq(debts.id, req.params.id));
+      .where(eq(debts.id, req.body.id));
 
     if (!updated) {
       return res.status(404).json({ error: 'Debt not found' });

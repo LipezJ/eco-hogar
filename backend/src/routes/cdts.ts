@@ -14,10 +14,10 @@ function calculateFinalAmount(initialAmount: number, annualRate: number, days: n
 }
 
 // Función auxiliar para calcular fecha de vencimiento
-function calculateDueDate(openingDate: string, days: number): string {
+function calculateDueDate(openingDate: string, days: number): Date {
   const date = new Date(openingDate);
   date.setDate(date.getDate() + days);
-  return date.toISOString();
+  return date;
 }
 
 // GET /api/cdts - Listar todos los CDTs
@@ -69,7 +69,7 @@ router.post('/', async (req, res) => {
       interestRate: String(req.body.interestRate), // Convert number to string for decimal field
       finalAmount: String(finalAmount), // Convert number to string for decimal field
       openingDate: new Date(req.body.openingDate), // Convert string to Date
-      dueDate: new Date(dueDate), // Convert string to Date
+      dueDate: dueDate, // Already a Date object from calculateDueDate
       id: cdtId,
       createdAt: new Date(),
     });
@@ -89,7 +89,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/cdts/:id - Actualizar CDT
-router.put('/:id', async (req, res) => {
+router.put('/', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
 
@@ -100,13 +100,17 @@ router.put('/:id', async (req, res) => {
     if (updateData.interestRate !== undefined) {
       updateData.interestRate = String(updateData.interestRate);
     }
+    // Convert openingDate to Date if it exists and is a string
+    if (updateData.openingDate !== undefined && typeof updateData.openingDate === 'string') {
+      updateData.openingDate = new Date(updateData.openingDate);
+    }
 
     // Si se actualizan campos que afectan el cálculo, recalcular finalAmount y dueDate
     if (updateData.initialAmount || updateData.interestRate || updateData.term || updateData.openingDate) {
       const [currentCdt] = await db
         .select()
         .from(cdts)
-        .where(eq(cdts.id, req.params.id));
+        .where(eq(cdts.id, req.body.id));
 
       if (!currentCdt) {
         return res.status(404).json({ error: 'CDT not found' });
@@ -124,18 +128,20 @@ router.put('/:id', async (req, res) => {
       );
 
       updateData.finalAmount = String(finalAmountCalculated);
-      updateData.dueDate = calculateDueDate(openingDate.toISOString(), term);
+      // openingDate can be a Date object or string, ensure it's a string for calculateDueDate
+      const openingDateStr = openingDate instanceof Date ? openingDate.toISOString() : openingDate.toString();
+      updateData.dueDate = calculateDueDate(openingDateStr, term);
     }
 
     await db
       .update(cdts)
       .set(updateData)
-      .where(eq(cdts.id, req.params.id));
+      .where(eq(cdts.id, req.body.id));
 
     const [updated] = await db
       .select()
       .from(cdts)
-      .where(eq(cdts.id, req.params.id));
+      .where(eq(cdts.id, req.body.id));
 
     if (!updated) {
       return res.status(404).json({ error: 'CDT not found' });
