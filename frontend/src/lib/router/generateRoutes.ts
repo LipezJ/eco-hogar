@@ -7,8 +7,6 @@ const pageModules = import.meta.glob('../../pages/**/*.tsx', { eager: true });
 export function generateRoutes(): Route[] {
   const routes: Route[] = [];
 
-  console.log('🔍 Page modules found:', Object.keys(pageModules));
-
   Object.entries(pageModules).forEach(([filePath, module]) => {
     // Extraer el path relativo desde pages/
     const relativePath = filePath.replace('../../pages/', '');
@@ -19,8 +17,6 @@ export function generateRoutes(): Route[] {
     // Obtener el componente por defecto
     const component = (module as { default: React.ComponentType<unknown> }).default;
 
-    console.log(`📄 File: ${filePath} -> Route: ${routePath}`);
-
     if (component) {
       routes.push({
         path: routePath,
@@ -28,8 +24,6 @@ export function generateRoutes(): Route[] {
       });
     }
   });
-
-  console.log('✅ Generated routes:', routes.map(r => r.path));
 
   // Ordenar rutas para que las más específicas aparezcan primero
   return routes.sort((a, b) => {
