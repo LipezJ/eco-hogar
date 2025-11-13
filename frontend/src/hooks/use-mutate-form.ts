@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 // import { useTopLoader } from "nextjs-toploader"
 import { useState } from "react"
 import { type FieldValues, useForm, type UseFormProps } from "react-hook-form"
+import { API_BASE_URL } from "@/lib/api-config"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface UseMutateFormProps<TFieldValues extends FieldValues = FieldValues, TContext = any, TTransformedValues = TFieldValues> {
@@ -27,7 +28,7 @@ export function useMutateForm<TFieldValues extends FieldValues = FieldValues, TC
       // loader.start()
       setIsLoading(true)
       return fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${url}`, 
+        `${API_BASE_URL}${url}`,
         { 
           method, 
           body: JSON.stringify(data),
