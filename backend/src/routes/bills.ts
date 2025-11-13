@@ -1,0 +1,110 @@
+import { Router } from 'express';
+import { db } from '../db/index.js';
+import { bills, insertBillSchema } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
+
+const router = Router();
+
+// GET /api/bills - Listar todos los recibos
+router.get('/', async (_req, res) => {
+  try {
+    const allBills = await db.select().from(bills);
+    return res.json(allBills);
+  } catch (error) {
+    console.error('Error fetching bills:', error);
+    return res.status(500).json({ error: 'Error fetching bills' });
+  }
+});
+
+// GET /api/bills/:id - Obtener un recibo por ID
+router.get('/:id', async (req, res) => {
+  try {
+    const [bill] = await db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, req.params.id));
+
+    if (!bill) {
+      return res.status(404).json({ error: 'Bill not found' });
+    }
+
+    return res.json(bill);
+  } catch (error) {
+    console.error('Error fetching bill:', error);
+    return res.status(500).json({ error: 'Error fetching bill' });
+  }
+});
+
+// POST /api/bills - Crear nuevo recibo
+router.post('/', async (req, res) => {
+  try {
+    const billId = randomUUID();
+    const validatedData = insertBillSchema.parse({
+      ...req.body,
+      id: billId,
+      createdAt: new Date(),
+    });
+
+    await db.insert(bills).values(validatedData);
+
+    const [created] = await db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, billId));
+
+    return res.status(201).json(created);
+  } catch (error) {
+    console.error('Error creating bill:', error);
+    return res.status(400).json({ error: 'Error creating bill', details: error });
+  }
+});
+
+// PUT /api/bills/:id - Actualizar recibo
+router.put('/:id', async (req, res) => {
+  try {
+    const { id, createdAt, ...updateData } = req.body;
+
+    await db
+      .update(bills)
+      .set(updateData)
+      .where(eq(bills.id, req.params.id));
+
+    const [updated] = await db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, req.params.id));
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Bill not found' });
+    }
+
+    return res.json(updated);
+  } catch (error) {
+    console.error('Error updating bill:', error);
+    return res.status(400).json({ error: 'Error updating bill', details: error });
+  }
+});
+
+// DELETE /api/bills/:id - Eliminar recibo
+router.delete('/:id', async (req, res) => {
+  try {
+    const [bill] = await db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, req.params.id));
+
+    if (!bill) {
+      return res.status(404).json({ error: 'Bill not found' });
+    }
+
+    await db.delete(bills).where(eq(bills.id, req.params.id));
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting bill:', error);
+    return res.status(500).json({ error: 'Error deleting bill' });
+  }
+});
+
+export default router;
