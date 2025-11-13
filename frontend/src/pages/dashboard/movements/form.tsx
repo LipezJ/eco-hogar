@@ -53,7 +53,7 @@ function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementS
       name: "date",
       label: "Fecha",
       description: "Fecha del movimiento.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "tags",

@@ -54,7 +54,7 @@ function getCreateDebtFormDef(): FormFieldDef<z.infer<typeof CreateDebtSchema>>[
       name: "startDate",
       label: "Fecha de Inicio",
       description: "Fecha en que inicia el préstamo.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "paymentDay",
@@ -118,7 +118,7 @@ function getUpdateDebtFormDef(): FormFieldDef<z.infer<typeof UpdateDebtSchema>>[
       name: "startDate",
       label: "Fecha de Inicio",
       description: "Fecha en que inicia el préstamo.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "paymentDay",

@@ -48,6 +48,44 @@ export function DatePicker({ value, setValue }: { value?: string; setValue: (dat
   )
 }
 
+export function DatePickerFullRange({ value, setValue }: { value?: string; setValue: (date: string) => void }) {
+  const [open, setOpen] = React.useState(false)
+
+  // Guard against empty or invalid values
+  const date = value ? new Date(value) : undefined
+  const isValidDate = date && !isNaN(date.getTime())
+
+  return (
+    <div className="flex flex-col gap-3">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            id="date"
+            className="w-full justify-between font-normal border-input"
+          >
+            {isValidDate ? date!.toLocaleDateString() : "Select date"}
+            <ChevronDownIcon />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+          <Calendar
+            locale={es}
+            mode="single"
+            selected={isValidDate ? date : undefined}
+            captionLayout="dropdown"
+            disabled={(d) => d < new Date("1900-01-01")}
+            onSelect={(d) => {
+              setValue(d?.toISOString() || "")
+              setOpen(false)
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}
+
 export function DatePickerRange({ value, setValue }: { value?: string[]; setValue: (date: string[]) => void }) {
   const range = {
     from: value && value[0] !== "" ? new Date(value[0]) : undefined,

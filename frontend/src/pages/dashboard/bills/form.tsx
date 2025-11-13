@@ -23,8 +23,8 @@ const statusOptions = BillStatus.options.map(status => ({
   label: status.charAt(0).toUpperCase() + status.slice(1)
 }))
 
-function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[] {
-  return [
+function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof CreateBillSchema>>[] {
+  const baseFields: FormFieldDef<z.infer<typeof CreateBillSchema>>[] = [
     {
       name: "provider",
       label: "Proveedor",
@@ -58,7 +58,7 @@ function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[
       name: "dueDate",
       label: "Fecha de Vencimiento",
       description: "Fecha límite de pago.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "status",
@@ -67,19 +67,28 @@ function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[
       variant: "select",
       placeholder: "Seleccione estado",
       options: statusOptions
-    },
-    {
-      name: "paymentDate",
-      label: "Fecha de Pago",
-      description: "Fecha en que se realizó el pago (opcional).",
-      variant: "date"
-    },
-    {
-      name: "attachment",
-      label: "Comprobante",
-      description: "URL del comprobante o factura (opcional).",
-      placeholder: "https://..."
-    },
+    }
+  ]
+
+  // Solo agregar campos de pago cuando el estado sea "pagado"
+  if (status === "pagado") {
+    baseFields.push(
+      {
+        name: "paymentDate",
+        label: "Fecha de Pago",
+        description: "Fecha en que se realizó el pago.",
+        variant: "date"
+      },
+      {
+        name: "attachment",
+        label: "Comprobante",
+        description: "URL del comprobante o factura.",
+        placeholder: "https://..."
+      }
+    )
+  }
+
+  baseFields.push(
     {
       name: "autoRenew",
       label: "Renovación Automática",
@@ -102,11 +111,13 @@ function getCreateBillFormDef(): FormFieldDef<z.infer<typeof CreateBillSchema>>[
       description: "Notas adicionales (opcional).",
       placeholder: "Ej: Incluye internet + cable"
     }
-  ]
+  )
+
+  return baseFields
 }
 
-function getUpdateBillFormDef(): FormFieldDef<z.infer<typeof UpdateBillSchema>>[] {
-  return [
+function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof UpdateBillSchema>>[] {
+  const baseFields: FormFieldDef<z.infer<typeof UpdateBillSchema>>[] = [
     {
       name: "id",
       label: "ID",
@@ -145,7 +156,7 @@ function getUpdateBillFormDef(): FormFieldDef<z.infer<typeof UpdateBillSchema>>[
       name: "dueDate",
       label: "Fecha de Vencimiento",
       description: "Fecha límite de pago.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "status",
@@ -154,19 +165,28 @@ function getUpdateBillFormDef(): FormFieldDef<z.infer<typeof UpdateBillSchema>>[
       variant: "select",
       placeholder: "Seleccione estado",
       options: statusOptions
-    },
-    {
-      name: "paymentDate",
-      label: "Fecha de Pago",
-      description: "Fecha en que se realizó el pago (opcional).",
-      variant: "date"
-    },
-    {
-      name: "attachment",
-      label: "Comprobante",
-      description: "URL del comprobante o factura (opcional).",
-      placeholder: "https://..."
-    },
+    }
+  ]
+
+  // Solo agregar campos de pago cuando el estado sea "pagado"
+  if (status === "pagado") {
+    baseFields.push(
+      {
+        name: "paymentDate",
+        label: "Fecha de Pago",
+        description: "Fecha en que se realizó el pago.",
+        variant: "date"
+      },
+      {
+        name: "attachment",
+        label: "Comprobante",
+        description: "URL del comprobante o factura.",
+        placeholder: "https://..."
+      }
+    )
+  }
+
+  baseFields.push(
     {
       name: "autoRenew",
       label: "Renovación Automática",
@@ -189,15 +209,18 @@ function getUpdateBillFormDef(): FormFieldDef<z.infer<typeof UpdateBillSchema>>[
       description: "Notas adicionales (opcional).",
       placeholder: "Ej: Incluye internet + cable"
     }
-  ]
+  )
+
+  return baseFields
 }
 
 export function CreateBillForm() {
   const { setOpen } = useContext(FormDialogContext)
+  const [status, setStatus] = useState<string>("pendiente")
 
   return (
     <Form
-      formDefinition={getCreateBillFormDef()}
+      formDefinition={getCreateBillFormDef(status)}
       resolver={zodResolver(CreateBillSchema)}
       defaultValues={{
         provider: "",
@@ -215,16 +238,22 @@ export function CreateBillForm() {
       submitButtonText="Crear recibo"
       onSuccess={() => setOpen(false)}
       twoColumns={true}
+      onFieldChange={(name, value) => {
+        if (name === "status") {
+          setStatus(value as string)
+        }
+      }}
     />
   )
 }
 
 export function UpdateBillForm({ bill }: { bill: Bill }) {
   const { setOpen } = useContext(FormDialogContext)
+  const [status, setStatus] = useState<string>(bill.status)
 
   return (
     <Form
-      formDefinition={getUpdateBillFormDef()}
+      formDefinition={getUpdateBillFormDef(status)}
       resolver={zodResolver(UpdateBillSchema)}
       defaultValues={{
         id: bill.id,
@@ -245,6 +274,11 @@ export function UpdateBillForm({ bill }: { bill: Bill }) {
       submitButtonText="Guardar cambios"
       onSuccess={() => setOpen(false)}
       twoColumns={true}
+      onFieldChange={(name, value) => {
+        if (name === "status") {
+          setStatus(value as string)
+        }
+      }}
     />
   )
 }

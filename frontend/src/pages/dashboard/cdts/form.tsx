@@ -25,7 +25,7 @@ function getCreateCdtFormDef(): FormFieldDef<z.infer<typeof CreateCdtSchema>>[] 
       name: "openingDate",
       label: "Fecha de Apertura",
       description: "Fecha en que se abrió el CDT.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "initialAmount",
@@ -98,7 +98,7 @@ function getUpdateCdtFormDef(): FormFieldDef<z.infer<typeof UpdateCdtSchema>>[] 
       name: "openingDate",
       label: "Fecha de Apertura",
       description: "Fecha en que se abrió el CDT.",
-      variant: "date"
+      variant: "full-date"
     },
     {
       name: "initialAmount",
