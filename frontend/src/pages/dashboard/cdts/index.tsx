@@ -5,125 +5,50 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { FormDialog } from "@/components/form-dialog"
 import { CreateCdtForm } from "./form"
-import { type Cdt, calculateFinalAmount, calculateDueDate } from "@web-project/types/cdts"
 import DashboardLayout from "@/layouts/dashboard"
-import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { transformCdts } from "@/lib/api-transformers"
+import { Suspense } from "react"
+import { TableLoadingSkeleton } from "@/components/loading-skeleton"
 
-// Datos de ejemplo para la UI (fallback)
-const mockCdts: Cdt[] = [
-  {
-    id: "1",
-    institution: "Banco Nación",
-    openingDate: "2025-01-15",
-    initialAmount: 5000000,
-    interestRate: 8.5,
-    term: 365,
-    dueDate: calculateDueDate("2025-01-15", 365),
-    finalAmount: calculateFinalAmount(5000000, 8.5, 365),
-    status: "activo",
-    autoRenew: false,
-    description: "Inversión a largo plazo",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "2",
-    institution: "Banco Galicia",
-    openingDate: "2025-06-01",
-    initialAmount: 3000000,
-    interestRate: 10.2,
-    term: 180,
-    dueDate: calculateDueDate("2025-06-01", 180),
-    finalAmount: calculateFinalAmount(3000000, 10.2, 180),
-    status: "activo",
-    autoRenew: true,
-    description: "CDT a 6 meses",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "3",
-    institution: "Banco Santander",
-    openingDate: "2025-03-10",
-    initialAmount: 2000000,
-    interestRate: 7.8,
-    term: 90,
-    dueDate: calculateDueDate("2025-03-10", 90),
-    finalAmount: calculateFinalAmount(2000000, 7.8, 90),
-    status: "activo",
-    autoRenew: false,
-    description: "CDT a corto plazo",
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "4",
-    institution: "BBVA",
-    openingDate: "2024-11-01",
-    initialAmount: 4500000,
-    interestRate: 9.5,
-    term: 365,
-    dueDate: calculateDueDate("2024-11-01", 365),
-    finalAmount: calculateFinalAmount(4500000, 9.5, 365),
-    status: "activo",
-    autoRenew: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "5",
-    institution: "Banco Macro",
-    openingDate: "2024-05-15",
-    initialAmount: 10000000,
-    interestRate: 11.0,
-    term: 365,
-    dueDate: calculateDueDate("2024-05-15", 365),
-    finalAmount: calculateFinalAmount(10000000, 11.0, 365),
-    status: "vencido",
-    autoRenew: false,
-    description: "CDT vencido - renovar",
-    createdAt: new Date().toISOString()
-  }
-]
-
-export default function Cdts() {
-  const { data, isLoading, error } = useQueryFetch<unknown[]>({
+function CdtsContent() {
+  const { data } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.cdts,
     queryKey: ['cdts']
   })
 
-  const cdts = data ? transformCdts(data) : mockCdts;
+  const cdts = transformCdts(data);
 
+  return (
+    <>
+      <div className="flex justify-end">
+        <FormDialog
+          title="Nuevo CDT"
+          description="Complete los datos del nuevo Certificado de Depósito a Término"
+          form={<CreateCdtForm />}
+          className="sm:max-w-[700px]"
+        >
+          <Button>
+            <Plus />
+            Nuevo CDT
+          </Button>
+        </FormDialog>
+      </div>
+      <DataTable columns={columns} data={cdts} />
+    </>
+  )
+}
+
+export default function Cdts() {
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="CDTs - Certificados de Depósito a Término" />
-        {error && (
-          <div className="container mx-auto px-4 pt-4">
-            <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-md">
-              Error al cargar los CDTs. Usando datos de ejemplo.
-            </div>
-          </div>
-        )}
         <section className="container mx-auto pt-4 px-4 space-y-4">
-          <div className="flex justify-end">
-            <FormDialog
-              title="Nuevo CDT"
-              description="Complete los datos del nuevo Certificado de Depósito a Término"
-              form={<CreateCdtForm />}
-              className="sm:max-w-[700px]"
-            >
-              <Button>
-                <Plus />
-                Nuevo CDT
-              </Button>
-            </FormDialog>
-          </div>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Cargando CDTs...</div>
-            </div>
-          ) : (
-            <DataTable columns={columns} data={cdts} />
-          )}
+          <Suspense fallback={<TableLoadingSkeleton />}>
+            <CdtsContent />
+          </Suspense>
         </section>
       </div>
     </DashboardLayout>
