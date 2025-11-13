@@ -1,5 +1,5 @@
-// import { useSearchParams, usePathname } from "next/navigation"
-import React, { Fragment, useId, useMemo } from "react"
+import { useSearchParams, usePathname } from "@/lib/router"
+import React, { Fragment, useCallback, useId, useMemo } from "react"
 import { ChevronDownIcon, ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, FileSpreadsheet, RefreshCcw, SearchIcon, XIcon, CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 import {
   type Column,
@@ -35,7 +35,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 
 import { cn, dateRangeFilterFn, multiSelectFilterFn, exportToExcel } from "@/lib/utils"
 import { DatePicker, DatePickerRange } from "./date-picker"
-// import { useRouter } from "nextjs-toploader/app"
+import { useRouter } from "@/lib/router"
 import { Suspense } from "react"
 import { Skeleton } from "./skeleton"
 
@@ -70,42 +70,42 @@ function DataTableContent<TData, TValue>({
   refresh
 }: DataTableProps<TData, TValue>) {
   const id = useId()
-  // const searchParams = useSearchParams()
-  // const router = useRouter()
-  // const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
 
-  // const convertFilterValue = useCallback((columnId: string, value: string) => {
-  //   const column = columns.find(col => col.id === columnId)
-  //   if (column?.meta?.filterVariant === 'select') {
-  //     return [value]
-  //   }
-  //   return value
-  // }, [columns])
+  const convertFilterValue = useCallback((columnId: string, value: string) => {
+    const column = columns.find(col => col.id === columnId)
+    if (column?.meta?.filterVariant === 'select') {
+      return [value]
+    }
+    return value
+  }, [columns])
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     () => {
-      // if (!searchParams) return []
+      if (!searchParams) return []
       const filters: ColumnFiltersState = []
-      // for (const [key, value] of searchParams.entries()) {
-      //   if (value !== undefined && value !== null && value !== "") {
-      //     filters.push({ id: key, value: convertFilterValue(key, value) })
-      //   }
-      // }
+      for (const [key, value] of searchParams.entries()) {
+        if (value !== undefined && value !== null && value !== "") {
+          filters.push({ id: key, value: convertFilterValue(key, value) })
+        }
+      }
       return filters
     }
   )
 
   const [sorting, setSorting] = React.useState<SortingState>([])
 
-  // React.useEffect(() => {
-  //   const newFilters: ColumnFiltersState = []
-  //   for (const [key, value] of searchParams.entries()) {
-  //     if (value !== undefined && value !== null && value !== "") {
-  //       newFilters.push({ id: key, value: convertFilterValue(key, value) })
-  //     }
-  //   }
-  //   setColumnFilters(newFilters)
-  // }, [searchParams, columns, convertFilterValue])
+  React.useEffect(() => {
+    const newFilters: ColumnFiltersState = []
+    for (const [key, value] of searchParams.entries()) {
+      if (value !== undefined && value !== null && value !== "") {
+        newFilters.push({ id: key, value: convertFilterValue(key, value) })
+      }
+    }
+    setColumnFilters(newFilters)
+  }, [searchParams, columns, convertFilterValue])
 
   const enhancedColumns = useMemo(() => {
     return columns.map(column => {
@@ -291,7 +291,7 @@ function DataTableContent<TData, TValue>({
                 onClick={() => {
                   setColumnFilters([])
                   // Remove query params from the URL
-                  // router.replace(pathname)
+                  router.replace(pathname)
                 }}
                 variant="outline"
               >

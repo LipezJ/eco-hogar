@@ -14,7 +14,7 @@ import { Suspense } from "react"
 import { PageLoadingSkeleton } from "@/components/loading-skeleton"
 
 function AccountsContent() {
-  const { data } = useSuspenseQueryFetch<unknown[]>({
+  const { data, refetch } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.accounts,
     queryKey: ['accounts']
   })
@@ -37,7 +37,7 @@ function AccountsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={accounts} />
+      <DataTable columns={columns} data={accounts} refresh={refetch} />
     </>
   )
 }

@@ -1,5 +1,6 @@
 export { RouterProvider } from './context';
 export { useRouter, useParams } from './context.hook';
+export { usePathname, useSearchParams } from './navigation';
 export { Router } from './Router';
 export { Link } from './Link';
 export { matchRoute, filePathToRoute, normalizeRoute } from './utils';

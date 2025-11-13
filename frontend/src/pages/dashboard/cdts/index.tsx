@@ -13,7 +13,7 @@ import { Suspense } from "react"
 import { TableLoadingSkeleton } from "@/components/loading-skeleton"
 
 function CdtsContent() {
-  const { data } = useSuspenseQueryFetch<unknown[]>({
+  const { data, refetch } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.cdts,
     queryKey: ['cdts']
   })
@@ -35,7 +35,7 @@ function CdtsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={cdts} />
+      <DataTable columns={columns} data={cdts} refresh={refetch} />
     </>
   )
 }

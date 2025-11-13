@@ -13,7 +13,7 @@ import { Suspense } from "react"
 import { TableLoadingSkeleton } from "@/components/loading-skeleton"
 
 function MovementsContent() {
-  const { data } = useSuspenseQueryFetch<unknown[]>({
+  const { data, refetch } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.movements,
     queryKey: ['movements']
   })
@@ -35,7 +35,7 @@ function MovementsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={movements} />
+      <DataTable columns={columns} data={movements} refresh={refetch} />
     </>
   )
 }

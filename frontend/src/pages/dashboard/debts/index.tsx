@@ -19,7 +19,7 @@ function DebtsContent({
 }: {
   onViewPayments: (debt: Debt) => void
 }) {
-  const { data } = useSuspenseQueryFetch<unknown[]>({
+  const { data, refetch } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.debts,
     queryKey: ['debts']
   })
@@ -42,7 +42,7 @@ function DebtsContent({
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={debts} />
+      <DataTable columns={columns} data={debts} refresh={refetch} />
     </>
   )
 }
