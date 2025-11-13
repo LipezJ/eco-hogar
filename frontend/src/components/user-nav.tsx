@@ -1,14 +1,14 @@
+import { useEffect } from "react";
 import {
   ChevronsUpDown,
   LogOut
-} from "lucide-react"
-// import { useAuth } from "@/lib/auth-context"
-// import { logout } from "@/lib/actions/auth-actions"
-
+} from "lucide-react";
+import { useAuth } from "@/lib/auth/auth-context";
+import { useRouter } from "@/lib/router";
 import {
   Avatar,
   AvatarFallback,
-} from "@/components/ui/avatar"
+} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,38 +16,50 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-
-export type UserInfo = {
-  name: string
-  email: string
-  avatar: string
-}
+} from "@/components/ui/sidebar";
 
 export function NavUser() {
-  // const { user } = useAuth()
+  const { user, logout, isLoading } = useAuth();
+  const router = useRouter();
 
-  const handleLogout = async () => {
-    // await logout()
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.navigate('/login');
+    }
+  }, [isLoading, user, router]);
+
+  if (!user && !isLoading) {
+    return null;
   }
 
-  const displayUser = {
-    name: "Usuario",
-    username: "",
-  }
+  const displayName = user?.name ?? 'Cargando...';
+  const username = user?.username ?? '';
 
-  // Obtener las iniciales del nombre
-  const initials = displayUser.name
+  const initials = displayName
     .split(' ')
     .map(n => n[0])
     .join('')
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2) || '??';
+
+  const handleLogout = async () => {
+    if (!user) {
+      router.navigate('/login');
+      return;
+    }
+
+    try {
+      await logout();
+      router.navigate('/login');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -62,8 +74,8 @@ export function NavUser() {
                 <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{displayUser.name}</span>
-                <span className="truncate text-xs">@{displayUser.username}</span>
+                <span className="truncate font-medium">{displayName}</span>
+                <span className="truncate text-xs">@{username}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -80,19 +92,19 @@ export function NavUser() {
                   <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{displayUser.name}</span>
-                  <span className="truncate text-xs">@{displayUser.username}</span>
+                  <span className="truncate font-medium">{displayName}</span>
+                  <span className="truncate text-xs">@{username}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
-              Cerrar sesión
+              {user ? 'Cerrar sesión' : 'Iniciar sesión'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

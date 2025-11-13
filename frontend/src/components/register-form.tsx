@@ -1,56 +1,66 @@
 'use client';
 
-import { cn } from "@/lib/utils"
-// import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-// import { useSearchParams } from "next/navigation"
-// import { useActionState, useEffect, useState } from "react"
-// import { register } from "@/lib/actions/auth-actions"
-// import { ArrowRightIcon, AlertCircleIcon } from "lucide-react"
-import { Link } from '@/lib/router';
-// import { useTopLoader } from "nextjs-toploader";
+import { useEffect, useState, type ComponentProps } from "react";
+import { AlertCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Link, useRouter } from '@/lib/router';
+import { useAuth } from "@/lib/auth/auth-context";
+import { cn } from "@/lib/utils";
 
 export function RegisterForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
-  // const searchParams = useSearchParams();
-  // const loader = useTopLoader()
-  // const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-  // const [state, formAction, isPending] = useActionState(
-  //   register,
-  //   undefined,
-  // );
-  // const [passwordError, setPasswordError] = useState<string>('');
+}: ComponentProps<"div">) {
+  const router = useRouter();
+  const { user, register, isLoading } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // useEffect(() => {
-  //   if (isPending) {
-  //     loader.start()
-  //   } else {
-  //     loader.done()
-  //   }
-  // }, [ isPending, loader ])
+  useEffect(() => {
+    if (user && !isLoading) {
+      router.navigate('/dashboard');
+    }
+  }, [user, isLoading, router]);
 
-  // const handleSubmit = (formData: FormData) => {
-  //   const password = formData.get('password') as string;
-  //   const confirmPassword = formData.get('confirm-password') as string;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
 
-  //   if (password !== confirmPassword) {
-  //     setPasswordError('Las contraseñas no coinciden');
-  //     return;
-  //   }
+    const formData = new FormData(event.currentTarget);
+    const name = String(formData.get('name') ?? '').trim();
+    const username = String(formData.get('username') ?? '').trim();
+    const password = String(formData.get('password') ?? '');
+    const confirmPassword = String(formData.get('confirm-password') ?? '');
 
-  //   setPasswordError('');
-  //   formAction(formData);
-  // }
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (!name || !username || !password) {
+      setError('Completa todos los campos requeridos');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await register({ name, username, password });
+      router.navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo crear la cuenta');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0">
-          <form className="p-6 md:p-8 pb-8 md:pb-10">
+          <form className="p-6 md:p-8 pb-8 md:pb-10" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Crear cuenta</h1>
@@ -68,7 +78,7 @@ export function RegisterForm({
                   placeholder="Juan Pérez"
                   minLength={2}
                   required
-                  // disabled={isPending}
+                  disabled={isSubmitting || isLoading}
                 />
               </div>
 
@@ -81,7 +91,7 @@ export function RegisterForm({
                   placeholder="Nombre de usuario"
                   minLength={3}
                   required
-                  // disabled={isPending}
+                  disabled={isSubmitting || isLoading}
                 />
               </div>
 
@@ -94,7 +104,7 @@ export function RegisterForm({
                   type="password"
                   placeholder="Mínimo 6 caracteres"
                   required
-                  // disabled={isPending}
+                  disabled={isSubmitting || isLoading}
                 />
               </div>
 
@@ -107,22 +117,20 @@ export function RegisterForm({
                   type="password"
                   placeholder="Confirma tu contraseña"
                   required
-                  // disabled={isPending}
+                  disabled={isSubmitting || isLoading}
                 />
               </div>
 
-              {/* <input type="hidden" name="redirectTo" value={callbackUrl} />
-
-              <Button type="submit" disabled={isPending} className="w-full">
-                {isPending ? 'Creando cuenta...' : 'Crear cuenta'} <ArrowRightIcon className="ml-auto h-5 w-5" />
+              <Button type="submit" disabled={isSubmitting || isLoading} className="w-full">
+                {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
               </Button>
 
-              {(state?.error || passwordError) && (
-                <div className="flex gap-2">
-                  <AlertCircleIcon className="h-5 w-5 text-red-500" />
-                  <p className="text-sm text-red-500">{passwordError || state?.error}</p>
+              {error && (
+                <div className="flex items-center gap-2 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>{error}</span>
                 </div>
-              )} */}
+              )}
 
               <div className="text-center text-sm">
                 ¿Ya tienes cuenta?{" "}
@@ -141,5 +149,5 @@ export function RegisterForm({
         <a href="#">Política de Privacidad</a>.
       </div>
     </div>
-  )
+  );
 }

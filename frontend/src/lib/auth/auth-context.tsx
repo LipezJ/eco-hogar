@@ -1,47 +1,62 @@
-// // import { createContext, useContext, useState, useEffect } from 'react';
-// import type { User } from '@/lib/auth';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import type { AuthUser } from "./auth";
+import { loginRequest, logoutRequest, registerRequest, sessionRequest } from "./auth";
 
-// interface AuthContextType {
-//   user: User | null;
-//   isLoading: boolean;
-//   setUser: (user: User | null) => void;
-// }
+interface AuthContextType {
+  user: AuthUser | null;
+  isLoading: boolean;
+  login: (credentials: { username: string; password: string }) => Promise<void>;
+  register: (payload: { name: string; username: string; password: string }) => Promise<void>;
+  logout: () => Promise<void>;
+}
 
-// const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// export function AuthContextProvider({ children }: { children: React.ReactNode }) {
-//   const [user, setUser] = useState<User | null>(null);
-//   const [isLoading, setIsLoading] = useState(true);
+export function AuthContextProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-//   useEffect(() => {
-//     // Verificar si hay una sesión activa al cargar
-//     fetch('/api/auth/session')
-//       .then(res => res.json())
-//       .then(data => {
-//         if (data.user) {
-//           setUser(data.user);
-//         }
-//       })
-//       .catch(() => {
-//         setUser(null);
-//       })
-//       .finally(() => {
-//         setIsLoading(false);
-//       });
-//   }, []);
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const sessionUser = await sessionRequest();
+        setUser(sessionUser);
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-//   return (
-//     <AuthContext.Provider value={{ user, isLoading, setUser }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// }
+    void loadSession();
+  }, []);
 
-// // eslint-disable-next-line react-refresh/only-export-components
-// export function useAuth() {
-//   const context = useContext(AuthContext);
-//   if (context === undefined) {
-//     throw new Error('useAuth must be used within an AuthContextProvider');
-//   }
-//   return context;
-// }
+  const login = useCallback(async ({ username, password }: { username: string; password: string }) => {
+    const loggedUser = await loginRequest(username, password);
+    setUser(loggedUser);
+  }, []);
+
+  const register = useCallback(async ({ name, username, password }: { name: string; username: string; password: string }) => {
+    const newUser = await registerRequest(name, username, password);
+    setUser(newUser);
+  }, []);
+
+  const logout = useCallback(async () => {
+    await logoutRequest();
+    setUser(null);
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthContextProvider");
+  }
+  return context;
+}

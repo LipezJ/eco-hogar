@@ -1,6 +1,19 @@
-import { mysqlTable, varchar, decimal, boolean, datetime, int, text, mysqlEnum } from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, decimal, boolean, datetime, int, text, mysqlEnum, uniqueIndex } from 'drizzle-orm/mysql-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { relations } from 'drizzle-orm';
+
+// ============================================
+// USERS TABLE
+// ============================================
+export const users = mysqlTable('users', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  username: varchar('username', { length: 191 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+  createdAt: datetime('created_at').notNull().$defaultFn(() => new Date()),
+}, (table) => ({
+  usernameIdx: uniqueIndex('users_username_idx').on(table.username),
+}));
 
 // ============================================
 // ACCOUNTS TABLE
@@ -169,6 +182,9 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
 export const insertAccountSchema = createInsertSchema(accounts);
 export const selectAccountSchema = createSelectSchema(accounts);
 
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
+
 export const insertBillSchema = createInsertSchema(bills);
 export const selectBillSchema = createSelectSchema(bills);
 
@@ -189,6 +205,9 @@ export const selectMovementSchema = createSelectSchema(movements);
 // ============================================
 export type Account = typeof accounts.$inferSelect;
 export type InsertAccount = typeof accounts.$inferInsert;
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
 
 export type Bill = typeof bills.$inferSelect;
 export type InsertBill = typeof bills.$inferInsert;

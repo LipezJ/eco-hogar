@@ -11,7 +11,9 @@ export function useQueryFetch<T>({ url, queryKey, staleTime, params }: UseQueryF
   const query = useQuery<T>({
     queryKey,
     queryFn: async () => {
-      const res = await fetch(`${url}?${params ? new URLSearchParams(params) : ""}`);
+      const res = await fetch(`${url}?${params ? new URLSearchParams(params) : ""}`, {
+        credentials: "include"
+      });
       if (!res.ok) {
         throw new Error(`Error fetching data: ${res.statusText}`);
       }
@@ -27,7 +29,9 @@ export function useSuspenseQueryFetch<T>({ url, queryKey, staleTime, params }: U
   const query = useSuspenseQuery<T>({
     queryKey,
     queryFn: async () => {
-      const res = await fetch(`${url}?${params ? new URLSearchParams(params) : ""}`);
+      const res = await fetch(`${url}?${params ? new URLSearchParams(params) : ""}`, {
+        credentials: "include"
+      });
       if (!res.ok) {
         throw new Error(`Error fetching data: ${res.statusText}`);
       }

@@ -1,19 +1,25 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import accountsRouter from './routes/accounts.js';
 import movementsRouter from './routes/movements.js';
 import billsRouter from './routes/bills.js';
 import debtsRouter from './routes/debts.js';
 import paymentsRouter from './routes/payments.js';
 import cdtsRouter from './routes/cdts.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL ?? true,
+  credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 // Logging middleware
 app.use((req, _res, next) => {
@@ -27,6 +33,7 @@ app.get('/health', (_req, res) => {
 });
 
 // Routes
+app.use('/api/auth', authRouter);
 app.use('/api/accounts', accountsRouter);
 app.use('/api/movements', movementsRouter);
 app.use('/api/bills', billsRouter);
@@ -47,9 +54,13 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`\n📝 Available endpoints:`);
-  console.log(`   GET    /api/accounts`);
+  console.log(`🩺 Health check: http://localhost:${PORT}/health`);
+  console.log(`\n📚 Available endpoints:`);
+  console.log(`\n   POST   /api/auth/register`);
+  console.log(`   POST   /api/auth/login`);
+  console.log(`   GET    /api/auth/session`);
+  console.log(`   POST   /api/auth/logout`);
+  console.log(`\n   GET    /api/accounts`);
   console.log(`   POST   /api/accounts`);
   console.log(`   GET    /api/accounts/:id`);
   console.log(`   PUT    /api/accounts/:id`);

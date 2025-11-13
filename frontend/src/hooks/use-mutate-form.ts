@@ -32,6 +32,7 @@ export function useMutateForm<TFieldValues extends FieldValues = FieldValues, TC
         { 
           method, 
           body: JSON.stringify(data),
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json'
           }

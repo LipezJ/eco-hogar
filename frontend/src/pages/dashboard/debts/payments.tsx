@@ -59,6 +59,7 @@ export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
     try {
       const response = await fetch(`${API_ENDPOINTS.debts}/${debt.id}/payments/${paymentId}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },

@@ -15,7 +15,10 @@ export function useDeleteResource({ queryKeysToInvalidate = [] }: UseDeleteResou
     setError(null);
 
     try {
-      const response = await fetch(url, { method: 'DELETE' });
+      const response = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
 
       if (!response.ok) {
         const message = await response.text();
