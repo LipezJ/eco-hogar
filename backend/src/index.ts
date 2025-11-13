@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import path from 'node:path';
 import accountsRouter from './routes/accounts.js';
 import movementsRouter from './routes/movements.js';
 import billsRouter from './routes/bills.js';
@@ -9,6 +10,7 @@ import debtsRouter from './routes/debts.js';
 import paymentsRouter from './routes/payments.js';
 import cdtsRouter from './routes/cdts.js';
 import authRouter from './routes/auth.js';
+import uploadsRouter from './routes/uploads.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +22,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 // Logging middleware
 app.use((req, _res, next) => {
@@ -40,6 +43,7 @@ app.use('/api/bills', billsRouter);
 app.use('/api/debts', debtsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/cdts', cdtsRouter);
+app.use('/api/uploads', uploadsRouter);
 
 // 404 handler
 app.use((_req, res) => {

@@ -26,6 +26,7 @@ export interface FormProps<TFieldValues extends FieldValues = FieldValues> {
   submitButtonText: string
   twoColumns?: boolean
   onFieldChange?: (name: Path<TFieldValues>, value: unknown) => void
+  transformValues?: (values: TFieldValues) => Promise<TFieldValues> | TFieldValues
 }
 
 export function Form<TFieldValues extends FieldValues = FieldValues>({
@@ -39,7 +40,8 @@ export function Form<TFieldValues extends FieldValues = FieldValues>({
   onSuccess,
   submitButtonText,
   twoColumns = false,
-  onFieldChange
+  onFieldChange,
+  transformValues
 }: FormProps<TFieldValues>) {
   const { form, isLoading, onSubmit } = useMutateForm<TFieldValues, TFieldValues>({
     queryKey,
@@ -53,9 +55,14 @@ export function Form<TFieldValues extends FieldValues = FieldValues>({
     }
   })
 
+  const handleSubmit = async (values: TFieldValues) => {
+    const transformed = transformValues ? await transformValues(values) : values
+    onSubmit(transformed)
+  }
+
   return (
     <FormUI {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className={twoColumns ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-start" : "grid items-start gap-6"}>
           {
             formDefinition.map((fieldDef, index) => (

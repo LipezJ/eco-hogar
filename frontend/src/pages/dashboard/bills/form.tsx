@@ -8,7 +8,9 @@ import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialo
 import { type Bill, CreateBillSchema, UpdateBillSchema, BillCycle, BillCategory, BillStatus } from "@web-project/types/bills"
 import { z } from "zod/v4"
 import { useDeleteResource } from "@/hooks/use-delete-resource"
-import { API_ENDPOINTS } from "@/lib/api-config"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-config"
+import { AttachmentUploader } from "@/components/attachment-uploader"
+import { uploadFile } from "@/lib/upload"
 
 const categoryOptions = BillCategory.options.map(cat => ({
   id: cat,
@@ -25,7 +27,26 @@ const statusOptions = BillStatus.options.map(status => ({
   label: status.charAt(0).toUpperCase() + status.slice(1)
 }))
 
-function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof CreateBillSchema>>[] {
+const fileSchema = typeof File === "undefined" ? z.never() : z.instanceof(File)
+const attachmentValueSchema = typeof File === "undefined"
+  ? z.string()
+  : z.union([fileSchema, z.string()])
+
+const billAttachmentSchema = z.preprocess((val) => {
+  if (typeof File !== "undefined" && val instanceof File) return val
+  if (typeof val === "string" && val.trim().length > 0) return val
+  return undefined
+}, attachmentValueSchema.optional())
+
+const CreateBillSchemaClient = CreateBillSchema.extend({
+  attachment: billAttachmentSchema
+})
+
+const UpdateBillSchemaClient = UpdateBillSchema.extend({
+  attachment: billAttachmentSchema
+})
+
+function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof CreateBillSchemaClient>>[] {
   const baseFields: FormFieldDef<z.infer<typeof CreateBillSchema>>[] = [
     {
       name: "provider",
@@ -84,8 +105,14 @@ function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof Crea
       {
         name: "attachment",
         label: "Comprobante",
-        description: "URL del comprobante o factura.",
-        placeholder: "https://..."
+        description: "Suba el comprobante o factura.",
+        custom: ({ field }) => (
+          <AttachmentUploader
+            value={field.value as string | File | undefined}
+            onChange={(val) => field.onChange(val)}
+            placeholder="Formatos admitidos: imágenes o PDF."
+          />
+        )
       }
     )
   }
@@ -118,7 +145,7 @@ function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof Crea
   return baseFields
 }
 
-function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof UpdateBillSchema>>[] {
+function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof UpdateBillSchemaClient>>[] {
   const baseFields: FormFieldDef<z.infer<typeof UpdateBillSchema>>[] = [
     {
       name: "id",
@@ -182,8 +209,14 @@ function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof Upda
       {
         name: "attachment",
         label: "Comprobante",
-        description: "URL del comprobante o factura.",
-        placeholder: "https://..."
+        description: "Suba el comprobante o factura.",
+        custom: ({ field }) => (
+          <AttachmentUploader
+            value={field.value as string | File | undefined}
+            onChange={(val) => field.onChange(val)}
+            placeholder="Formatos admitidos: imágenes o PDF."
+          />
+        )
       }
     )
   }
@@ -216,6 +249,20 @@ function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof Upda
   return baseFields
 }
 
+async function prepareBillPayload<T extends { status?: string; attachment?: string | File | null; paymentDate?: string | null }>(values: T) {
+  const nextValues = { ...values };
+  if (nextValues.status !== "pagado") {
+    nextValues.attachment = undefined;
+    nextValues.paymentDate = undefined;
+  } else if (nextValues.attachment instanceof File) {
+    const { path } = await uploadFile(nextValues.attachment);
+    nextValues.attachment = path;
+  } else if (typeof nextValues.attachment === 'string' && nextValues.attachment.trim().length === 0) {
+    nextValues.attachment = undefined;
+  }
+  return nextValues;
+}
+
 export function CreateBillForm() {
   const { setOpen } = useContext(FormDialogContext)
   const [status, setStatus] = useState<string>("pendiente")
@@ -223,7 +270,7 @@ export function CreateBillForm() {
   return (
     <Form
       formDefinition={getCreateBillFormDef(status)}
-      resolver={zodResolver(CreateBillSchema)}
+      resolver={zodResolver(CreateBillSchemaClient)}
       defaultValues={{
         provider: "",
         category: "otros",
@@ -245,6 +292,7 @@ export function CreateBillForm() {
           setStatus(value as string)
         }
       }}
+      transformValues={prepareBillPayload}
     />
   )
 }
@@ -256,7 +304,7 @@ export function UpdateBillForm({ bill }: { bill: Bill }) {
   return (
     <Form
       formDefinition={getUpdateBillFormDef(status)}
-      resolver={zodResolver(UpdateBillSchema)}
+      resolver={zodResolver(UpdateBillSchemaClient)}
       defaultValues={{
         id: bill.id,
         provider: bill.provider,
@@ -281,6 +329,7 @@ export function UpdateBillForm({ bill }: { bill: Bill }) {
           setStatus(value as string)
         }
       }}
+      transformValues={prepareBillPayload}
     />
   )
 }
@@ -292,6 +341,13 @@ export function BillsActions({ bill }: { bill: Bill }) {
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
     queryKeysToInvalidate: [['bills']]
   })
+  const openAttachment = () => {
+    if (!bill.attachment) return
+    const url = bill.attachment.startsWith('http')
+      ? bill.attachment
+      : `${API_BASE_URL}${bill.attachment}`
+    window.open(url, '_blank')
+  }
 
   const handleDelete = async () => {
     try {
@@ -371,7 +427,7 @@ export function BillsActions({ bill }: { bill: Bill }) {
             </DropdownMenuItem>
           )}
           {bill.attachment && (
-            <DropdownMenuItem onClick={() => window.open(bill.attachment, '_blank')}>
+            <DropdownMenuItem onClick={openAttachment}>
               <Paperclip />
               Ver comprobante
             </DropdownMenuItem>

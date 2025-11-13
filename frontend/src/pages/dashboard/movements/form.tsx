@@ -7,8 +7,10 @@ import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Movement, CreateMovementFormSchema, UpdateMovementFormSchema, MovementCategory, MovementType } from "@web-project/types/movements"
 import { z } from "zod/v4"
+import { AttachmentUploader } from "@/components/attachment-uploader"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-config"
 import { useDeleteResource } from "@/hooks/use-delete-resource"
-import { API_ENDPOINTS } from "@/lib/api-config"
+import { uploadFile } from "@/lib/upload"
 
 const categoryOptions = MovementCategory.options.map(cat => ({
   id: cat,
@@ -20,7 +22,26 @@ const typeOptions = MovementType.options.map(type => ({
   label: type.charAt(0).toUpperCase() + type.slice(1)
 }))
 
-function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementFormSchema>>[] {
+const fileSchema = typeof File === "undefined" ? z.never() : z.instanceof(File)
+const attachmentValueSchema = typeof File === "undefined"
+  ? z.string()
+  : z.union([fileSchema, z.string()])
+
+const attachmentFieldSchema = z.preprocess((val) => {
+  if (typeof File !== "undefined" && val instanceof File) return val
+  if (typeof val === "string" && val.trim().length > 0) return val
+  return undefined
+}, attachmentValueSchema.optional())
+
+const CreateMovementFormSchemaClient = CreateMovementFormSchema.extend({
+  attachment: attachmentFieldSchema
+})
+
+const UpdateMovementFormSchemaClient = UpdateMovementFormSchema.extend({
+  attachment: attachmentFieldSchema
+})
+
+function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementFormSchemaClient>>[] {
   return [
     {
       name: "type",
@@ -79,13 +100,19 @@ function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementF
     {
       name: "attachment",
       label: "Adjunto",
-      description: "URL del adjunto (opcional).",
-      placeholder: "https://..."
+      description: "Suba un comprobante o documento (opcional).",
+      custom: ({ field }) => (
+        <AttachmentUploader
+          value={field.value as string | File | undefined}
+          onChange={(val) => field.onChange(val)}
+          placeholder="Formatos admitidos: imágenes o PDF."
+        />
+      )
     }
   ]
 }
 
-function getUpdateMovementFormDef(): FormFieldDef<z.infer<typeof UpdateMovementFormSchema>>[] {
+function getUpdateMovementFormDef(): FormFieldDef<z.infer<typeof UpdateMovementFormSchemaClient>>[] {
   return [
     {
       name: "id",
@@ -96,6 +123,17 @@ function getUpdateMovementFormDef(): FormFieldDef<z.infer<typeof UpdateMovementF
   ] as unknown as FormFieldDef<z.infer<typeof UpdateMovementFormSchema>>[]
 }
 
+async function prepareMovementPayload<T extends { attachment?: string | File | null }>(values: T) {
+  if (values.attachment instanceof File) {
+    const { path } = await uploadFile(values.attachment)
+    return { ...values, attachment: path }
+  }
+  if (typeof values.attachment === 'string' && values.attachment.trim().length === 0) {
+    return { ...values, attachment: undefined }
+  }
+  return values
+}
+
 
 export function CreateMovementForm() {
   const { setOpen } = useContext(FormDialogContext)
@@ -103,7 +141,7 @@ export function CreateMovementForm() {
   return (
     <Form
       formDefinition={getCreateMovementFormDef()}
-      resolver={zodResolver(CreateMovementFormSchema)}
+      resolver={zodResolver(CreateMovementFormSchemaClient)}
       defaultValues={{
         type: "egreso",
         category: "otros",
@@ -111,7 +149,7 @@ export function CreateMovementForm() {
         description: "",
         date: new Date().toISOString().split('T')[0],
         tags: undefined,
-        attachment: ""
+        attachment: undefined
       }}
       queryKey={['movements']}
       url="/api/movements"
@@ -119,6 +157,7 @@ export function CreateMovementForm() {
       submitButtonText="Crear movimiento"
       onSuccess={() => setOpen(false)}
       twoColumns={true}
+      transformValues={prepareMovementPayload}
     />
   )
 }
@@ -129,7 +168,7 @@ export function UpdateMovementForm({ movement }: { movement: Movement }) {
   return (
     <Form
       formDefinition={getUpdateMovementFormDef()}
-      resolver={zodResolver(UpdateMovementFormSchema)}
+      resolver={zodResolver(UpdateMovementFormSchemaClient)}
       defaultValues={{
         id: movement.id,
         type: movement.type,
@@ -138,7 +177,7 @@ export function UpdateMovementForm({ movement }: { movement: Movement }) {
         description: movement.description,
         date: movement.date,
         tags: movement.tags,
-        attachment: movement.attachment || ""
+        attachment: movement.attachment ?? undefined
       }}
       queryKey={['movements']}
       url="/api/movements"
@@ -146,6 +185,7 @@ export function UpdateMovementForm({ movement }: { movement: Movement }) {
       submitButtonText="Guardar cambios"
       onSuccess={() => setOpen(false)}
       twoColumns={true}
+      transformValues={prepareMovementPayload}
     />
   )
 }
@@ -156,6 +196,13 @@ export function MovementsActions({ movement }: { movement: Movement }) {
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
     queryKeysToInvalidate: [['movements']]
   })
+  const openAttachment = () => {
+    if (!movement.attachment) return
+    const url = movement.attachment.startsWith('http')
+      ? movement.attachment
+      : `${API_BASE_URL}${movement.attachment}`
+    window.open(url, '_blank')
+  }
 
   const handleDelete = async () => {
     try {
@@ -207,7 +254,7 @@ export function MovementsActions({ movement }: { movement: Movement }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           {movement.attachment && (
-            <DropdownMenuItem onClick={() => window.open(movement.attachment || "", '_blank')}>
+            <DropdownMenuItem onClick={openAttachment}>
               <Paperclip />
               Ver adjunto
             </DropdownMenuItem>
