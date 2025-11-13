@@ -52,16 +52,33 @@ router.get('/:id', async (req, res) => {
 // POST /api/movements - Crear nuevo movimiento
 router.post('/', async (req, res) => {
   try {
+
     // Convertir tags array a JSON string
     const tagsString = req.body.tags ? JSON.stringify(req.body.tags) : null;
 
+    // Convertir fecha string a Date object
+    const dateValue = req.body.date ? new Date(req.body.date) : new Date();
+
+    // Convertir attachment vacío a null
+    const attachment = req.body.attachment && req.body.attachment.trim() !== ''
+      ? req.body.attachment
+      : null;
+
+    // Convertir amount a string (drizzle-zod espera string para decimal)
+    const amountString = req.body.amount !== undefined ? String(req.body.amount) : undefined;
+
     const movementId = randomUUID();
-    const validatedData = insertMovementSchema.parse({
+    const dataToValidate = {
       ...req.body,
+      amount: amountString,
       tags: tagsString,
+      attachment,
+      date: dateValue,
       id: movementId,
       createdAt: new Date(),
-    });
+    };
+
+    const validatedData = insertMovementSchema.parse(dataToValidate);
 
     await db.insert(movements).values(validatedData);
 
@@ -87,6 +104,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
+
+    // Convert amount to string if it exists
+    if (updateData.amount !== undefined) {
+      updateData.amount = String(updateData.amount);
+    }
 
     // Convertir tags array a JSON string si existe
     if (updateData.tags) {

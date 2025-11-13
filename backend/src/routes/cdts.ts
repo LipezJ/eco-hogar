@@ -65,7 +65,9 @@ router.post('/', async (req, res) => {
     const cdtId = randomUUID();
     const validatedData = insertCdtSchema.parse({
       ...req.body,
-      finalAmount,
+      initialAmount: String(req.body.initialAmount), // Convert number to string for decimal field
+      interestRate: String(req.body.interestRate), // Convert number to string for decimal field
+      finalAmount: String(finalAmount), // Convert number to string for decimal field
       dueDate,
       id: cdtId,
       createdAt: new Date(),
@@ -90,6 +92,14 @@ router.put('/:id', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
 
+    // Convert decimal fields to strings if they exist
+    if (updateData.initialAmount !== undefined) {
+      updateData.initialAmount = String(updateData.initialAmount);
+    }
+    if (updateData.interestRate !== undefined) {
+      updateData.interestRate = String(updateData.interestRate);
+    }
+
     // Si se actualizan campos que afectan el cálculo, recalcular finalAmount y dueDate
     if (updateData.initialAmount || updateData.interestRate || updateData.term || updateData.openingDate) {
       const [currentCdt] = await db
@@ -106,12 +116,13 @@ router.put('/:id', async (req, res) => {
       const term = updateData.term ?? currentCdt.term;
       const openingDate = updateData.openingDate ?? currentCdt.openingDate;
 
-      updateData.finalAmount = calculateFinalAmount(
+      const finalAmountCalculated = calculateFinalAmount(
         Number(initialAmount),
         Number(interestRate),
         term
       );
 
+      updateData.finalAmount = String(finalAmountCalculated);
       updateData.dueDate = calculateDueDate(openingDate.toISOString(), term);
     }
 

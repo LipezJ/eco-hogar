@@ -151,6 +151,8 @@ router.post('/', async (req, res) => {
     const debtId = randomUUID();
     const validatedData = insertDebtSchema.parse({
       ...req.body,
+      amount: String(req.body.amount), // Convert number to string for decimal field
+      interestRate: String(req.body.interestRate), // Convert number to string for decimal field
       id: debtId,
       createdAt: new Date(),
     });
@@ -179,6 +181,14 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
+
+    // Convert decimal fields to strings if they exist
+    if (updateData.amount !== undefined) {
+      updateData.amount = String(updateData.amount);
+    }
+    if (updateData.interestRate !== undefined) {
+      updateData.interestRate = String(updateData.interestRate);
+    }
 
     await db
       .update(debts)

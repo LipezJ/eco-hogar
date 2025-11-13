@@ -8,7 +8,7 @@ import debtsRouter from './routes/debts.js';
 import cdtsRouter from './routes/cdts.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());

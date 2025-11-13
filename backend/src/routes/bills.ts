@@ -42,6 +42,7 @@ router.post('/', async (req, res) => {
     const billId = randomUUID();
     const validatedData = insertBillSchema.parse({
       ...req.body,
+      amount: String(req.body.amount), // Convert number to string for decimal field
       id: billId,
       createdAt: new Date(),
     });
@@ -64,6 +65,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
+
+    // Convert amount to string if it exists
+    if (updateData.amount !== undefined) {
+      updateData.amount = String(updateData.amount);
+    }
 
     await db
       .update(bills)

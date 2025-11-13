@@ -42,6 +42,7 @@ router.post('/', async (req, res) => {
     const accountId = randomUUID();
     const validatedData = insertAccountSchema.parse({
       ...req.body,
+      balance: String(req.body.balance), // Convert number to string for decimal field
       id: accountId,
       createdAt: new Date(),
     });
@@ -64,6 +65,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id, createdAt, ...updateData } = req.body;
+
+    // Convert balance to string if it exists
+    if (updateData.balance !== undefined) {
+      updateData.balance = String(updateData.balance);
+    }
 
     await db
       .update(accounts)
