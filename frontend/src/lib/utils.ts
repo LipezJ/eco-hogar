@@ -78,8 +78,9 @@ export async function exportToExcel(data: Record<string, string>[], name: string
     return;
   }
 
+  const sheetName = name || "Datos";
   const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet(name.slice(0, 31));
+  const ws = wb.addWorksheet(sheetName.slice(0, 31));
 
   ws.columns = Object.keys(data[0]).map(key => ({ header: key, key }));
 
@@ -89,7 +90,55 @@ export async function exportToExcel(data: Record<string, string>[], name: string
 
   const buffer = await wb.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  const fileName = `${name.toLowerCase()}-${new Date().toISOString()}.xlsx`;
+  const fileName = `${(name || "datos").toLowerCase()}-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
+  const link = Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(blob),
+    download: fileName
+  });
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+export function exportToCSV(data: Record<string, string>[], name: string) {
+  if (!data || data.length === 0) {
+    console.warn("No hay datos para exportar.");
+    return;
+  }
+
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(","),
+    ...data.map(row =>
+      headers.map(header => {
+        const value = row[header] || "";
+        // Escapar comillas y envolver en comillas si contiene coma, comilla o salto de línea
+        if (value.includes(",") || value.includes('"') || value.includes("\n")) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      }).join(",")
+    )
+  ].join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const fileName = `${(name || "datos").toLowerCase()}-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+  const link = Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(blob),
+    download: fileName
+  });
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+export function exportToJSON(data: Record<string, string>[], name: string) {
+  if (!data || data.length === 0) {
+    console.warn("No hay datos para exportar.");
+    return;
+  }
+
+  const jsonContent = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" });
+  const fileName = `${(name || "datos").toLowerCase()}-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
   const link = Object.assign(document.createElement("a"), {
     href: URL.createObjectURL(blob),
     download: fileName

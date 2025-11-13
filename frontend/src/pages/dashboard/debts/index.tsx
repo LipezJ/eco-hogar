@@ -42,7 +42,7 @@ function DebtsContent({
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={debts} refresh={refetch} />
+      <DataTable columns={columns} data={debts} refresh={refetch} exportTo={true} />
     </>
   )
 }

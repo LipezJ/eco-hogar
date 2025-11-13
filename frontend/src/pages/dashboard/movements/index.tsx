@@ -35,7 +35,7 @@ function MovementsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={movements} refresh={refetch} />
+      <DataTable columns={columns} data={movements} refresh={refetch} exportTo={true} />
     </>
   )
 }

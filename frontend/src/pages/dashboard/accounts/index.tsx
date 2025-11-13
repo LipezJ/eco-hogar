@@ -37,7 +37,7 @@ function AccountsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={accounts} refresh={refetch} />
+      <DataTable columns={columns} data={accounts} refresh={refetch} exportTo={true} />
     </>
   )
 }

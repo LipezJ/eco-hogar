@@ -35,7 +35,7 @@ function CdtsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={cdts} refresh={refetch} />
+      <DataTable columns={columns} data={cdts} refresh={refetch} exportTo={true} />
     </>
   )
 }

@@ -35,7 +35,7 @@ function BillsContent() {
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={bills} refresh={refetch} />
+      <DataTable columns={columns} data={bills} refresh={refetch} exportTo={true} />
     </>
   )
 }

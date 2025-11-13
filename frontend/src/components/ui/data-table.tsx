@@ -1,6 +1,6 @@
 import { useSearchParams, usePathname } from "@/lib/router"
 import React, { Fragment, useCallback, useId, useMemo } from "react"
-import { ChevronDownIcon, ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, FileSpreadsheet, RefreshCcw, SearchIcon, XIcon, CheckIcon, ChevronsUpDownIcon } from "lucide-react"
+import { ChevronDownIcon, ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, FileSpreadsheet, RefreshCcw, SearchIcon, XIcon, CheckIcon, ChevronsUpDownIcon, Download, FileJson, FileText } from "lucide-react"
 import {
   type Column,
   type ColumnDef,
@@ -32,8 +32,9 @@ import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/p
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-import { cn, dateRangeFilterFn, multiSelectFilterFn, exportToExcel } from "@/lib/utils"
+import { cn, dateRangeFilterFn, multiSelectFilterFn, exportToExcel, exportToCSV, exportToJSON } from "@/lib/utils"
 import { DatePicker, DatePickerRange } from "./date-picker"
 import { useRouter } from "@/lib/router"
 import { Suspense } from "react"
@@ -301,9 +302,36 @@ function DataTableContent<TData, TValue>({
           </div>
           <div className="flex justify-end items-center pr-2 gap-2">
             {exportTo && (
-              <Button onClick={() => exportToExcel(exportData, name ?? "")} variant="outline">
-                <FileSpreadsheet />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Download size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => {
+                    const exportName = name || "datos";
+                    exportToExcel(exportData, exportName);
+                  }}>
+                    <FileSpreadsheet size={16} />
+                    Excel (.xlsx)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    const exportName = name || "datos";
+                    exportToCSV(exportData, exportName);
+                  }}>
+                    <FileText size={16} />
+                    CSV (.csv)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    const exportName = name || "datos";
+                    exportToJSON(exportData, exportName);
+                  }}>
+                    <FileJson size={16} />
+                    JSON (.json)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             {refresh && (
               <Button onClick={refresh} variant="outline">
@@ -423,7 +451,7 @@ function Filter<TData>({ column }: { column: Column<TData, unknown> }) {
         <div className='flex'>
           <Input
             id={`${id}-range-1`}
-            className='flex-1 rounded-e-none [-moz-appearance:_textfield] focus:z-10 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none'
+            className='flex-1 rounded-e-none [-moz-appearance:textfield] focus:z-10 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none'
             value={(columnFilterValue as [number, number])?.[0] ?? ''}
             onChange={e =>
               column.setFilterValue((old: [number, number]) => [
@@ -437,7 +465,7 @@ function Filter<TData>({ column }: { column: Column<TData, unknown> }) {
           />
           <Input
             id={`${id}-range-2`}
-            className='-ms-px flex-1 rounded-s-none [-moz-appearance:_textfield] focus:z-10 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none'
+            className='-ms-px flex-1 rounded-s-none [-moz-appearance:textfield] focus:z-10 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none'
             value={(columnFilterValue as [number, number])?.[1] ?? ''}
             onChange={e =>
               column.setFilterValue((old: [number, number]) => [
