@@ -130,7 +130,7 @@ export const columns: ColumnDef<Bill>[] = [
     accessorKey: "paymentDate",
     header: "Fecha Pago",
     meta: {
-      className: "w-1/12",
+      className: "w-2/12",
     },
     cell(props) {
       const paymentDate = props.row.original.paymentDate
