@@ -542,7 +542,7 @@ function Filter<TData>({ column }: { column: Column<TData, unknown> }) {
               <ChevronsUpDownIcon size={16} className="text-muted-foreground/80 shrink-0" aria-hidden="true" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0" align='start'>
+          <PopoverContent className="border-input w-full min-w-(--radix-popper-anchor-width) p-0" align='start'>
             <Command>
               <CommandInput placeholder={`Buscar ${columnHeader.toLowerCase()}...`} />
               <CommandList>

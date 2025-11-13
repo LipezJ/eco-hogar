@@ -33,7 +33,7 @@ export function TableBadge({ label, href, variant = "id", className }: IdBadgePr
         </Link>
         :
         <span>
-          parsedLabel
+          {parsedLabel}
         </span>
       }
     </Fragment>
