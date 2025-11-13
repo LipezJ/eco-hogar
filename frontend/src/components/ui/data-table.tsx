@@ -1,5 +1,3 @@
-"use client"
-
 // import { useSearchParams, usePathname } from "next/navigation"
 import React, { Fragment, useId, useMemo } from "react"
 import { ChevronDownIcon, ChevronFirstIcon, ChevronLastIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, FileSpreadsheet, RefreshCcw, SearchIcon, XIcon, CheckIcon, ChevronsUpDownIcon } from "lucide-react"

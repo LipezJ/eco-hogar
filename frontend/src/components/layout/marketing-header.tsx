@@ -1,5 +1,3 @@
-"use client"
-
 import { Link } from '@/lib/router';
 import { useState } from "react"
 import { Button } from "@/components/ui/button"

@@ -1,5 +1,3 @@
-"use client"
-
 import { RegisterForm } from "@/components/register-form"
 import { useQueryClient } from "@tanstack/react-query"
 // import NextTopLoader from "nextjs-toploader"

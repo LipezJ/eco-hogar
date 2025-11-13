@@ -1,5 +1,3 @@
-"use client"
-
 import { type ColumnDef } from "@tanstack/react-table"
 import { type Bill, getDaysUntilDue, isDueSoon, isOverdue } from "@web-project/types/bills"
 import { TableBadge } from "@/components/id-badge"

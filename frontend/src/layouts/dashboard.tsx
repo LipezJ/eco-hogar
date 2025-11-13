@@ -1,5 +1,3 @@
-"use client"
-
 import { CreditCard, FileText, Home, Landmark, PiggyBank, Receipt } from "lucide-react"
 
 import { SidebarProvider } from "@/components/ui/sidebar"

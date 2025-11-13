@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { CalendarIcon, ChevronDownIcon } from "lucide-react"
 import { es } from "date-fns/locale";
@@ -51,8 +49,6 @@ export function DatePicker({ value, setValue }: { value?: string; setValue: (dat
 }
 
 export function DatePickerRange({ value, setValue }: { value?: string[]; setValue: (date: string[]) => void }) {
-  "use client"
-
   const range = {
     from: value && value[0] !== "" ? new Date(value[0]) : undefined,
     to: value && value[1] !== "" ? new Date(value[1]) : undefined

@@ -1,5 +1,3 @@
-"use client"
-
 import { LoginForm } from "@/components/login-form"
 import { useQueryClient } from "@tanstack/react-query"
 // import NextTopLoader from "nextjs-toploader"

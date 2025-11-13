@@ -1,5 +1,3 @@
-"use client"
-
 import { DataTable } from "@/components/ui/data-table"
 import { SiteHeader } from "@/components/site-header"
 import { createColumns } from "./columns"

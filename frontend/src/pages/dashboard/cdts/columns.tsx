@@ -1,5 +1,3 @@
-"use client"
-
 import { type ColumnDef } from "@tanstack/react-table"
 import { type Cdt, getDaysRemaining, calculateProgress, calculateAccruedInterest, isDueSoon } from "@web-project/types/cdts"
 import { TableBadge } from "@/components/id-badge"

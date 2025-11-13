@@ -1,5 +1,3 @@
-"use client"
-
 import { type ColumnDef } from "@tanstack/react-table"
 import { type Movement } from "@web-project/types/movements"
 import { TableBadge } from "@/components/id-badge"

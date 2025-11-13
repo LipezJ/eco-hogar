@@ -1,5 +1,3 @@
-"use client"
-
 import { SiteHeader } from "@/components/site-header";
 import { MovementsStats } from "@/components/stats/movements";
 import { MovementsReports } from "@/components/reports/movements-reports";

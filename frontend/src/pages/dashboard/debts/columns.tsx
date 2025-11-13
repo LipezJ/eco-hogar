@@ -1,5 +1,3 @@
-"use client"
-
 import { type ColumnDef } from "@tanstack/react-table"
 import { type Debt, calculateMonthlyPayment, calculateRemainingBalance, generateAmortizationTable } from "@web-project/types/debts"
 import { TableBadge } from "@/components/id-badge"

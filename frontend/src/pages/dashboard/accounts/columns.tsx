@@ -1,5 +1,3 @@
-"use client"
-
 import { type ColumnDef } from "@tanstack/react-table"
 import { type Account, formatCurrency, convertToBase, getCurrencyName } from "@web-project/types/accounts"
 import { TableBadge } from "@/components/id-badge"
