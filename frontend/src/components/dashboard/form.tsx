@@ -19,6 +19,7 @@ export interface FormProps<TFieldValues extends FieldValues = FieldValues> {
   defaultValues?: DefaultValues<TFieldValues>
   resolver: Resolver<TFieldValues>
   queryKey: readonly unknown[]
+  queryKeysToInvalidate?: Array<unknown[]>
   url: string
   method?: string
   onSuccess: () => void
@@ -32,6 +33,7 @@ export function Form<TFieldValues extends FieldValues = FieldValues>({
   resolver,
   defaultValues,
   queryKey,
+  queryKeysToInvalidate,
   url,
   method = "POST",
   onSuccess,
@@ -41,6 +43,7 @@ export function Form<TFieldValues extends FieldValues = FieldValues>({
 }: FormProps<TFieldValues>) {
   const { form, isLoading, onSubmit } = useMutateForm<TFieldValues, TFieldValues>({
     queryKey,
+    queryKeysToInvalidate,
     url,
     method,
     onSuccess,

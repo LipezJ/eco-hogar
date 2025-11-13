@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { FormDialog, FormDialogStandalone } from "@/components/form-dialog"
 import { CreateDebtForm } from "./form"
-import { type Debt } from "@web-project/types/debts"
+import { type Debt, type Payment } from "@web-project/types/debts"
 import { useState, Suspense } from "react"
 import { PaymentsView } from "./payments"
 import DashboardLayout from "@/layouts/dashboard"
 import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch"
 import { API_ENDPOINTS } from "@/lib/api-config"
-import { transformDebts } from "@/lib/api-transformers"
+import { transformDebts, transformPayments } from "@/lib/api-transformers"
 import { TableLoadingSkeleton } from "@/components/loading-skeleton"
 
 function DebtsContent({
@@ -24,8 +24,18 @@ function DebtsContent({
     queryKey: ['debts']
   })
 
+  const { data: paymentsData, refetch: refetchPayments } = useSuspenseQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.payments,
+    queryKey: ['payments']
+  })
+
   const debts = transformDebts(data);
-  const columns = createColumns(onViewPayments)
+  const payments = transformPayments(paymentsData);
+  const columns = createColumns(onViewPayments, payments)
+  const refreshAll = () => {
+    void refetch()
+    void refetchPayments()
+  }
 
   return (
     <>
@@ -42,7 +52,7 @@ function DebtsContent({
           </Button>
         </FormDialog>
       </div>
-      <DataTable columns={columns} data={debts} refresh={refetch} exportTo={true} />
+      <DataTable columns={columns} data={debts} refresh={refreshAll} exportTo={true} />
     </>
   )
 }

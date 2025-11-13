@@ -154,6 +154,7 @@ export function CreateDebtForm() {
         description: ""
       }}
       queryKey={['debts']}
+      queryKeysToInvalidate={[['payments']]}
       url="/api/debts"
       method="POST"
       submitButtonText="Crear deuda/préstamo"
@@ -182,6 +183,7 @@ export function UpdateDebtForm({ debt }: { debt: Debt }) {
         description: debt.description
       }}
       queryKey={['debts']}
+      queryKeysToInvalidate={[['payments'], ['debt-payments', debt.id]]}
       url="/api/debts"
       method="PUT"
       submitButtonText="Guardar cambios"

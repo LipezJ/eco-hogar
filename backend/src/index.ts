@@ -5,6 +5,7 @@ import accountsRouter from './routes/accounts.js';
 import movementsRouter from './routes/movements.js';
 import billsRouter from './routes/bills.js';
 import debtsRouter from './routes/debts.js';
+import paymentsRouter from './routes/payments.js';
 import cdtsRouter from './routes/cdts.js';
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/accounts', accountsRouter);
 app.use('/api/movements', movementsRouter);
 app.use('/api/bills', billsRouter);
 app.use('/api/debts', debtsRouter);
+app.use('/api/payments', paymentsRouter);
 app.use('/api/cdts', cdtsRouter);
 
 // 404 handler
@@ -69,6 +71,8 @@ app.listen(PORT, () => {
   console.log(`   DELETE /api/debts/:id`);
   console.log(`   GET    /api/debts/:id/payments`);
   console.log(`   PUT    /api/debts/:id/payments/:paymentId`);
+  console.log(`\n   GET    /api/payments`);
+  console.log(`   GET    /api/payments?debtId=...`);
   console.log(`\n   GET    /api/cdts`);
   console.log(`   POST   /api/cdts`);
   console.log(`   GET    /api/cdts/:id`);

@@ -7,12 +7,12 @@ import { BillsReports } from "@/components/reports/bills-reports";
 import { CdtsStats } from "@/components/stats/cdts";
 import { CdtsReports } from "@/components/reports/cdts-reports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { type Payment, generateAmortizationTable } from "@web-project/types/debts";
+import { type Payment } from "@web-project/types/debts";
 import { Wallet, CreditCard, FileText, PiggyBank } from "lucide-react";
 import DashboardLayout from "@/layouts/dashboard";
 import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { transformMovements, transformDebts, transformBills, transformCdts } from "@/lib/api-transformers";
+import { transformMovements, transformDebts, transformBills, transformCdts, transformPayments } from "@/lib/api-transformers";
 import { Suspense } from "react";
 import { StatsLoadingSkeleton, ReportsLoadingSkeleton } from "@/components/loading-skeleton";
 
@@ -39,8 +39,13 @@ function DebtsContent() {
     queryKey: ['debts']
   })
 
+  const { data: paymentsData } = useSuspenseQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.payments,
+    queryKey: ['payments']
+  })
+
   const debts = transformDebts(debtsData);
-  const allPayments: Payment[] = debts.flatMap(debt => generateAmortizationTable(debt));
+  const allPayments: Payment[] = transformPayments(paymentsData);
 
   return <DebtsStats debts={debts} payments={allPayments} />
 }

@@ -1,7 +1,7 @@
 import type { Account } from '@web-project/types/accounts';
 import type { Bill } from '@web-project/types/bills';
 import type { Movement } from '@web-project/types/movements';
-import type { Debt } from '@web-project/types/debts';
+import type { Debt, Payment } from '@web-project/types/debts';
 import type { Cdt } from '@web-project/types/cdts';
 
 // Helper para convertir decimales de string a number
@@ -50,6 +50,25 @@ export const transformDebt = (data: any): Debt => ({
 
 export const transformDebts = (data: any[]): Debt[] => {
   return Array.isArray(data) ? data.map(transformDebt) : [];
+};
+
+// Transformar Payment del backend
+export const transformPayment = (data: any): Payment => ({
+  ...data,
+  amount: parseDecimal(data.amount),
+  principal: parseDecimal(data.principal),
+  interest: parseDecimal(data.interest),
+  installmentNumber: typeof data.installmentNumber === 'number'
+    ? data.installmentNumber
+    : parseInt(data.installmentNumber ?? '0', 10),
+  isPaid: Boolean(data.isPaid),
+  dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : new Date().toISOString(),
+  paidDate: data.paidDate ? new Date(data.paidDate).toISOString() : undefined,
+  createdAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
+});
+
+export const transformPayments = (data: any[]): Payment[] => {
+  return Array.isArray(data) ? data.map(transformPayment) : [];
 };
 
 // Transformar CDT del backend

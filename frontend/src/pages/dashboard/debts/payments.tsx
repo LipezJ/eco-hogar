@@ -1,29 +1,103 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { type Debt, type Payment, generateAmortizationTable } from "@web-project/types/debts"
-import { Check, AlertCircle, Calendar } from "lucide-react"
-import { useState } from "react"
+import { type Debt, type Payment } from "@web-project/types/debts"
+import { Check, AlertCircle, Calendar, Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
+import { API_ENDPOINTS } from "@/lib/api-config"
+import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { transformPayment, transformPayments } from "@/lib/api-transformers"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface PaymentsViewProps {
   debt: Debt
   onClose: () => void
 }
 
-export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
-  const [payments, setPayments] = useState<Payment[]>(() => generateAmortizationTable(debt))
+const formatCurrency = (value: number) =>
+  Number(value || 0).toLocaleString('es-ES', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 
-  const togglePayment = (paymentId: string) => {
-    setPayments(prev => prev.map(p =>
-      p.id === paymentId
-        ? { ...p, isPaid: !p.isPaid, paidDate: !p.isPaid ? new Date().toISOString() : undefined }
-        : p
-    ))
+export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
+  const [payments, setPayments] = useState<Payment[]>([])
+  const [savingPaymentId, setSavingPaymentId] = useState<string | null>(null)
+  const [updateError, setUpdateError] = useState<string | null>(null)
+
+  const { data, isLoading, isError, error, refetch } = useQueryFetch<unknown[]>({
+    url: `${API_ENDPOINTS.debts}/${debt.id}/payments`,
+    queryKey: ['debt-payments', debt.id],
+    staleTime: 0
+  })
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      setPayments(transformPayments(data))
+    }
+  }, [data])
+
+  const togglePayment = async (paymentId: string) => {
+    if (savingPaymentId) return
+
+    const originalPayment = payments.find(p => p.id === paymentId)
+    if (!originalPayment) return
+
+    const optimisticPayment: Payment = {
+      ...originalPayment,
+      isPaid: !originalPayment.isPaid,
+      paidDate: !originalPayment.isPaid ? new Date().toISOString() : undefined
+    }
+
+    setSavingPaymentId(paymentId)
+    setUpdateError(null)
+    setPayments(prev =>
+      prev.map(p => p.id === paymentId ? optimisticPayment : p)
+    )
+
+    try {
+      const response = await fetch(`${API_ENDPOINTS.debts}/${debt.id}/payments/${paymentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          isPaid: optimisticPayment.isPaid,
+          paidDate: optimisticPayment.paidDate
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('No se pudo actualizar el pago')
+      }
+
+      const saved = transformPayment(await response.json())
+      setPayments(prev =>
+        prev.map(p => p.id === paymentId ? saved : p)
+      )
+      refetch()
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      queryClient.invalidateQueries({ queryKey: ['debts'] })
+    } catch (updateErr) {
+      console.error('Error updating payment:', updateErr)
+      setPayments(prev =>
+        prev.map(p => p.id === paymentId ? originalPayment : p)
+      )
+      setUpdateError('Hubo un error al actualizar el pago. Intente nuevamente.')
+    } finally {
+      setSavingPaymentId(null)
+    }
   }
 
   const totalPaid = payments.filter(p => p.isPaid).length
+  const totalInstallments = payments.length || debt.installments
+  const completion = totalInstallments ? ((totalPaid / totalInstallments) * 100) : 0
   const totalInterest = payments.reduce((sum, p) => sum + p.interest, 0)
   const paidInterest = payments.filter(p => p.isPaid).reduce((sum, p) => sum + p.interest, 0)
+  const totalToPay = payments.length
+    ? payments.reduce((sum, p) => sum + p.amount, 0)
+    : debt.amount + totalInterest
 
   const isOverdue = (payment: Payment) => {
     if (payment.isPaid) return false
@@ -38,43 +112,46 @@ export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
     return diffDays >= 0 && diffDays <= 7
   }
 
+  const isInitialLoading = isLoading && payments.length === 0
+  const loadError = isError && payments.length === 0
+
   return (
     <div className="space-y-4">
       {/* Resumen */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Progreso</CardTitle>
+      <div className="grid gap-3 md:grid-cols-3">
+        <Card className="py-2">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Progreso</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalPaid}/{debt.installments}</div>
-            <p className="text-xs text-muted-foreground">
-              {((totalPaid / debt.installments) * 100).toFixed(0)}% completado
+          <CardContent className="pt-0 space-y-1 text-sm">
+            <div className="text-xl font-semibold">{totalPaid}/{totalInstallments}</div>
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
+              {completion.toFixed(0)}% completado
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Interés Total</CardTitle>
+        <Card className="py-2">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Interés Total</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalInterest.toLocaleString('es-ES')}</div>
-            <p className="text-xs text-muted-foreground">
-              ${paidInterest.toLocaleString('es-ES')} pagado
+          <CardContent className="pt-0 space-y-1 text-sm">
+            <div className="text-xl font-semibold">${formatCurrency(totalInterest)}</div>
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
+              ${formatCurrency(paidInterest)} pagado
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total a Pagar</CardTitle>
+        <Card className="py-2">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Total a Pagar</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${(debt.amount + totalInterest).toLocaleString('es-ES')}
+          <CardContent className="pt-0 space-y-1 text-sm">
+            <div className="text-xl font-semibold">
+              ${formatCurrency(totalToPay)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wide">
               Capital + intereses
             </p>
           </CardContent>
@@ -89,8 +166,27 @@ export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
             Haga clic en cada pago para marcarlo como pagado
           </CardDescription>
         </CardHeader>
-        <CardContent>
+          <CardContent>
           <div className="space-y-2 max-h-96 overflow-y-auto">
+            {isInitialLoading && (
+              <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Cargando pagos...
+              </div>
+            )}
+
+            {loadError && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error instanceof Error ? error.message : 'No se pudieron cargar los pagos.'}
+              </div>
+            )}
+
+            {!isInitialLoading && !loadError && payments.length === 0 && (
+              <div className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+                No hay pagos generados para esta deuda.
+              </div>
+            )}
+
             {payments.map((payment) => {
               const dueDate = new Date(payment.dueDate)
               const overdue = isOverdue(payment)
@@ -103,7 +199,8 @@ export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
                     "flex items-center justify-between p-3 rounded-lg border transition-colors cursor-pointer hover:bg-accent",
                     payment.isPaid && "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900",
                     overdue && !payment.isPaid && "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900",
-                    dueSoon && !payment.isPaid && "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900"
+                    dueSoon && !payment.isPaid && "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900",
+                    savingPaymentId === payment.id && "opacity-70 pointer-events-none"
                   )}
                   onClick={() => togglePayment(payment.id)}
                 >
@@ -143,9 +240,9 @@ export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
                     </div>
 
                     <div className="text-right">
-                      <div className="font-bold">${payment.amount.toLocaleString('es-ES')}</div>
+                      <div className="font-bold">${formatCurrency(payment.amount)}</div>
                       <div className="text-xs text-muted-foreground">
-                        Cap: ${payment.principal.toLocaleString('es-ES')} · Int: ${payment.interest.toLocaleString('es-ES')}
+                        Cap: ${formatCurrency(payment.principal)} · Int: ${formatCurrency(payment.interest)}
                       </div>
                     </div>
                   </div>
@@ -153,6 +250,10 @@ export function PaymentsView({ debt, onClose }: PaymentsViewProps) {
               )
             })}
           </div>
+
+          {updateError && (
+            <p className="mt-4 text-sm text-destructive">{updateError}</p>
+          )}
         </CardContent>
       </Card>
 

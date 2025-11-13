@@ -7,5 +7,6 @@ export const API_ENDPOINTS = {
   movements: `${API_BASE_URL}/api/movements`,
   bills: `${API_BASE_URL}/api/bills`,
   debts: `${API_BASE_URL}/api/debts`,
+  payments: `${API_BASE_URL}/api/payments`,
   cdts: `${API_BASE_URL}/api/cdts`,
 } as const;

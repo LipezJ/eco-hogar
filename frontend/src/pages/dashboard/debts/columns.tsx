@@ -1,9 +1,14 @@
 import { type ColumnDef } from "@tanstack/react-table"
-import { type Debt, calculateMonthlyPayment, calculateRemainingBalance, generateAmortizationTable } from "@web-project/types/debts"
+import { type Debt, type Payment, calculateMonthlyPayment, calculateRemainingBalance, generateAmortizationTable } from "@web-project/types/debts"
 import { TableBadge } from "@/components/id-badge"
 import { DebtsActions } from "./form"
 
-export const createColumns = (onViewPayments: (debt: Debt) => void): ColumnDef<Debt>[] => [
+const getDebtPayments = (debt: Debt, payments: Payment[]) => {
+  const storedPayments = payments.filter(p => p.debtId === debt.id);
+  return storedPayments.length > 0 ? storedPayments : generateAmortizationTable(debt);
+};
+
+export const createColumns = (onViewPayments: (debt: Debt) => void, payments: Payment[]): ColumnDef<Debt>[] => [
   {
     accessorKey: "type",
     header: "Tipo",
@@ -74,8 +79,8 @@ export const createColumns = (onViewPayments: (debt: Debt) => void): ColumnDef<D
     },
     cell(props) {
       const debt = props.row.original
-      const payments = generateAmortizationTable(debt)
-      const paidCount = payments.filter(p => p.isPaid).length
+      const debtPayments = getDebtPayments(debt, payments)
+      const paidCount = debtPayments.filter(p => p.isPaid).length
       return (
         <span className="text-sm">
           {paidCount}/{debt.installments}
@@ -91,8 +96,8 @@ export const createColumns = (onViewPayments: (debt: Debt) => void): ColumnDef<D
     },
     cell(props) {
       const debt = props.row.original
-      const payments = generateAmortizationTable(debt)
-      const remaining = calculateRemainingBalance(debt, payments)
+      const debtPayments = getDebtPayments(debt, payments)
+      const remaining = calculateRemainingBalance(debt, debtPayments)
       const percentage = ((remaining / debt.amount) * 100).toFixed(0)
 
       return (
