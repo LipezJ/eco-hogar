@@ -2,6 +2,9 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { type Movement } from "@web-project/types/movements"
 import { TableBadge } from "@/components/id-badge"
 import { MovementsActions } from "./form"
+import { API_BASE_URL } from "@/lib/api-config"
+import { Paperclip } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export const columns: ColumnDef<Movement>[] = [
   {
@@ -82,6 +85,29 @@ export const columns: ColumnDef<Movement>[] = [
             />
           ))}
         </div>
+      )
+    },
+  },
+  {
+    accessorKey: "attachment",
+    header: "Adjunto",
+    meta: {
+      className: "w-1/12 text-center",
+    },
+    cell({ row }) {
+      const attachment = row.original.attachment
+      if (!attachment) {
+        return <span className="text-muted-foreground text-xs">-</span>
+      }
+      const href = attachment.startsWith("http")
+        ? attachment
+        : `${API_BASE_URL}${attachment}`
+      return (
+        <Button asChild size="icon" variant="ghost" className="h-8 w-8" title="Ver adjunto">
+          <a href={href} target="_blank" rel="noreferrer">
+            <Paperclip className="h-4 w-4" />
+          </a>
+        </Button>
       )
     },
   },

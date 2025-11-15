@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button"
 import { Fragment, useContext, useState } from "react"
 import type { Resolver } from "react-hook-form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Edit, MoreVertical, Trash2, Paperclip } from "lucide-react"
+import { Edit, MoreVertical, Trash2 } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Movement, CreateMovementFormSchema, UpdateMovementFormSchema, MovementCategory, MovementType } from "@web-project/types/movements"
 import { z } from "zod/v4"
 import { AttachmentUploader } from "@/components/attachment-uploader"
-import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-config"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { useDeleteResource } from "@/hooks/use-delete-resource"
 import { uploadFile } from "@/lib/upload"
 
@@ -203,13 +203,6 @@ export function MovementsActions({ movement }: { movement: Movement }) {
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
     queryKeysToInvalidate: [['movements'], ['budget']]
   })
-  const openAttachment = () => {
-    if (!movement.attachment) return
-    const url = movement.attachment.startsWith('http')
-      ? movement.attachment
-      : `${API_BASE_URL}${movement.attachment}`
-    window.open(url, '_blank')
-  }
 
   const handleDelete = async () => {
     try {
@@ -260,12 +253,6 @@ export function MovementsActions({ movement }: { movement: Movement }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-          {movement.attachment && (
-            <DropdownMenuItem onClick={openAttachment}>
-              <Paperclip />
-              Ver adjunto
-            </DropdownMenuItem>
-          )}
           <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Edit/>
             Editar
