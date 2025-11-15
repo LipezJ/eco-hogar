@@ -2,6 +2,7 @@ import { z } from "zod/v4";
 
 export const MonthlyBudgetConfigSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   year: z.number().int().min(2000),
   month: z.number().int().min(1).max(12),
   amount: z.union([z.string(), z.number()]),

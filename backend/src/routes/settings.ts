@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { getMonthlyBudgetSummary, upsertMonthlyBudget } from '../services/budget.js';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
 
 const monthYearSchema = z.object({
   month: z.number().int().min(1).max(12),
@@ -24,7 +26,7 @@ const resolveMonthYear = (queryMonth?: string | string[], queryYear?: string | s
 router.get('/budget', async (req, res) => {
   try {
     const { month, year } = resolveMonthYear(req.query.month as string, req.query.year as string);
-    const summary = await getMonthlyBudgetSummary(year, month);
+    const summary = await getMonthlyBudgetSummary(req.authUser!.id, year, month);
     return res.json(summary);
   } catch (error) {
     console.error('Error fetching budget summary:', error);
@@ -42,11 +44,12 @@ router.put('/budget', async (req, res) => {
     });
 
     const config = await upsertMonthlyBudget({
+      userId: req.authUser!.id,
       ...parsed,
       amount: parsed.amount.toFixed(2),
     });
 
-    const summary = await getMonthlyBudgetSummary(config.year, config.month);
+    const summary = await getMonthlyBudgetSummary(req.authUser!.id, config.year, config.month);
     return res.json(summary);
   } catch (error) {
     console.error('Error saving budget configuration:', error);

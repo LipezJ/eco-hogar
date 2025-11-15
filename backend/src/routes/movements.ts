@@ -1,15 +1,27 @@
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { movements, insertMovementSchema } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
+
+function normalizeCategory(category: unknown) {
+  if (typeof category !== 'string') return category;
+  const normalized = category.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (normalized.toLowerCase() === 'educacion') {
+    return 'educacion';
+  }
+  return category;
+}
 
 // GET /api/movements - Listar todos los movimientos
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const allMovements = await db.select().from(movements);
+    const userId = req.authUser!.id;
+    const allMovements = await db.select().from(movements).where(eq(movements.userId, userId));
 
     // Parsear tags de JSON string a array
     const parsedMovements = allMovements.map(movement => ({
@@ -27,10 +39,11 @@ router.get('/', async (_req, res) => {
 // GET /api/movements/:id - Obtener un movimiento por ID
 router.get('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [movement] = await db
       .select()
       .from(movements)
-      .where(eq(movements.id, req.params.id));
+      .where(and(eq(movements.id, req.params.id), eq(movements.userId, userId)));
 
     if (!movement) {
       return res.status(404).json({ error: 'Movement not found' });
@@ -52,6 +65,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/movements - Crear nuevo movimiento
 router.post('/', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
 
     // Convertir tags array a JSON string
     const tagsString = req.body.tags ? JSON.stringify(req.body.tags) : null;
@@ -70,12 +84,14 @@ router.post('/', async (req, res) => {
     const movementId = randomUUID();
     const dataToValidate = {
       ...req.body,
+      category: normalizeCategory(req.body.category),
       amount: amountString,
       tags: tagsString,
       attachment,
       date: dateValue,
       id: movementId,
       createdAt: new Date(),
+      userId,
     };
 
     const validatedData = insertMovementSchema.parse(dataToValidate);
@@ -85,7 +101,7 @@ router.post('/', async (req, res) => {
     const [created] = await db
       .select()
       .from(movements)
-      .where(eq(movements.id, movementId));
+      .where(and(eq(movements.id, movementId), eq(movements.userId, userId)));
 
     // Parsear tags de vuelta a array
     const parsedCreated = {
@@ -103,7 +119,9 @@ router.post('/', async (req, res) => {
 // PUT /api/movements - Actualizar movimiento
 router.put('/', async (req, res) => {
   try {
-    const { id, createdAt, ...updateData } = req.body;
+    const userId = req.authUser!.id;
+    const { id, createdAt, userId: _ignoredUserId, ...updateData } = req.body;
+    updateData.category = normalizeCategory(updateData.category);
 
     // Convert amount to string if it exists
     if (updateData.amount !== undefined) {
@@ -123,12 +141,12 @@ router.put('/', async (req, res) => {
     await db
       .update(movements)
       .set(updateData)
-      .where(eq(movements.id, req.body.id));
+      .where(and(eq(movements.id, req.body.id), eq(movements.userId, userId)));
 
     const [updated] = await db
       .select()
       .from(movements)
-      .where(eq(movements.id, req.body.id));
+      .where(and(eq(movements.id, req.body.id), eq(movements.userId, userId)));
 
     if (!updated) {
       return res.status(404).json({ error: 'Movement not found' });
@@ -150,16 +168,17 @@ router.put('/', async (req, res) => {
 // DELETE /api/movements/:id - Eliminar movimiento
 router.delete('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [movement] = await db
       .select()
       .from(movements)
-      .where(eq(movements.id, req.params.id));
+      .where(and(eq(movements.id, req.params.id), eq(movements.userId, userId)));
 
     if (!movement) {
       return res.status(404).json({ error: 'Movement not found' });
     }
 
-    await db.delete(movements).where(eq(movements.id, req.params.id));
+    await db.delete(movements).where(and(eq(movements.id, req.params.id), eq(movements.userId, userId)));
 
     return res.status(204).send();
   } catch (error) {

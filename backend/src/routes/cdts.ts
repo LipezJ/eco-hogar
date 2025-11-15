@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { cdts, insertCdtSchema } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
 
 // Función auxiliar para calcular monto final con interés compuesto
 function calculateFinalAmount(initialAmount: number, annualRate: number, days: number): number {
@@ -21,9 +23,10 @@ function calculateDueDate(openingDate: string, days: number): Date {
 }
 
 // GET /api/cdts - Listar todos los CDTs
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const allCdts = await db.select().from(cdts);
+    const userId = req.authUser!.id;
+    const allCdts = await db.select().from(cdts).where(eq(cdts.userId, userId));
     return res.json(allCdts);
   } catch (error) {
     console.error('Error fetching CDTs:', error);
@@ -34,10 +37,11 @@ router.get('/', async (_req, res) => {
 // GET /api/cdts/:id - Obtener un CDT por ID
 router.get('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [cdt] = await db
       .select()
       .from(cdts)
-      .where(eq(cdts.id, req.params.id));
+      .where(and(eq(cdts.id, req.params.id), eq(cdts.userId, userId)));
 
     if (!cdt) {
       return res.status(404).json({ error: 'CDT not found' });
@@ -53,6 +57,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/cdts - Crear nuevo CDT
 router.post('/', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     // Calcular automáticamente finalAmount y dueDate
     const finalAmount = calculateFinalAmount(
       req.body.initialAmount,
@@ -72,6 +77,7 @@ router.post('/', async (req, res) => {
       dueDate: dueDate, // Already a Date object from calculateDueDate
       id: cdtId,
       createdAt: new Date(),
+      userId,
     });
 
     await db.insert(cdts).values(validatedData);
@@ -79,7 +85,7 @@ router.post('/', async (req, res) => {
     const [created] = await db
       .select()
       .from(cdts)
-      .where(eq(cdts.id, cdtId));
+      .where(and(eq(cdts.id, cdtId), eq(cdts.userId, userId)));
 
     return res.status(201).json(created);
   } catch (error) {
@@ -91,7 +97,8 @@ router.post('/', async (req, res) => {
 // PUT /api/cdts/:id - Actualizar CDT
 router.put('/', async (req, res) => {
   try {
-    const { id, createdAt, ...updateData } = req.body;
+    const userId = req.authUser!.id;
+    const { id, createdAt, userId: _ignoredUserId, ...updateData } = req.body;
 
     // Convert decimal fields to strings if they exist
     if (updateData.initialAmount !== undefined) {
@@ -110,7 +117,7 @@ router.put('/', async (req, res) => {
       const [currentCdt] = await db
         .select()
         .from(cdts)
-        .where(eq(cdts.id, req.body.id));
+        .where(and(eq(cdts.id, req.body.id), eq(cdts.userId, userId)));
 
       if (!currentCdt) {
         return res.status(404).json({ error: 'CDT not found' });
@@ -136,12 +143,12 @@ router.put('/', async (req, res) => {
     await db
       .update(cdts)
       .set(updateData)
-      .where(eq(cdts.id, req.body.id));
+      .where(and(eq(cdts.id, req.body.id), eq(cdts.userId, userId)));
 
     const [updated] = await db
       .select()
       .from(cdts)
-      .where(eq(cdts.id, req.body.id));
+      .where(and(eq(cdts.id, req.body.id), eq(cdts.userId, userId)));
 
     if (!updated) {
       return res.status(404).json({ error: 'CDT not found' });
@@ -157,16 +164,17 @@ router.put('/', async (req, res) => {
 // DELETE /api/cdts/:id - Eliminar CDT
 router.delete('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [cdt] = await db
       .select()
       .from(cdts)
-      .where(eq(cdts.id, req.params.id));
+      .where(and(eq(cdts.id, req.params.id), eq(cdts.userId, userId)));
 
     if (!cdt) {
       return res.status(404).json({ error: 'CDT not found' });
     }
 
-    await db.delete(cdts).where(eq(cdts.id, req.params.id));
+    await db.delete(cdts).where(and(eq(cdts.id, req.params.id), eq(cdts.userId, userId)));
 
     return res.status(204).send();
   } catch (error) {

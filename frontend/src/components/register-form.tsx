@@ -31,6 +31,7 @@ export function RegisterForm({
 
     const formData = new FormData(event.currentTarget);
     const name = String(formData.get('name') ?? '').trim();
+    const email = String(formData.get('email') ?? '').trim();
     const username = String(formData.get('username') ?? '').trim();
     const password = String(formData.get('password') ?? '');
     const confirmPassword = String(formData.get('confirm-password') ?? '');
@@ -40,14 +41,14 @@ export function RegisterForm({
       return;
     }
 
-    if (!name || !username || !password) {
+    if (!name || !username || !email || !password) {
       setError('Completa todos los campos requeridos');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await register({ name, username, password });
+      await register({ name, username, email, password });
       router.navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo crear la cuenta');
@@ -77,6 +78,18 @@ export function RegisterForm({
                   type="text"
                   placeholder="Juan Pérez"
                   minLength={2}
+                  required
+                  disabled={isSubmitting || isLoading}
+                />
+              </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="email">Correo electrónico</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="tu@email.com"
                   required
                   disabled={isSubmitting || isLoading}
                 />

@@ -46,6 +46,7 @@ async function renewBill(bill: BillRecord) {
   await db.transaction(async (tx) => {
     await tx.insert(bills).values({
       id: newBillId,
+      userId: bill.userId,
       provider: bill.provider,
       category: bill.category,
       cycle: bill.cycle,

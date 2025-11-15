@@ -31,12 +31,12 @@ export async function loginRequest(username: string, password: string): Promise<
   return data.user;
 }
 
-export async function registerRequest(name: string, username: string, password: string): Promise<AuthUser> {
+export async function registerRequest(name: string, username: string, email: string, password: string): Promise<AuthUser> {
   const res = await fetch(`${API_ENDPOINTS.auth}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ name, username, password }),
+    body: JSON.stringify({ name, username, email, password }),
   });
 
   const data = await handleResponse(res);

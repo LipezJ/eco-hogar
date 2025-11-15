@@ -20,6 +20,7 @@ export const BillCategory = z.enum([
 
 export const BillSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   provider: z.string(), // Proveedor del servicio
   category: BillCategory,
   cycle: BillCycle,
@@ -35,11 +36,13 @@ export const BillSchema = z.object({
 
 export const CreateBillSchema = BillSchema.omit({
   id: true,
-  createdAt: true
+  createdAt: true,
+  userId: true
 })
 
 export const UpdateBillSchema = BillSchema.omit({
-  createdAt: true
+  createdAt: true,
+  userId: true
 })
 
 export type Bill = z.infer<typeof BillSchema>

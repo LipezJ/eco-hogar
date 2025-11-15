@@ -1,15 +1,18 @@
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { accounts, insertAccountSchema } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
 
 // GET /api/accounts - Listar todas las cuentas
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const allAccounts = await db.select().from(accounts);
+    const userId = req.authUser!.id;
+    const allAccounts = await db.select().from(accounts).where(eq(accounts.userId, userId));
     return res.json(allAccounts);
   } catch (error) {
     console.error('Error fetching accounts:', error);
@@ -20,10 +23,11 @@ router.get('/', async (_req, res) => {
 // GET /api/accounts/:id - Obtener una cuenta por ID
 router.get('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [account] = await db
       .select()
       .from(accounts)
-      .where(eq(accounts.id, req.params.id));
+      .where(and(eq(accounts.id, req.params.id), eq(accounts.userId, userId)));
 
     if (!account) {
       return res.status(404).json({ error: 'Account not found' });
@@ -39,12 +43,14 @@ router.get('/:id', async (req, res) => {
 // POST /api/accounts - Crear nueva cuenta
 router.post('/', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const accountId = randomUUID();
     const validatedData = insertAccountSchema.parse({
       ...req.body,
       balance: String(req.body.balance), // Convert number to string for decimal field
       id: accountId,
       createdAt: new Date(),
+      userId,
     });
 
     await db.insert(accounts).values(validatedData);
@@ -52,7 +58,7 @@ router.post('/', async (req, res) => {
     const [created] = await db
       .select()
       .from(accounts)
-      .where(eq(accounts.id, accountId));
+      .where(and(eq(accounts.id, accountId), eq(accounts.userId, userId)));
 
     return res.status(201).json(created);
   } catch (error) {
@@ -64,7 +70,8 @@ router.post('/', async (req, res) => {
 // PUT /api/accounts - Actualizar cuenta
 router.put('/', async (req, res) => {
   try {
-    const { id, createdAt, ...updateData } = req.body;
+    const userId = req.authUser!.id;
+    const { id, createdAt, userId: _ignoredUserId, ...updateData } = req.body;
 
     // Convert balance to string if it exists
     if (updateData.balance !== undefined) {
@@ -74,12 +81,12 @@ router.put('/', async (req, res) => {
     await db
       .update(accounts)
       .set(updateData)
-      .where(eq(accounts.id, req.body.id));
+      .where(and(eq(accounts.id, req.body.id), eq(accounts.userId, userId)));
 
     const [updated] = await db
       .select()
       .from(accounts)
-      .where(eq(accounts.id, req.body.id));
+      .where(and(eq(accounts.id, req.body.id), eq(accounts.userId, userId)));
 
     if (!updated) {
       return res.status(404).json({ error: 'Account not found' });
@@ -95,16 +102,17 @@ router.put('/', async (req, res) => {
 // DELETE /api/accounts/:id - Eliminar cuenta
 router.delete('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [account] = await db
       .select()
       .from(accounts)
-      .where(eq(accounts.id, req.params.id));
+      .where(and(eq(accounts.id, req.params.id), eq(accounts.userId, userId)));
 
     if (!account) {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    await db.delete(accounts).where(eq(accounts.id, req.params.id));
+    await db.delete(accounts).where(and(eq(accounts.id, req.params.id), eq(accounts.userId, userId)));
 
     return res.status(204).send();
   } catch (error) {

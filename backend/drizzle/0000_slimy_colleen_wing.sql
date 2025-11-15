@@ -63,7 +63,7 @@ CREATE TABLE `debts` (
 CREATE TABLE `movements` (
 	`id` varchar(36) NOT NULL,
 	`type` enum('ingreso','egreso') NOT NULL,
-	`category` enum('comida','transporte','servicios','ocio','salud','educaci�n','vivienda','otros') NOT NULL,
+	`category` enum('comida','transporte','servicios','ocio','salud','educacion','vivienda','otros') NOT NULL,
 	`amount` decimal(15,2) NOT NULL,
 	`description` varchar(500) NOT NULL,
 	`tags` text,

@@ -4,6 +4,7 @@ export const DebtType = z.enum(["deuda", "prestamo"])
 
 export const DebtSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   type: DebtType,
   origin: z.string(), // Origen de la deuda o destino del préstamo
   amount: z.number().positive(),
@@ -17,6 +18,7 @@ export const DebtSchema = z.object({
 
 export const PaymentSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   debtId: z.string(),
   installmentNumber: z.number().int().positive(),
   dueDate: z.string(),
@@ -30,10 +32,11 @@ export const PaymentSchema = z.object({
 
 export const CreateDebtSchema = DebtSchema.omit({
   id: true,
-  createdAt: true
+  createdAt: true,
+  userId: true
 })
 
-export const UpdateDebtSchema = DebtSchema.partial().required({ id: true })
+export const UpdateDebtSchema = DebtSchema.omit({ userId: true }).partial().required({ id: true })
 
 export type Debt = z.infer<typeof DebtSchema>
 export type Payment = z.infer<typeof PaymentSchema>
@@ -77,6 +80,7 @@ export function generateAmortizationTable(debt: Debt): Payment[] {
     payments.push({
       id: `${debt.id}-${i}`,
       debtId: debt.id,
+      userId: debt.userId,
       installmentNumber: i,
       dueDate: dueDate.toISOString(),
       amount: monthlyPayment,

@@ -4,6 +4,7 @@ export const CdtStatus = z.enum(["activo", "vencido", "cancelado"])
 
 export const CdtSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   institution: z.string(), // Banco o institución financiera
   openingDate: z.string(), // Fecha de apertura
   initialAmount: z.number().positive(), // Monto inicial
@@ -21,10 +22,11 @@ export const CreateCdtSchema = CdtSchema.omit({
   id: true,
   createdAt: true,
   finalAmount: true,
-  dueDate: true
+  dueDate: true,
+  userId: true
 })
 
-export const UpdateCdtSchema = CdtSchema.partial().required({ id: true })
+export const UpdateCdtSchema = CdtSchema.omit({ userId: true }).partial().required({ id: true })
 
 export type Cdt = z.infer<typeof CdtSchema>
 export type CreateCdt = z.infer<typeof CreateCdtSchema>

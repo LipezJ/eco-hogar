@@ -6,7 +6,7 @@ interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
   login: (credentials: { username: string; password: string }) => Promise<void>;
-  register: (payload: { name: string; username: string; password: string }) => Promise<void>;
+  register: (payload: { name: string; username: string; email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -36,8 +36,8 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
     setUser(loggedUser);
   }, []);
 
-  const register = useCallback(async ({ name, username, password }: { name: string; username: string; password: string }) => {
-    const newUser = await registerRequest(name, username, password);
+  const register = useCallback(async ({ name, username, email, password }: { name: string; username: string; email: string; password: string }) => {
+    const newUser = await registerRequest(name, username, email, password);
     setUser(newUser);
   }, []);
 

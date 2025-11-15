@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { debts, payments, insertDebtSchema } from '../db/schema.js';
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, and } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
 
 // Función auxiliar para generar tabla de amortización
 function generateAmortizationTable(debt: any): any[] {
@@ -39,6 +41,7 @@ function generateAmortizationTable(debt: any): any[] {
     amortizationPayments.push({
       id: safePaymentId,
       debtId: debt.id,
+      userId: debt.userId,
       installmentNumber: i,
       dueDate,
       amount: (Math.round(monthlyPayment * 100) / 100).toFixed(2),
@@ -68,7 +71,7 @@ async function syncPaymentsForDebt(debt: any) {
   const existingPayments = await db
     .select()
     .from(payments)
-    .where(eq(payments.debtId, debt.id))
+    .where(and(eq(payments.debtId, debt.id), eq(payments.userId, debt.userId)))
     .orderBy(asc(payments.installmentNumber));
 
   const amortizationTable = generateAmortizationTable(debt);
@@ -119,7 +122,7 @@ async function syncPaymentsForDebt(debt: any) {
         principal: scheduled.principal,
         interest: scheduled.interest,
       })
-      .where(eq(payments.id, update.id));
+      .where(and(eq(payments.id, update.id), eq(payments.userId, debt.userId)));
   }
 
   if (inserts.length > 0) {
@@ -127,14 +130,15 @@ async function syncPaymentsForDebt(debt: any) {
   }
 
   for (const removal of removals) {
-    await db.delete(payments).where(eq(payments.id, removal.id));
+    await db.delete(payments).where(and(eq(payments.id, removal.id), eq(payments.userId, debt.userId)));
   }
 }
 
 // GET /api/debts - Listar todas las deudas
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const allDebts = await db.select().from(debts);
+    const userId = req.authUser!.id;
+    const allDebts = await db.select().from(debts).where(eq(debts.userId, userId));
     return res.json(allDebts);
   } catch (error) {
     console.error('Error fetching debts:', error);
@@ -145,10 +149,11 @@ router.get('/', async (_req, res) => {
 // GET /api/debts/:id - Obtener una deuda por ID
 router.get('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [debt] = await db
       .select()
       .from(debts)
-      .where(eq(debts.id, req.params.id));
+      .where(and(eq(debts.id, req.params.id), eq(debts.userId, userId)));
 
     if (!debt) {
       return res.status(404).json({ error: 'Debt not found' });
@@ -164,11 +169,12 @@ router.get('/:id', async (req, res) => {
 // GET /api/debts/:id/payments - Obtener tabla de amortización de una deuda
 router.get('/:id/payments', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     // Primero buscar los pagos existentes en la base de datos
     const existingPayments = await db
       .select()
       .from(payments)
-      .where(eq(payments.debtId, req.params.id))
+      .where(and(eq(payments.debtId, req.params.id), eq(payments.userId, userId)))
       .orderBy(asc(payments.installmentNumber));
 
     if (existingPayments.length > 0) {
@@ -179,7 +185,7 @@ router.get('/:id/payments', async (req, res) => {
     const [debt] = await db
       .select()
       .from(debts)
-      .where(eq(debts.id, req.params.id));
+      .where(and(eq(debts.id, req.params.id), eq(debts.userId, userId)));
 
     if (!debt) {
       return res.status(404).json({ error: 'Debt not found' });
@@ -202,6 +208,7 @@ router.get('/:id/payments', async (req, res) => {
 // PUT /api/debts/:id/payments/:paymentId - Marcar un pago como realizado
 router.put('/:id/payments/:paymentId', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const { isPaid, paidDate } = req.body;
 
     await db
@@ -210,12 +217,12 @@ router.put('/:id/payments/:paymentId', async (req, res) => {
         isPaid,
         paidDate: paidDate ? new Date(paidDate) : null
       })
-      .where(eq(payments.id, req.params.paymentId));
+      .where(and(eq(payments.id, req.params.paymentId), eq(payments.debtId, req.params.id), eq(payments.userId, userId)));
 
     const [updated] = await db
       .select()
       .from(payments)
-      .where(eq(payments.id, req.params.paymentId));
+      .where(and(eq(payments.id, req.params.paymentId), eq(payments.debtId, req.params.id), eq(payments.userId, userId)));
 
     if (!updated) {
       return res.status(404).json({ error: 'Payment not found' });
@@ -231,6 +238,7 @@ router.put('/:id/payments/:paymentId', async (req, res) => {
 // POST /api/debts - Crear nueva deuda
 router.post('/', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const debtId = randomUUID();
     const validatedData = insertDebtSchema.parse({
       ...req.body,
@@ -239,6 +247,7 @@ router.post('/', async (req, res) => {
       startDate: new Date(req.body.startDate), // Convert string to Date
       id: debtId,
       createdAt: new Date(),
+      userId,
     });
 
     await db.insert(debts).values(validatedData);
@@ -246,7 +255,7 @@ router.post('/', async (req, res) => {
     const [created] = await db
       .select()
       .from(debts)
-      .where(eq(debts.id, debtId));
+      .where(and(eq(debts.id, debtId), eq(debts.userId, userId)));
 
     await syncPaymentsForDebt(created);
 
@@ -264,7 +273,8 @@ router.post('/', async (req, res) => {
 // PUT /api/debts - Actualizar deuda
 router.put('/', async (req, res) => {
   try {
-    const { id, createdAt, ...updateData } = req.body;
+    const userId = req.authUser!.id;
+    const { id, createdAt, userId: _ignoredUserId, ...updateData } = req.body;
 
     // Convert decimal fields to strings if they exist
     if (updateData.amount !== undefined) {
@@ -281,12 +291,12 @@ router.put('/', async (req, res) => {
     await db
       .update(debts)
       .set(updateData)
-      .where(eq(debts.id, req.body.id));
+      .where(and(eq(debts.id, req.body.id), eq(debts.userId, userId)));
 
     const [updated] = await db
       .select()
       .from(debts)
-      .where(eq(debts.id, req.body.id));
+      .where(and(eq(debts.id, req.body.id), eq(debts.userId, userId)));
 
     if (!updated) {
       return res.status(404).json({ error: 'Debt not found' });
@@ -308,20 +318,21 @@ router.put('/', async (req, res) => {
 // DELETE /api/debts/:id - Eliminar deuda (y sus pagos asociados)
 router.delete('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [debt] = await db
       .select()
       .from(debts)
-      .where(eq(debts.id, req.params.id));
+      .where(and(eq(debts.id, req.params.id), eq(debts.userId, userId)));
 
     if (!debt) {
       return res.status(404).json({ error: 'Debt not found' });
     }
 
     // Primero eliminar los pagos asociados
-    await db.delete(payments).where(eq(payments.debtId, req.params.id));
+    await db.delete(payments).where(and(eq(payments.debtId, req.params.id), eq(payments.userId, userId)));
 
     // Luego eliminar la deuda
-    await db.delete(debts).where(eq(debts.id, req.params.id));
+    await db.delete(debts).where(and(eq(debts.id, req.params.id), eq(debts.userId, userId)));
 
     return res.status(204).send();
   } catch (error) {

@@ -18,17 +18,17 @@ const getMonthDateRange = (year: number, month: number) => {
   return { start, end };
 };
 
-export async function findMonthlyBudget(year: number, month: number) {
+export async function findMonthlyBudget(userId: string, year: number, month: number) {
   const [existing] = await db
     .select()
     .from(monthlyBudgets)
-    .where(and(eq(monthlyBudgets.year, year), eq(monthlyBudgets.month, month)));
+    .where(and(eq(monthlyBudgets.year, year), eq(monthlyBudgets.month, month), eq(monthlyBudgets.userId, userId)));
   return existing ?? null;
 }
 
-export async function upsertMonthlyBudget(params: { year: number; month: number; amount: string; currency: string }) {
-  const { year, month, amount, currency } = params;
-  const existing = await findMonthlyBudget(year, month);
+export async function upsertMonthlyBudget(params: { userId: string; year: number; month: number; amount: string; currency: string }) {
+  const { userId, year, month, amount, currency } = params;
+  const existing = await findMonthlyBudget(userId, year, month);
 
   if (existing) {
     await db
@@ -50,6 +50,7 @@ export async function upsertMonthlyBudget(params: { year: number; month: number;
 
   const record = {
     id: randomUUID(),
+    userId,
     year,
     month,
     amount,
@@ -62,9 +63,9 @@ export async function upsertMonthlyBudget(params: { year: number; month: number;
   return record;
 }
 
-export async function getMonthlyBudgetSummary(year: number, month: number) {
+export async function getMonthlyBudgetSummary(userId: string, year: number, month: number) {
   const { start, end } = getMonthDateRange(year, month);
-  const config = await findMonthlyBudget(year, month);
+  const config = await findMonthlyBudget(userId, year, month);
 
   const [movementTotals] = await db
     .select({
@@ -72,7 +73,7 @@ export async function getMonthlyBudgetSummary(year: number, month: number) {
       expenses: sql<string>`COALESCE(SUM(CASE WHEN ${movements.type} = 'egreso' THEN ${movements.amount} ELSE 0 END), 0)`,
     })
     .from(movements)
-    .where(sql`${movements.date} >= ${start} AND ${movements.date} < ${end}`);
+    .where(and(eq(movements.userId, userId), sql`${movements.date} >= ${start} AND ${movements.date} < ${end}`));
 
   const [debtPaymentTotals] = await db
     .select({
@@ -81,6 +82,7 @@ export async function getMonthlyBudgetSummary(year: number, month: number) {
     .from(payments)
     .where(
       and(
+        eq(payments.userId, userId),
         eq(payments.isPaid, true),
         sql`${payments.paidDate} IS NOT NULL`,
         sql`${payments.paidDate} >= ${start} AND ${payments.paidDate} < ${end}`,
@@ -95,14 +97,17 @@ export async function getMonthlyBudgetSummary(year: number, month: number) {
       status: bills.status,
     })
     .from(bills)
-    .where(sql`COALESCE(${bills.paymentDate}, ${bills.dueDate}) >= ${start} AND COALESCE(${bills.paymentDate}, ${bills.dueDate}) < ${end}`);
+    .where(and(
+      eq(bills.userId, userId),
+      sql`COALESCE(${bills.paymentDate}, ${bills.dueDate}) >= ${start} AND COALESCE(${bills.paymentDate}, ${bills.dueDate}) < ${end}`
+    ));
 
   const [cdtTotals] = await db
     .select({
       invested: sql<string>`COALESCE(SUM(${cdts.initialAmount}), 0)`,
     })
     .from(cdts)
-    .where(sql`${cdts.openingDate} >= ${start} AND ${cdts.openingDate} < ${end}`);
+    .where(and(eq(cdts.userId, userId), sql`${cdts.openingDate} >= ${start} AND ${cdts.openingDate} < ${end}`));
 
   const paidBillsTotal = billsInRange
     .filter((bill) => bill.paymentDate)

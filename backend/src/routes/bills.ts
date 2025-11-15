@@ -1,15 +1,18 @@
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { bills, insertBillSchema } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
 
 // GET /api/bills - Listar todos los recibos
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const allBills = await db.select().from(bills);
+    const userId = req.authUser!.id;
+    const allBills = await db.select().from(bills).where(eq(bills.userId, userId));
     return res.json(allBills);
   } catch (error) {
     console.error('Error fetching bills:', error);
@@ -20,10 +23,11 @@ router.get('/', async (_req, res) => {
 // GET /api/bills/:id - Obtener un recibo por ID
 router.get('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [bill] = await db
       .select()
       .from(bills)
-      .where(eq(bills.id, req.params.id));
+      .where(and(eq(bills.id, req.params.id), eq(bills.userId, userId)));
 
     if (!bill) {
       return res.status(404).json({ error: 'Bill not found' });
@@ -39,6 +43,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/bills - Crear nuevo recibo
 router.post('/', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const billId = randomUUID();
     const status = req.body.status;
     const normalizedPaymentDate = status === 'pagado' && req.body.paymentDate
@@ -56,6 +61,7 @@ router.post('/', async (req, res) => {
       attachment: normalizedAttachment,
       id: billId,
       createdAt: new Date(),
+      userId,
     });
 
     await db.insert(bills).values(validatedData);
@@ -63,7 +69,7 @@ router.post('/', async (req, res) => {
     const [created] = await db
       .select()
       .from(bills)
-      .where(eq(bills.id, billId));
+      .where(and(eq(bills.id, billId), eq(bills.userId, userId)));
 
     return res.status(201).json(created);
   } catch (error) {
@@ -75,7 +81,8 @@ router.post('/', async (req, res) => {
 // PUT /api/bills - Actualizar recibo
 router.put('/', async (req, res) => {
   try {
-    const { id, createdAt, ...updateData } = req.body;
+    const userId = req.authUser!.id;
+    const { id, createdAt, userId: _ignoredUserId, ...updateData } = req.body;
 
     // Convert amount to string if it exists
     if (updateData.amount !== undefined) {
@@ -97,12 +104,12 @@ router.put('/', async (req, res) => {
     await db
       .update(bills)
       .set(updateData)
-      .where(eq(bills.id, req.body.id));
+      .where(and(eq(bills.id, req.body.id), eq(bills.userId, userId)));
 
     const [updated] = await db
       .select()
       .from(bills)
-      .where(eq(bills.id, req.body.id));
+      .where(and(eq(bills.id, req.body.id), eq(bills.userId, userId)));
 
     if (!updated) {
       return res.status(404).json({ error: 'Bill not found' });
@@ -118,16 +125,17 @@ router.put('/', async (req, res) => {
 // DELETE /api/bills/:id - Eliminar recibo
 router.delete('/:id', async (req, res) => {
   try {
+    const userId = req.authUser!.id;
     const [bill] = await db
       .select()
       .from(bills)
-      .where(eq(bills.id, req.params.id));
+      .where(and(eq(bills.id, req.params.id), eq(bills.userId, userId)));
 
     if (!bill) {
       return res.status(404).json({ error: 'Bill not found' });
     }
 
-    await db.delete(bills).where(eq(bills.id, req.params.id));
+    await db.delete(bills).where(and(eq(bills.id, req.params.id), eq(bills.userId, userId)));
 
     return res.status(204).send();
   } catch (error) {

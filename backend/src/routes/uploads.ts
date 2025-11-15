@@ -2,8 +2,10 @@ import { Router, type Request, type Response } from 'express';
 import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
+import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
+router.use(requireAuth);
 
 const uploadDir = path.resolve(process.cwd(), 'uploads');
 

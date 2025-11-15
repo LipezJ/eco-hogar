@@ -1,20 +1,17 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
+import { TOKEN_COOKIE, clearAuthCookie, createToken, setAuthCookie, verifyToken } from '../lib/auth-utils.js';
 
 const router = Router();
 
-const TOKEN_COOKIE = 'auth_token';
-const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
-
 const registerSchema = z.object({
   username: z.string().min(3, 'El usuario debe tener al menos 3 caracteres'),
+  email: z.string().email('Debe ingresar un email válido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
 });
@@ -29,29 +26,13 @@ function sanitizeUser(user: typeof users.$inferSelect) {
   return rest;
 }
 
-function setAuthCookie(res: import('express').Response, token: string) {
-  res.cookie(TOKEN_COOKIE, token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: TOKEN_TTL_MS,
-  });
-}
-
-function clearAuthCookie(res: import('express').Response) {
-  res.clearCookie(TOKEN_COOKIE, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-  });
-}
-
-function createToken(userId: string) {
-  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: '7d' });
-}
-
 async function findUserByUsername(username: string) {
   const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+  return user;
+}
+
+async function findUserByEmail(email: string) {
+  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return user;
 }
 
@@ -62,11 +43,13 @@ async function findUserById(id: string) {
 
 async function ensureDefaultAdmin() {
   const defaultUsername = 'admin';
+  const defaultEmail = 'admin@example.com';
   const defaultPassword = 'admin1234';
   const defaultName = 'Administrador';
 
   const existing = await findUserByUsername(defaultUsername);
-  if (existing) {
+  const existingEmail = await findUserByEmail(defaultEmail);
+  if (existing || existingEmail) {
     return;
   }
 
@@ -74,6 +57,7 @@ async function ensureDefaultAdmin() {
   await db.insert(users).values({
     id: randomUUID(),
     username: defaultUsername,
+    email: defaultEmail,
     name: defaultName,
     passwordHash,
     createdAt: new Date(),
@@ -93,17 +77,22 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Datos inválidos' });
     }
 
-    const { username, password, name } = parsed.data;
+    const { username, email, password, name } = parsed.data;
 
     const existing = await findUserByUsername(username);
     if (existing) {
       return res.status(400).json({ error: 'El nombre de usuario ya está en uso' });
+    }
+    const existingEmail = await findUserByEmail(email);
+    if (existingEmail) {
+      return res.status(400).json({ error: 'El email ya está registrado' });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = {
       id: randomUUID(),
       username,
+      email,
       name,
       passwordHash,
       createdAt: new Date(),
@@ -157,7 +146,7 @@ router.get('/session', async (req, res) => {
       return res.json({ user: null });
     }
 
-    const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
+    const payload = verifyToken(token);
     const user = await findUserById(payload.sub);
 
     if (!user) {

@@ -187,7 +187,7 @@ function BudgetBreakdownCard({ data }: { data: BudgetSummaryResponse }) {
       <CardContent>
         {!hasData ? (
           <p className="text-sm text-muted-foreground">
-            Todav�a no hay movimientos que impacten el presupuesto en este mes. Registra movimientos,
+            Todavía no hay movimientos que impacten el presupuesto en este mes. Registra movimientos,
             pagos, recibos o CDTs para ver el detalle.
           </p>
         ) : (

@@ -26,6 +26,7 @@ export const AccountStatus = z.enum(["activa", "inactiva", "bloqueada"])
 
 export const AccountSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   name: z.string(), // Nombre descriptivo de la cuenta
   institution: z.string(), // Banco o institución
   accountType: AccountType,
@@ -41,7 +42,8 @@ export const AccountSchema = z.object({
 
 export const CreateAccountSchema = AccountSchema.omit({
   id: true,
-  createdAt: true
+  createdAt: true,
+  userId: true
 })
 
 export const UpdateAccountSchema = AccountSchema.partial().required({ id: true })

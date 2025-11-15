@@ -22,6 +22,13 @@
       "when": 1763158065742,
       "tag": "0002_bitter_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1763184273161,
+      "tag": "0003_clean_metal_master",
+      "breakpoints": true
     }
   ]
 }

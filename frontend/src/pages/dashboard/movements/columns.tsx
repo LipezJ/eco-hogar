@@ -6,6 +6,12 @@ import { API_BASE_URL } from "@/lib/api-config"
 import { Paperclip } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+const movementCategoryLabels: Record<string, string> = {
+  educacion: "Educación"
+}
+
+const formatCategoryLabel = (value: string) => movementCategoryLabels[value] ?? (value.charAt(0).toUpperCase() + value.slice(1))
+
 export const columns: ColumnDef<Movement>[] = [
   {
     accessorKey: "date",
@@ -44,7 +50,7 @@ export const columns: ColumnDef<Movement>[] = [
       className: "w-2/12",
     },
     cell(props) {
-      return <TableBadge label={props.row.original.category} />
+      return <TableBadge label={formatCategoryLabel(props.row.original.category)} />
     },
   },
   {

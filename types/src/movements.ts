@@ -8,13 +8,14 @@ export const MovementCategory = z.enum([
   "servicios",
   "ocio",
   "salud",
-  "educación",
+  "educacion",
   "vivienda",
   "otros"
 ])
 
 export const MovementSchema = z.object({
   id: z.string(),
+  userId: z.string(),
   type: MovementType,
   category: MovementCategory,
   amount: z.number().positive(),
@@ -27,7 +28,8 @@ export const MovementSchema = z.object({
 
 export const CreateMovementSchema = MovementSchema.omit({
   id: true,
-  createdAt: true
+  createdAt: true,
+  userId: true
 })
 
 export const UpdateMovementSchema = MovementSchema.partial().required({ id: true })

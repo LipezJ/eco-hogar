@@ -8,11 +8,13 @@ import { relations } from 'drizzle-orm';
 export const users = mysqlTable('users', {
   id: varchar('id', { length: 36 }).primaryKey(),
   username: varchar('username', { length: 191 }).notNull(),
+  email: varchar('email', { length: 191 }).notNull(),
   name: varchar('name', { length: 255 }).notNull(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   createdAt: datetime('created_at').notNull().$defaultFn(() => new Date()),
 }, (table) => ({
   usernameIdx: uniqueIndex('users_username_idx').on(table.username),
+  emailIdx: uniqueIndex('users_email_idx').on(table.email),
 }));
 
 // ============================================
@@ -20,6 +22,7 @@ export const users = mysqlTable('users', {
 // ============================================
 export const accounts = mysqlTable('accounts', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   name: varchar('name', { length: 255 }).notNull(),
   institution: varchar('institution', { length: 255 }).notNull(),
   accountType: mysqlEnum('account_type', [
@@ -56,6 +59,7 @@ export const accounts = mysqlTable('accounts', {
 // ============================================
 export const bills = mysqlTable('bills', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   provider: varchar('provider', { length: 255 }).notNull(),
   category: mysqlEnum('category', [
     'electricidad',
@@ -92,6 +96,7 @@ export const bills = mysqlTable('bills', {
 // ============================================
 export const cdts = mysqlTable('cdts', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   institution: varchar('institution', { length: 255 }).notNull(),
   openingDate: datetime('opening_date').notNull(),
   initialAmount: decimal('initial_amount', { precision: 15, scale: 2 }).notNull(),
@@ -110,6 +115,7 @@ export const cdts = mysqlTable('cdts', {
 // ============================================
 export const debts = mysqlTable('debts', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   type: mysqlEnum('type', ['deuda', 'prestamo']).notNull(),
   origin: varchar('origin', { length: 255 }).notNull(),
   amount: decimal('amount', { precision: 15, scale: 2 }).notNull(),
@@ -126,6 +132,7 @@ export const debts = mysqlTable('debts', {
 // ============================================
 export const payments = mysqlTable('payments', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   debtId: varchar('debt_id', { length: 36 }).notNull(),
   installmentNumber: int('installment_number').notNull(),
   dueDate: datetime('due_date').notNull(),
@@ -142,6 +149,7 @@ export const payments = mysqlTable('payments', {
 // ============================================
 export const movements = mysqlTable('movements', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   type: mysqlEnum('type', ['ingreso', 'egreso']).notNull(),
   category: mysqlEnum('category', [
     'comida',
@@ -149,7 +157,7 @@ export const movements = mysqlTable('movements', {
     'servicios',
     'ocio',
     'salud',
-    'educaci�n',
+    'educacion',
     'vivienda',
     'otros'
   ]).notNull(),
@@ -166,6 +174,7 @@ export const movements = mysqlTable('movements', {
 // ============================================
 export const monthlyBudgets = mysqlTable('monthly_budgets', {
   id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   year: int('year').notNull(),
   month: int('month').notNull(),
   amount: decimal('amount', { precision: 15, scale: 2 }).notNull(),

@@ -13,9 +13,15 @@ import { API_ENDPOINTS } from "@/lib/api-config"
 import { useDeleteResource } from "@/hooks/use-delete-resource"
 import { uploadFile } from "@/lib/upload"
 
+const movementCategoryLabels: Record<string, string> = {
+  educacion: "Educación"
+}
+
+const formatCategoryLabel = (value: string) => movementCategoryLabels[value] ?? (value.charAt(0).toUpperCase() + value.slice(1))
+
 const categoryOptions = MovementCategory.options.map(cat => ({
   id: cat,
-  label: cat.charAt(0).toUpperCase() + cat.slice(1)
+  label: formatCategoryLabel(cat)
 }))
 
 const typeOptions = MovementType.options.map(type => ({
