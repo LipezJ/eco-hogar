@@ -17,7 +17,8 @@ import { Link } from '@/lib/router';
 import { LogOut } from "lucide-react"
 // import { logout } from "@/lib/actions/auth-actions"
 import { Button } from "./ui/button"
-// import { signOut } from "next-auth/react"
+import { useAuth } from "@/lib/auth/auth-context"
+import { useRouter } from "@/lib/router"
 
 export type AppSidebar = {
   name?: string;
@@ -29,8 +30,16 @@ export type AppSidebar = {
 }
 
 export function AppSidebar({ sidebar }: { sidebar: AppSidebar[] }) {
+  const { logout } = useAuth()
+  const router = useRouter()
+
   const handleSignOut = async () => {
-    // await logout()
+    try {
+      await logout()
+      router.navigate('/login')
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    }
   }
 
   return (
