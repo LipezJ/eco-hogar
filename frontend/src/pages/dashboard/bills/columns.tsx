@@ -49,7 +49,7 @@ export const columns: ColumnDef<Bill>[] = [
     header: "Monto",
     meta: {
       filterVariant: "range",
-      className: "w-2/12",
+      className: "w-1/12",
     },
     cell(props) {
       return <span className="font-medium">${props.row.original.amount.toLocaleString('es-ES')}</span>
@@ -60,7 +60,7 @@ export const columns: ColumnDef<Bill>[] = [
     header: "Vencimiento",
     meta: {
       filterVariant: "date",
-      className: "w-2/12",
+      className: "w-1/12",
     },
     cell(props) {
       const bill = props.row.original
@@ -132,7 +132,7 @@ export const columns: ColumnDef<Bill>[] = [
     accessorKey: "paymentDate",
     header: "Fecha Pago",
     meta: {
-      className: "w-2/12",
+      className: "w-1/12",
     },
     cell(props) {
       const paymentDate = props.row.original.paymentDate
@@ -145,6 +145,26 @@ export const columns: ColumnDef<Bill>[] = [
           {date.toLocaleDateString('es-ES')}
         </div>
       )
+    },
+  },
+  {
+    accessorKey: "description",
+    header: "Descripción",
+    meta: {
+      filterVariant: "text",
+      className: "w-2/12",
+    },
+    cell({ row }) {
+      const description = row.original.description;
+      if (!description) {
+        return <span className="text-muted-foreground text-xs">-</span>;
+      }
+
+      return (
+        <span className="text-sm line-clamp-2" title={description}>
+          {description}
+        </span>
+      );
     },
   },
   {
