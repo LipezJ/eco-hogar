@@ -36,6 +36,10 @@
     "./budget": {
       "types": "./dist/budget.d.ts",
       "default": "./dist/budget.js"
+    },
+    "./notifications": {
+      "types": "./dist/notifications.d.ts",
+      "default": "./dist/notifications.js"
     }
   },
   "scripts": {

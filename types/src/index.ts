@@ -6,6 +6,7 @@ export * from './debts'
 export * from './movements'
 export * from './users'
 export * from './budget'
+export * from './notifications'
 
 // Re-export bills with conflict resolution
 export type { Bill, CreateBill, UpdateBill } from './bills'

@@ -12,8 +12,10 @@ import cdtsRouter from './routes/cdts.js';
 import authRouter from './routes/auth.js';
 import uploadsRouter from './routes/uploads.js';
 import settingsRouter from './routes/settings.js';
-import { startBillRenewalJob } from './jobs/bill-renewal.js';
+import notificationsRouter from './routes/notifications.js';
 import devToolsRouter from './routes/dev-tools.js';
+import { startBillRenewalJob } from './jobs/bill-renewal.js';
+import { startNotificationJob } from './jobs/notification-scheduler.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,6 +50,7 @@ app.use('/api/payments', paymentsRouter);
 app.use('/api/cdts', cdtsRouter);
 app.use('/api/uploads', uploadsRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/notifications', notificationsRouter);
 if (process.env.ENABLE_DEV_ENDPOINTS === 'true') {
   console.log('[DevTools] /api/dev habilitado');
   app.use('/api/dev', devToolsRouter);
@@ -101,5 +104,13 @@ app.listen(PORT, () => {
   console.log(`   GET    /api/cdts/:id`);
   console.log(`   PUT    /api/cdts/:id`);
   console.log(`   DELETE /api/cdts/:id`);
+  console.log(`\n   GET    /api/notifications`);
+  console.log(`   POST   /api/notifications/:id/read`);
+  console.log(`   POST   /api/notifications/read-all`);
+  if (process.env.ENABLE_DEV_ENDPOINTS === 'true') {
+    console.log(`\n   POST   /api/dev/bill-renewal`);
+    console.log(`   POST   /api/dev/notifications/create-admin`);
+  }
   startBillRenewalJob();
+  startNotificationJob();
 });

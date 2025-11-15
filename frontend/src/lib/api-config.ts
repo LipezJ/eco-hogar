@@ -12,4 +12,5 @@ export const API_ENDPOINTS = {
   uploads: `${API_BASE_URL}/api/uploads`,
   cdts: `${API_BASE_URL}/api/cdts`,
   budget: `${API_BASE_URL}/api/settings/budget`,
+  notifications: `${API_BASE_URL}/api/notifications`,
 } as const;

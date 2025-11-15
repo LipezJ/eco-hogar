@@ -89,3 +89,30 @@ export function PageLoadingSkeleton() {
     </div>
   )
 }
+
+export function ListLoadingSkeleton({ count = 5, showHeader = false }: { count?: number; showHeader?: boolean }) {
+  return (
+    <div className="space-y-3">
+      {showHeader && (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-[220px]" />
+            <Skeleton className="h-4 w-[320px]" />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Skeleton className="h-9 w-[120px]" />
+            <Skeleton className="h-9 w-[140px]" />
+            <Skeleton className="h-9 w-[140px]" />
+          </div>
+        </div>
+      )}
+      {[...Array(count)].map((_, index) => (
+        <Card key={index} className="p-4 space-y-2">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-1/3" />
+        </Card>
+      ))}
+    </div>
+  )
+}

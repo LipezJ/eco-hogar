@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, decimal, boolean, datetime, int, text, mysqlEnum, uniqueIndex } from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, decimal, boolean, datetime, int, text, mysqlEnum, uniqueIndex, index } from 'drizzle-orm/mysql-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { relations } from 'drizzle-orm';
 
@@ -182,7 +182,26 @@ export const monthlyBudgets = mysqlTable('monthly_budgets', {
   createdAt: datetime('created_at').notNull().$defaultFn(() => new Date()),
   updatedAt: datetime('updated_at').notNull().$defaultFn(() => new Date()).$onUpdate(() => new Date()),
 }, (table) => ({
-  uniqueYearMonthIdx: uniqueIndex('monthly_budgets_year_month_idx').on(table.year, table.month),
+  uniqueYearMonthIdx: uniqueIndex('monthly_budgets_year_month_idx').on(table.userId, table.year, table.month),
+}));
+
+// ============================================
+// NOTIFICATIONS TABLE
+// ============================================
+export const notifications = mysqlTable('notifications', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  title: varchar('title', { length: 255 }).notNull(),
+  message: text('message').notNull(),
+  type: mysqlEnum('type', ['info', 'warning', 'alert']).notNull().default('info'),
+  status: mysqlEnum('status', ['unread', 'read']).notNull().default('unread'),
+  resourceType: varchar('resource_type', { length: 100 }),
+  resourceId: varchar('resource_id', { length: 36 }),
+  eventType: varchar('event_type', { length: 100 }),
+  createdAt: datetime('created_at').notNull().$defaultFn(() => new Date()),
+  readAt: datetime('read_at'),
+}, (table) => ({
+  userResourceEventIdx: index('notifications_user_resource_event_idx').on(table.userId, table.resourceId, table.eventType),
 }));
 
 // ============================================
@@ -225,6 +244,8 @@ export const insertMovementSchema = createInsertSchema(movements);
 export const selectMovementSchema = createSelectSchema(movements);
 export const insertMonthlyBudgetSchema = createInsertSchema(monthlyBudgets);
 export const selectMonthlyBudgetSchema = createSelectSchema(monthlyBudgets);
+export const insertNotificationSchema = createInsertSchema(notifications);
+export const selectNotificationSchema = createSelectSchema(notifications);
 
 // ============================================
 // TYPES
@@ -251,3 +272,5 @@ export type Movement = typeof movements.$inferSelect;
 export type InsertMovement = typeof movements.$inferInsert;
 export type MonthlyBudget = typeof monthlyBudgets.$inferSelect;
 export type InsertMonthlyBudget = typeof monthlyBudgets.$inferInsert;
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

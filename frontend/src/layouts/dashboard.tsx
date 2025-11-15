@@ -1,4 +1,4 @@
-import { CreditCard, FileText, Home, Landmark, PiggyBank, Receipt, Settings } from "lucide-react"
+import { Bell, CreditCard, FileText, Home, Landmark, PiggyBank, Receipt, Settings } from "lucide-react"
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -11,6 +11,11 @@ const items = [
         title: "Home",
         url: "/dashboard",
         icon: Home,
+      },
+      {
+        title: "Notificaciones",
+        url: "/dashboard/notifications",
+        icon: Bell,
       }
     ]
   },

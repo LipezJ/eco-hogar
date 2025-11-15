@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { getMonthlyBudgetSummary, upsertMonthlyBudget } from '../services/budget.js';
+import { processNotificationsForUser } from '../services/notifications.js';
 import { requireAuth } from '../middleware/require-auth.js';
 
 const router = Router();
@@ -49,6 +50,7 @@ router.put('/budget', async (req, res) => {
       amount: parsed.amount.toFixed(2),
     });
 
+    await processNotificationsForUser(req.authUser!.id);
     const summary = await getMonthlyBudgetSummary(req.authUser!.id, config.year, config.month);
     return res.json(summary);
   } catch (error) {

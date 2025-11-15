@@ -127,6 +127,16 @@ Al iniciar el servidor se ejecuta una pasada inmediata y el cron se mantiene cor
 ### Endpoints de desarrollo
 Con `ENABLE_DEV_ENDPOINTS=true`, se expone `POST /api/dev/bill-renewal` para ejecutar manualmente el job de renovación. Se puede enviar opcionalmente `{"referenceDate": "2025-01-01T00:00:00.000Z"}` en el body para forzar la fecha de corte.
 
+### Notificaciones in-app
+Cada usuario cuenta con un centro de notificaciones. Un job diario revisa recibos vencidos o próximos a vencer y genera alertas locales (sin correos todavía). Variables:
+
+- `NOTIFICATION_DISABLED`: desactiva por completo el job.
+- `NOTIFICATION_CRON`: expresión CRON para ejecutar el generador (por defecto `0 8 * * *`).
+- `NOTIFICATION_TZ`: zona horaria opcional para el cron.
+- `NOTIFICATION_DUE_SOON_DAYS`: cantidad de días antes del vencimiento para disparar la alerta (“próximo a vencer”).
+
+El endpoint `/api/notifications` devuelve las notificaciones actuales; `/api/notifications/:id/read` y `/api/notifications/read-all` permiten marcarlas como leídas.
+
 ## Base de Datos
 
 ### Tablas
