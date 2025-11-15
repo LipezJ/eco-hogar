@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Account } from '@web-project/types/accounts';
 import type { Bill } from '@web-project/types/bills';
 import type { Movement } from '@web-project/types/movements';

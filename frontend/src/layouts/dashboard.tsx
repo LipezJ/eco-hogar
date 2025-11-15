@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import { Bell, CreditCard, FileText, Home, Landmark, PiggyBank, Receipt, Settings } from "lucide-react"
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
+import { useAuth } from "@/lib/auth/auth-context";
+import { useRouter } from "@/lib/router";
 // import NextTopLoader from "nextjs-toploader"
 
 const items = [
@@ -62,6 +65,19 @@ const items = [
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  const { replace } = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      replace("/login");
+    }
+  }, [isLoading, replace, user]);
+  
+  if (!user && !isLoading) {
+    return null;
+  }
+
   return (
     <SidebarProvider
       style={
