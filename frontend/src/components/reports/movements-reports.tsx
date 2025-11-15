@@ -108,7 +108,7 @@ export function MovementsReports({ movements }: MovementsReportsProps) {
     servicios: number
     ocio: number
     salud: number
-    educación: number
+    educacion: number
     vivienda: number
     otros: number
   }
@@ -129,7 +129,7 @@ export function MovementsReports({ movements }: MovementsReportsProps) {
         servicios: 0,
         ocio: 0,
         salud: 0,
-        educación: 0,
+        educacion: 0,
         vivienda: 0,
         otros: 0
       }
