@@ -57,7 +57,10 @@ export function useMutateForm<TFieldValues extends FieldValues = FieldValues, TC
     }
   })
 
-  const form = useForm(formProps)
+  const form = useForm({
+    ...formProps,
+    shouldUnregister: true
+  })
 
   const onSubmit = (data: TFieldValues) => {
     mutation.mutate(data)

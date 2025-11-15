@@ -40,11 +40,20 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const billId = randomUUID();
+    const status = req.body.status;
+    const normalizedPaymentDate = status === 'pagado' && req.body.paymentDate
+      ? new Date(req.body.paymentDate)
+      : undefined;
+    const normalizedAttachment = status === 'pagado'
+      ? req.body.attachment
+      : undefined;
+
     const validatedData = insertBillSchema.parse({
       ...req.body,
       amount: String(req.body.amount), // Convert number to string for decimal field
       dueDate: new Date(req.body.dueDate), // Convert string to Date
-      paymentDate: req.body.paymentDate ? new Date(req.body.paymentDate) : undefined, // Convert string to Date if exists
+      paymentDate: normalizedPaymentDate,
+      attachment: normalizedAttachment,
       id: billId,
       createdAt: new Date(),
     });
@@ -78,6 +87,11 @@ router.put('/', async (req, res) => {
     }
     if (updateData.paymentDate !== undefined && typeof updateData.paymentDate === 'string') {
       updateData.paymentDate = new Date(updateData.paymentDate);
+    }
+
+    if (updateData.status && updateData.status !== 'pagado') {
+      updateData.paymentDate = null;
+      updateData.attachment = null;
     }
 
     await db

@@ -1,17 +1,18 @@
-import { zodResolver } from "@hookform/resolvers/zod"
+﻿import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Fragment, useContext, useState } from "react"
 import type { Resolver } from "react-hook-form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Edit, MoreVertical, Trash2, Paperclip, CheckCircle } from "lucide-react"
+import { Edit, MoreVertical, Trash2, CheckCircle } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
 import { FormDialogContext, FormDialogStandalone } from "@/components/form-dialog"
 import { type Bill, CreateBillSchema, UpdateBillSchema, BillCycle, BillCategory, BillStatus } from "@web-project/types/bills"
 import { z } from "zod/v4"
 import { useDeleteResource } from "@/hooks/use-delete-resource"
-import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api-config"
+import { API_ENDPOINTS } from "@/lib/api-config"
 import { AttachmentUploader } from "@/components/attachment-uploader"
 import { uploadFile } from "@/lib/upload"
+import { useQueryClient } from "@tanstack/react-query"
 
 const categoryOptions = BillCategory.options.map(cat => ({
   id: cat,
@@ -51,7 +52,7 @@ type CreateBillFormValues = z.input<typeof CreateBillSchemaClient>
 type UpdateBillFormValues = z.input<typeof UpdateBillSchemaClient>
 
 function getCreateBillFormDef(status?: string): FormFieldDef<CreateBillFormValues>[] {
-  const baseFields: FormFieldDef<any>[] = [
+  const baseFields: FormFieldDef<CreateBillFormValues>[] = [
     {
       name: "provider",
       label: "Proveedor",
@@ -150,7 +151,7 @@ function getCreateBillFormDef(status?: string): FormFieldDef<CreateBillFormValue
 }
 
 function getUpdateBillFormDef(status?: string): FormFieldDef<UpdateBillFormValues>[] {
-  const baseFields: FormFieldDef<any>[] = [
+  const baseFields: FormFieldDef<UpdateBillFormValues>[] = [
     {
       name: "id",
       label: "ID",
@@ -348,16 +349,13 @@ export function BillsActions({ bill }: { bill: Bill }) {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [markPaidOpen, setMarkPaidOpen] = useState(false)
+  const [markPaidAttachment, setMarkPaidAttachment] = useState<string | File | undefined>(undefined)
+  const [markPaidLoading, setMarkPaidLoading] = useState(false)
+  const [markPaidError, setMarkPaidError] = useState<string | null>(null)
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
     queryKeysToInvalidate: [['bills'], ['budget']]
   })
-  const openAttachment = () => {
-    if (!bill.attachment) return
-    const url = bill.attachment.startsWith('http')
-      ? bill.attachment
-      : `${API_BASE_URL}${bill.attachment}`
-    window.open(url, '_blank')
-  }
+  const queryClient = useQueryClient()
 
   const handleDelete = async () => {
     try {
@@ -368,10 +366,43 @@ export function BillsActions({ bill }: { bill: Bill }) {
     }
   }
 
-  const handleMarkAsPaid = () => {
-    // Aquí iría la lógica para marcar como pagado
-    console.log("Marcar como pagado:", bill.id)
-    setMarkPaidOpen(false)
+  const handleMarkAsPaid = async () => {
+    setMarkPaidError(null)
+    setMarkPaidLoading(true)
+    try {
+      const payload = await prepareBillPayload({
+        id: bill.id,
+        status: 'pagado',
+        paymentDate: new Date().toISOString(),
+        attachment: markPaidAttachment ?? undefined
+      })
+
+      const response = await fetch(API_ENDPOINTS.bills, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) {
+        throw new Error('No se pudo actualizar el recibo')
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['bills'] }),
+        queryClient.invalidateQueries({ queryKey: ['budget'] })
+      ])
+
+      setMarkPaidAttachment(undefined)
+      setMarkPaidOpen(false)
+    } catch (error) {
+      console.error('Error marking bill as paid:', error)
+      setMarkPaidError('No se pudo confirmar el pago. Intente nuevamente.')
+    } finally {
+      setMarkPaidLoading(false)
+    }
   }
 
   return (
@@ -411,13 +442,31 @@ export function BillsActions({ bill }: { bill: Bill }) {
         title="Marcar como pagado"
         description={`¿Confirmar pago de ${bill.provider} por $${bill.amount.toLocaleString('es-ES')}?`}
       >
-        <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={() => setMarkPaidOpen(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleMarkAsPaid} className="bg-green-600 hover:bg-green-700">
-            Confirmar Pago
-          </Button>
+        <div className="space-y-3">
+          <AttachmentUploader
+            value={markPaidAttachment}
+            onChange={(val) => setMarkPaidAttachment(val as string | File | undefined)}
+            placeholder="Adjunte el comprobante de pago"
+          />
+          {markPaidError && (
+            <p className="text-sm text-destructive">{markPaidError}</p>
+          )}
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => {
+              setMarkPaidOpen(false)
+              setMarkPaidAttachment(undefined)
+              setMarkPaidError(null)
+            }}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleMarkAsPaid}
+              className="bg-green-600 hover:bg-green-700"
+              disabled={markPaidLoading}
+            >
+              {markPaidLoading ? "Guardando..." : "Confirmar pago"}
+            </Button>
+          </div>
         </div>
       </FormDialogStandalone>
 
@@ -436,12 +485,6 @@ export function BillsActions({ bill }: { bill: Bill }) {
               Marcar como pagado
             </DropdownMenuItem>
           )}
-          {bill.attachment && (
-            <DropdownMenuItem onClick={openAttachment}>
-              <Paperclip />
-              Ver comprobante
-            </DropdownMenuItem>
-          )}
           <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Edit/>
             Editar
@@ -455,3 +498,4 @@ export function BillsActions({ bill }: { bill: Bill }) {
     </Fragment>
   )
 }
+

@@ -63,11 +63,25 @@ export function Form<TFieldValues extends FieldValues = FieldValues>({
   return (
     <FormUI {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {
+          formDefinition
+            .filter((fieldDef) => fieldDef.type === "hidden")
+            .map((fieldDef) => (
+              <FormField
+                key={`${String(fieldDef.name)}-hidden`}
+                control={form.control}
+                field={fieldDef}
+                onFieldChange={onFieldChange}
+              />
+            ))
+        }
         <div className={twoColumns ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-start" : "grid items-start gap-6"}>
           {
-            formDefinition.map((fieldDef, index) => (
-              <FormField key={index} control={form.control} field={fieldDef} onFieldChange={onFieldChange} />
-            ))
+            formDefinition
+              .filter((fieldDef) => fieldDef.type !== "hidden")
+              .map((fieldDef) => (
+                <FormField key={fieldDef.name} control={form.control} field={fieldDef} onFieldChange={onFieldChange} />
+              ))
           }
         </div>
         <div className="flex justify-end">
@@ -107,6 +121,17 @@ interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
 function FormField<TFieldValues extends FieldValues = FieldValues>(
   { control, field: { name, type, label, description, placeholder, variant, options, custom }, onFieldChange }: FormFieldProps<TFieldValues>
 ) {
+  if (type === "hidden") {
+    return (
+      <FormFieldUI
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <input type="hidden" {...field} />
+        )}
+      />
+    )
+  }
   if (custom) {
     return (
       <FormFieldUI

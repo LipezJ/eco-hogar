@@ -2,7 +2,9 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { type Bill, getDaysUntilDue, isDueSoon, isOverdue } from "@web-project/types/bills"
 import { TableBadge } from "@/components/id-badge"
 import { BillsActions } from "./form"
-import { AlertCircle, Clock, CheckCircle } from "lucide-react"
+import { AlertCircle, Clock, CheckCircle, Paperclip } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api-config"
+import { Button } from "@/components/ui/button"
 
 export const columns: ColumnDef<Bill>[] = [
   {
@@ -142,6 +144,31 @@ export const columns: ColumnDef<Bill>[] = [
           <CheckCircle className="h-3 w-3 text-green-600" />
           {date.toLocaleDateString('es-ES')}
         </div>
+      )
+    },
+  },
+  {
+    accessorKey: "attachment",
+    header: "Comprobante",
+    meta: {
+      className: "w-1/12 text-center",
+    },
+    cell({ row }) {
+      const attachment = row.original.attachment
+      if (!attachment) {
+        return <span className="text-muted-foreground text-xs">-</span>
+      }
+
+      const href = attachment.startsWith('http')
+        ? attachment
+        : `${API_BASE_URL}${attachment}`
+
+      return (
+        <Button asChild size="icon" variant="ghost" className="h-8 w-8" title="Ver comprobante">
+          <a href={href} target="_blank" rel="noreferrer">
+            <Paperclip className="h-4 w-4" />
+          </a>
+        </Button>
       )
     },
   },
