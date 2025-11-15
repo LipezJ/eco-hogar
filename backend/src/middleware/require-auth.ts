@@ -16,14 +16,16 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   try {
     const token = req.cookies?.[TOKEN_COOKIE];
     if (!token) {
-      return res.status(401).json({ error: 'No autenticado' });
+      res.status(401).json({ error: 'No autenticado' });
+      return;
     }
 
     const payload = verifyToken(token);
     const [user] = await db.select().from(users).where(eq(users.id, payload.sub)).limit(1);
     if (!user) {
       clearAuthCookie(res);
-      return res.status(401).json({ error: 'Sesión inválida' });
+      res.status(401).json({ error: 'Sesión inválida' });
+      return;
     }
 
     req.authUser = user;
@@ -31,6 +33,6 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   } catch (error) {
     console.error('Error in authentication middleware:', error);
     clearAuthCookie(res);
-    return res.status(401).json({ error: 'Sesión inválida' });
+    res.status(401).json({ error: 'Sesión inválida' });
   }
 };
