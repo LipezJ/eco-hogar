@@ -156,7 +156,7 @@ export function CreateDebtForm() {
         description: ""
       }}
       queryKey={['debts']}
-      queryKeysToInvalidate={[['payments']]}
+      queryKeysToInvalidate={[['payments'], ['budget']]}
       url="/api/debts"
       method="POST"
       submitButtonText="Crear deuda/préstamo"
@@ -185,7 +185,7 @@ export function UpdateDebtForm({ debt }: { debt: Debt }) {
         description: debt.description
       }}
       queryKey={['debts']}
-      queryKeysToInvalidate={[['payments'], ['debt-payments', debt.id]]}
+      queryKeysToInvalidate={[['payments'], ['debt-payments', debt.id], ['budget']]}
       url="/api/debts"
       method="PUT"
       submitButtonText="Guardar cambios"
@@ -199,7 +199,7 @@ export function DebtsActions({ debt, onViewPayments }: { debt: Debt, onViewPayme
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
-    queryKeysToInvalidate: [['debts'], ['payments'], ['debt-payments', debt.id]]
+    queryKeysToInvalidate: [['debts'], ['payments'], ['debt-payments', debt.id], ['budget']]
   })
 
   const handleDelete = async () => {

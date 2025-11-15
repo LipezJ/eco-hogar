@@ -8,13 +8,17 @@ import { CdtsStats } from "@/components/stats/cdts";
 import { CdtsReports } from "@/components/reports/cdts-reports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type Payment } from "@web-project/types/debts";
-import { Wallet, CreditCard, FileText, PiggyBank } from "lucide-react";
+import { Wallet, CreditCard, FileText, PiggyBank, TrendingUp, TrendingDown } from "lucide-react";
 import DashboardLayout from "@/layouts/dashboard";
 import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { transformMovements, transformDebts, transformBills, transformCdts, transformPayments } from "@/lib/api-transformers";
 import { Suspense } from "react";
 import { StatsLoadingSkeleton, ReportsLoadingSkeleton } from "@/components/loading-skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import type { BudgetSummaryResponse } from "@web-project/types/budget";
+import { formatCurrency } from "@web-project/types/accounts";
 
 // Componentes con datos que usan Suspense
 function MovementsContent() {
@@ -82,13 +86,104 @@ function CdtsContent() {
   )
 }
 
+function DashboardOverview() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1);
+  const year = String(now.getFullYear());
+
+  const { data: movementsData } = useSuspenseQueryFetch<unknown[]>({
+    url: API_ENDPOINTS.movements,
+    queryKey: ['movements'],
+  });
+  const { data: budgetData } = useSuspenseQueryFetch<BudgetSummaryResponse>({
+    url: API_ENDPOINTS.budget,
+    queryKey: ['budget', year, month],
+    params: { year, month },
+  });
+
+  const movements = transformMovements(movementsData);
+
+  const totalIncome = movements.reduce((sum, movement) => movement.type === "ingreso" ? sum + movement.amount : sum, 0);
+  const totalExpenses = movements.reduce((sum, movement) => movement.type === "egreso" ? sum + movement.amount : sum, 0);
+
+  const budgetCurrency = budgetData.config?.currency ?? "COP";
+  const budgetUsage = Math.min(budgetData.summary.overall.usagePercentage, 100);
+
+  return (
+    <section className="space-y-3">
+      <div className="grid gap-2 grid-cols-2 md:grid-cols-5">
+        <Card className="col-span-1 md:col-span-1 h-full p-4 gap-1 md:gap-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-0">
+            <CardTitle className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+              Ingresos
+            </CardTitle>
+            <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+          </CardHeader>
+          <CardContent className="px-0 py-0 space-y-0.5">
+            <div className="text-base font-semibold leading-tight">{formatCurrency(totalIncome, budgetCurrency)}</div>
+            <p className="text-[10px] text-muted-foreground">{movements.length} movimientos</p>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1 md:col-span-1 h-full p-4 gap-1 md:gap-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 px-0">
+            <CardTitle className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+              Egresos
+            </CardTitle>
+            <TrendingDown className="h-3.5 w-3.5 text-red-600" />
+          </CardHeader>
+          <CardContent className="px-0 py-0 space-y-0.5">
+            <div className="text-base font-semibold leading-tight">{formatCurrency(totalExpenses, budgetCurrency)}</div>
+            <p className="text-[10px] text-muted-foreground">{movements.filter(m => m.type === "egreso").length} movimientos</p>
+          </CardContent>
+        </Card>
+        <Card className="col-span-2 md:col-span-3 h-full flex flex-col gap-1 py-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
+            <CardTitle className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+              Presupuesto
+            </CardTitle>
+            <TrendingDown className="h-3.5 w-3.5 text-red-600" />
+          </CardHeader>
+          <CardContent className="flex flex-col gap-1">
+            <div className="flex flex-wrap items-baseline gap-2">
+              <span className="text-xl font-semibold">{formatCurrency(budgetData.summary.overall.used, budgetCurrency)}</span>
+              <span className="text-[11px] text-muted-foreground">
+                de {formatCurrency(budgetData.summary.overall.limit, budgetCurrency)} configurados
+              </span>
+            </div>
+            <Progress value={budgetUsage} className="h-1" />
+            <div className="grid gap-2 grid-cols-3 text-[11px]">
+              <div>
+                <p className="text-muted-foreground">Restante</p>
+                <p className={`font-semibold ${budgetData.summary.overall.remaining < 0 ? "text-destructive" : ""}`}>
+                  {formatCurrency(budgetData.summary.overall.remaining, budgetCurrency)}
+                </p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Uso</p>
+                <p className="font-semibold">{budgetUsage.toFixed(1)}%</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Impacto CDTs</p>
+                <p className="font-semibold">{formatCurrency(budgetData.summary.totals.cdts.invested, budgetCurrency)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
 
   return (
     <DashboardLayout>
       <div className="flex flex-col min-h-screen">
         <SiteHeader title="Dashboard" />
-        <section className="container mx-auto pt-4 px-4">
+        <section className="container mx-auto pt-4 px-4 space-y-4">
+          <Suspense fallback={<StatsLoadingSkeleton />}>
+            <DashboardOverview />
+          </Suspense>
           <Tabs defaultValue="movements" className="w-full">
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto">
               <TabsTrigger value="movements" className="flex items-center gap-2 text-xs sm:text-sm">

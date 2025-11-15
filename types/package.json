@@ -32,6 +32,10 @@
     "./users": {
       "types": "./dist/users.d.ts",
       "default": "./dist/users.js"
+    },
+    "./budget": {
+      "types": "./dist/budget.d.ts",
+      "default": "./dist/budget.js"
     }
   },
   "scripts": {

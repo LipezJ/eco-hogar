@@ -11,4 +11,5 @@ export const API_ENDPOINTS = {
   auth: `${API_BASE_URL}/api/auth`,
   uploads: `${API_BASE_URL}/api/uploads`,
   cdts: `${API_BASE_URL}/api/cdts`,
+  budget: `${API_BASE_URL}/api/settings/budget`,
 } as const;

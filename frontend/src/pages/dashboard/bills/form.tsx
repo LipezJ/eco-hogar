@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Fragment, useContext, useState } from "react"
+import type { Resolver } from "react-hook-form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Edit, MoreVertical, Trash2, Paperclip, CheckCircle } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
@@ -36,7 +37,7 @@ const billAttachmentSchema = z.preprocess((val) => {
   if (typeof File !== "undefined" && val instanceof File) return val
   if (typeof val === "string" && val.trim().length > 0) return val
   return undefined
-}, attachmentValueSchema.optional())
+}, attachmentValueSchema).optional()
 
 const CreateBillSchemaClient = CreateBillSchema.extend({
   attachment: billAttachmentSchema
@@ -46,8 +47,11 @@ const UpdateBillSchemaClient = UpdateBillSchema.extend({
   attachment: billAttachmentSchema
 })
 
-function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof CreateBillSchemaClient>>[] {
-  const baseFields: FormFieldDef<z.infer<typeof CreateBillSchema>>[] = [
+type CreateBillFormValues = z.input<typeof CreateBillSchemaClient>
+type UpdateBillFormValues = z.input<typeof UpdateBillSchemaClient>
+
+function getCreateBillFormDef(status?: string): FormFieldDef<CreateBillFormValues>[] {
+  const baseFields: FormFieldDef<any>[] = [
     {
       name: "provider",
       label: "Proveedor",
@@ -142,11 +146,11 @@ function getCreateBillFormDef(status?: string): FormFieldDef<z.infer<typeof Crea
     }
   )
 
-  return baseFields
+  return baseFields as FormFieldDef<CreateBillFormValues>[]
 }
 
-function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof UpdateBillSchemaClient>>[] {
-  const baseFields: FormFieldDef<z.infer<typeof UpdateBillSchema>>[] = [
+function getUpdateBillFormDef(status?: string): FormFieldDef<UpdateBillFormValues>[] {
+  const baseFields: FormFieldDef<any>[] = [
     {
       name: "id",
       label: "ID",
@@ -246,19 +250,22 @@ function getUpdateBillFormDef(status?: string): FormFieldDef<z.infer<typeof Upda
     }
   )
 
-  return baseFields
+  return baseFields as FormFieldDef<UpdateBillFormValues>[]
 }
 
-async function prepareBillPayload<T extends { status?: string; attachment?: string | File | null; paymentDate?: string | null }>(values: T) {
+async function prepareBillPayload<T extends { status?: string; attachment?: unknown; paymentDate?: string | null }>(values: T) {
   const nextValues = { ...values };
   if (nextValues.status !== "pagado") {
     nextValues.attachment = undefined;
     nextValues.paymentDate = undefined;
-  } else if (nextValues.attachment instanceof File) {
-    const { path } = await uploadFile(nextValues.attachment);
-    nextValues.attachment = path;
-  } else if (typeof nextValues.attachment === 'string' && nextValues.attachment.trim().length === 0) {
-    nextValues.attachment = undefined;
+  } else {
+    const attachmentValue = nextValues.attachment;
+    if (typeof File !== "undefined" && attachmentValue instanceof File) {
+      const { path } = await uploadFile(attachmentValue);
+      nextValues.attachment = path as T["attachment"];
+    } else if (typeof attachmentValue === 'string' && attachmentValue.trim().length === 0) {
+      nextValues.attachment = undefined;
+    }
   }
   return nextValues;
 }
@@ -268,9 +275,9 @@ export function CreateBillForm() {
   const [status, setStatus] = useState<string>("pendiente")
 
   return (
-    <Form
+    <Form<CreateBillFormValues>
       formDefinition={getCreateBillFormDef(status)}
-      resolver={zodResolver(CreateBillSchemaClient)}
+      resolver={zodResolver(CreateBillSchemaClient) as Resolver<CreateBillFormValues>}
       defaultValues={{
         provider: "",
         category: "otros",
@@ -279,9 +286,11 @@ export function CreateBillForm() {
         dueDate: new Date().toISOString().split('T')[0],
         status: "pendiente",
         autoRenew: true,
-        description: ""
+        description: "",
+        attachment: undefined
       }}
       queryKey={['bills']}
+      queryKeysToInvalidate={[['budget']]}
       url="/api/bills"
       method="POST"
       submitButtonText="Crear recibo"
@@ -302,9 +311,9 @@ export function UpdateBillForm({ bill }: { bill: Bill }) {
   const [status, setStatus] = useState<string>(bill.status)
 
   return (
-    <Form
+    <Form<UpdateBillFormValues>
       formDefinition={getUpdateBillFormDef(status)}
-      resolver={zodResolver(UpdateBillSchemaClient)}
+      resolver={zodResolver(UpdateBillSchemaClient) as Resolver<UpdateBillFormValues>}
       defaultValues={{
         id: bill.id,
         provider: bill.provider,
@@ -319,6 +328,7 @@ export function UpdateBillForm({ bill }: { bill: Bill }) {
         description: bill.description
       }}
       queryKey={['bills']}
+      queryKeysToInvalidate={[['budget']]}
       url="/api/bills"
       method="PUT"
       submitButtonText="Guardar cambios"
@@ -339,7 +349,7 @@ export function BillsActions({ bill }: { bill: Bill }) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [markPaidOpen, setMarkPaidOpen] = useState(false)
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
-    queryKeysToInvalidate: [['bills']]
+    queryKeysToInvalidate: [['bills'], ['budget']]
   })
   const openAttachment = () => {
     if (!bill.attachment) return

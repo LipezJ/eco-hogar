@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Fragment, useContext, useState } from "react"
+import type { Resolver } from "react-hook-form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Edit, MoreVertical, Trash2, Paperclip } from "lucide-react"
 import { Form, type FormFieldDef } from "@/components/dashboard/form"
@@ -31,7 +32,7 @@ const attachmentFieldSchema = z.preprocess((val) => {
   if (typeof File !== "undefined" && val instanceof File) return val
   if (typeof val === "string" && val.trim().length > 0) return val
   return undefined
-}, attachmentValueSchema.optional())
+}, attachmentValueSchema).optional()
 
 const CreateMovementFormSchemaClient = CreateMovementFormSchema.extend({
   attachment: attachmentFieldSchema
@@ -41,8 +42,11 @@ const UpdateMovementFormSchemaClient = UpdateMovementFormSchema.extend({
   attachment: attachmentFieldSchema
 })
 
-function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementFormSchemaClient>>[] {
-  return [
+type CreateMovementFormValues = z.input<typeof CreateMovementFormSchemaClient>
+type UpdateMovementFormValues = z.input<typeof UpdateMovementFormSchemaClient>
+
+function getCreateMovementFormDef(): FormFieldDef<CreateMovementFormValues>[] {
+  return ([
     {
       name: "type",
       label: "Tipo",
@@ -109,24 +113,25 @@ function getCreateMovementFormDef(): FormFieldDef<z.infer<typeof CreateMovementF
         />
       )
     }
-  ]
+  ] as FormFieldDef<any>[]) as FormFieldDef<CreateMovementFormValues>[]
 }
 
-function getUpdateMovementFormDef(): FormFieldDef<z.infer<typeof UpdateMovementFormSchemaClient>>[] {
-  return [
+function getUpdateMovementFormDef(): FormFieldDef<UpdateMovementFormValues>[] {
+  const createFields = getCreateMovementFormDef() as unknown as FormFieldDef<UpdateMovementFormValues>[];
+  return ([
     {
       name: "id",
       label: "ID",
       type: "hidden"
     },
-    ...getCreateMovementFormDef()
-  ] as unknown as FormFieldDef<z.infer<typeof UpdateMovementFormSchema>>[]
+    ...createFields
+  ]) as FormFieldDef<UpdateMovementFormValues>[];
 }
 
-async function prepareMovementPayload<T extends { attachment?: string | File | null }>(values: T) {
-  if (values.attachment instanceof File) {
+async function prepareMovementPayload<T extends { attachment?: unknown }>(values: T) {
+  if (typeof File !== "undefined" && values.attachment instanceof File) {
     const { path } = await uploadFile(values.attachment)
-    return { ...values, attachment: path }
+    return { ...values, attachment: path as T["attachment"] }
   }
   if (typeof values.attachment === 'string' && values.attachment.trim().length === 0) {
     return { ...values, attachment: undefined }
@@ -139,9 +144,9 @@ export function CreateMovementForm() {
   const { setOpen } = useContext(FormDialogContext)
 
   return (
-    <Form
+    <Form<CreateMovementFormValues>
       formDefinition={getCreateMovementFormDef()}
-      resolver={zodResolver(CreateMovementFormSchemaClient)}
+      resolver={zodResolver(CreateMovementFormSchemaClient) as Resolver<CreateMovementFormValues>}
       defaultValues={{
         type: "egreso",
         category: "otros",
@@ -152,6 +157,7 @@ export function CreateMovementForm() {
         attachment: undefined
       }}
       queryKey={['movements']}
+      queryKeysToInvalidate={[['budget']]}
       url="/api/movements"
       method="POST"
       submitButtonText="Crear movimiento"
@@ -166,9 +172,9 @@ export function UpdateMovementForm({ movement }: { movement: Movement }) {
   const { setOpen } = useContext(FormDialogContext)
 
   return (
-    <Form
+    <Form<UpdateMovementFormValues>
       formDefinition={getUpdateMovementFormDef()}
-      resolver={zodResolver(UpdateMovementFormSchemaClient)}
+      resolver={zodResolver(UpdateMovementFormSchemaClient) as Resolver<UpdateMovementFormValues>}
       defaultValues={{
         id: movement.id,
         type: movement.type,
@@ -180,6 +186,7 @@ export function UpdateMovementForm({ movement }: { movement: Movement }) {
         attachment: movement.attachment ?? undefined
       }}
       queryKey={['movements']}
+      queryKeysToInvalidate={[['budget']]}
       url="/api/movements"
       method="PUT"
       submitButtonText="Guardar cambios"
@@ -194,7 +201,7 @@ export function MovementsActions({ movement }: { movement: Movement }) {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
-    queryKeysToInvalidate: [['movements']]
+    queryKeysToInvalidate: [['movements'], ['budget']]
   })
   const openAttachment = () => {
     if (!movement.attachment) return

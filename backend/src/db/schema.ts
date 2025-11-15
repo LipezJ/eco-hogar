@@ -162,6 +162,21 @@ export const movements = mysqlTable('movements', {
 });
 
 // ============================================
+// MONTHLY BUDGETS TABLE
+// ============================================
+export const monthlyBudgets = mysqlTable('monthly_budgets', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  year: int('year').notNull(),
+  month: int('month').notNull(),
+  amount: decimal('amount', { precision: 15, scale: 2 }).notNull(),
+  currency: varchar('currency', { length: 10 }).notNull().default('COP'),
+  createdAt: datetime('created_at').notNull().$defaultFn(() => new Date()),
+  updatedAt: datetime('updated_at').notNull().$defaultFn(() => new Date()).$onUpdate(() => new Date()),
+}, (table) => ({
+  uniqueYearMonthIdx: uniqueIndex('monthly_budgets_year_month_idx').on(table.year, table.month),
+}));
+
+// ============================================
 // RELATIONS
 // ============================================
 export const debtsRelations = relations(debts, ({ many }) => ({
@@ -199,6 +214,8 @@ export const selectPaymentSchema = createSelectSchema(payments);
 
 export const insertMovementSchema = createInsertSchema(movements);
 export const selectMovementSchema = createSelectSchema(movements);
+export const insertMonthlyBudgetSchema = createInsertSchema(monthlyBudgets);
+export const selectMonthlyBudgetSchema = createSelectSchema(monthlyBudgets);
 
 // ============================================
 // TYPES
@@ -223,3 +240,5 @@ export type InsertPayment = typeof payments.$inferInsert;
 
 export type Movement = typeof movements.$inferSelect;
 export type InsertMovement = typeof movements.$inferInsert;
+export type MonthlyBudget = typeof monthlyBudgets.$inferSelect;
+export type InsertMonthlyBudget = typeof monthlyBudgets.$inferInsert;

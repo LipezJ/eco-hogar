@@ -11,6 +11,7 @@ import paymentsRouter from './routes/payments.js';
 import cdtsRouter from './routes/cdts.js';
 import authRouter from './routes/auth.js';
 import uploadsRouter from './routes/uploads.js';
+import settingsRouter from './routes/settings.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +45,7 @@ app.use('/api/debts', debtsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/cdts', cdtsRouter);
 app.use('/api/uploads', uploadsRouter);
+app.use('/api/settings', settingsRouter);
 
 // 404 handler
 app.use((_req, res) => {

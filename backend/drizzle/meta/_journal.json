@@ -15,6 +15,13 @@
       "when": 1763063299883,
       "tag": "0001_nebulous_roxanne_simpson",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1763158065742,
+      "tag": "0002_bitter_blade",
+      "breakpoints": true
     }
   ]
 }

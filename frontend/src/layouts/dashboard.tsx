@@ -1,4 +1,4 @@
-import { CreditCard, FileText, Home, Landmark, PiggyBank, Receipt } from "lucide-react"
+import { CreditCard, FileText, Home, Landmark, PiggyBank, Receipt, Settings } from "lucide-react"
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -41,6 +41,16 @@ const items = [
         title: "Cuentas",
         url: "/dashboard/accounts",
         icon: Landmark,
+      }
+    ]
+  },
+  {
+    name: "Configuraciones",
+    items: [
+      {
+        title: "Presupuesto mensual",
+        url: "/dashboard/settings",
+        icon: Settings,
       }
     ]
   }

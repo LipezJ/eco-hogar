@@ -45,11 +45,12 @@ function ensureHistoryPatched() {
 
   const wrap = (type: 'pushState' | 'replaceState') => {
     const original = history[type];
-    history[type] = (function (...args: Parameters<typeof original>) {
+    function patched(this: History, ...args: Parameters<typeof original>) {
       const result = original.apply(this, args);
       dispatch(type === 'pushState' ? 'pushstate' : 'replacestate');
       return result;
-    }) as typeof original;
+    }
+    history[type] = patched as typeof original;
   };
 
   wrap('pushState');

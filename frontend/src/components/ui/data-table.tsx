@@ -59,7 +59,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   isLoading?: boolean
   exportTo?: boolean
-  refresh?: () => object
+  refresh?: () => void | Promise<unknown>
 }
 
 function DataTableContent<TData, TValue>({

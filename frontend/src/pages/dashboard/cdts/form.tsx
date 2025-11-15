@@ -174,6 +174,7 @@ export function CreateCdtForm() {
         description: ""
       }}
       queryKey={['cdts']}
+      queryKeysToInvalidate={[['budget']]}
       url="/api/cdts"
       method="POST"
       submitButtonText="Crear CDT"
@@ -202,6 +203,7 @@ export function UpdateCdtForm({ cdt }: { cdt: Cdt }) {
         description: cdt.description
       }}
       queryKey={['cdts']}
+      queryKeysToInvalidate={[['budget']]}
       url="/api/cdts"
       method="PUT"
       submitButtonText="Guardar cambios"
@@ -216,7 +218,7 @@ export function CdtsActions({ cdt }: { cdt: Cdt }) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [calculatorOpen, setCalculatorOpen] = useState(false)
   const { deleteResource, isDeleting, error: deleteError } = useDeleteResource({
-    queryKeysToInvalidate: [['cdts']]
+    queryKeysToInvalidate: [['cdts'], ['budget']]
   })
 
   const handleDelete = async () => {
