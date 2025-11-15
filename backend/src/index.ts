@@ -12,6 +12,8 @@ import cdtsRouter from './routes/cdts.js';
 import authRouter from './routes/auth.js';
 import uploadsRouter from './routes/uploads.js';
 import settingsRouter from './routes/settings.js';
+import { startBillRenewalJob } from './jobs/bill-renewal.js';
+import devToolsRouter from './routes/dev-tools.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +48,10 @@ app.use('/api/payments', paymentsRouter);
 app.use('/api/cdts', cdtsRouter);
 app.use('/api/uploads', uploadsRouter);
 app.use('/api/settings', settingsRouter);
+if (process.env.ENABLE_DEV_ENDPOINTS === 'true') {
+  console.log('[DevTools] /api/dev habilitado');
+  app.use('/api/dev', devToolsRouter);
+}
 
 // 404 handler
 app.use((_req, res) => {
@@ -95,4 +101,5 @@ app.listen(PORT, () => {
   console.log(`   GET    /api/cdts/:id`);
   console.log(`   PUT    /api/cdts/:id`);
   console.log(`   DELETE /api/cdts/:id`);
+  startBillRenewalJob();
 });

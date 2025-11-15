@@ -114,6 +114,19 @@ Al crear un CDT, el sistema calcula automáticamente:
 ### Conversión de Tags en Movements
 Los tags se almacenan como JSON string en la base de datos pero se devuelven como arrays en las respuestas.
 
+### Renovación automática de recibos
+Un job en segundo plano (implementado con `node-cron`) revisa diariamente los recibos con `autoRenew = true`, estado `pagado` y fecha de vencimiento pasada. Por cada coincidencia se crea un nuevo recibo con el ciclo correspondiente y el registro anterior se conserva como histórico (su `autoRenew` se desactiva para evitar duplicados). Variables de entorno disponibles:
+
+- `BILL_RENEW_DISABLED`: si es `true`, no se programa el job (útil para entornos de prueba).
+- `BILL_RENEW_CRON`: expresión CRON usada para la ejecución. Por defecto `0 3 * * *` (03:00 todos los días).
+- `BILL_RENEW_TZ`: zona horaria a usar para el CRON (por ejemplo `America/Bogota`). Si no se establece, se usa el timezone del sistema.
+- `ENABLE_DEV_ENDPOINTS`: cuando es `true`, habilita `/api/dev/bill-renewal` para disparar el job manualmente (solo recomendado para entornos locales).
+
+Al iniciar el servidor se ejecuta una pasada inmediata y el cron se mantiene corriendo con la configuración indicada.
+
+### Endpoints de desarrollo
+Con `ENABLE_DEV_ENDPOINTS=true`, se expone `POST /api/dev/bill-renewal` para ejecutar manualmente el job de renovación. Se puede enviar opcionalmente `{"referenceDate": "2025-01-01T00:00:00.000Z"}` en el body para forzar la fecha de corte.
+
 ## Base de Datos
 
 ### Tablas
