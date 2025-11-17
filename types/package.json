@@ -43,14 +43,15 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -b --force",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "peerDependencies": {
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "rimraf": "^6.0.1",
     "typescript": "^5.9.3",
     "zod": "^4.1.12"
   }

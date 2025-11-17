@@ -8,6 +8,7 @@
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:backend": "npm run dev --prefix backend",
     "build": "npm run build:types && npm run build:frontend && npm run build:backend",
+    "postinstall": "npm run build --workspace types",
     "build:types": "npm run build --prefix types",
     "build:frontend": "npm run build --prefix frontend",
     "build:backend": "npm run build --prefix backend",
@@ -17,8 +18,8 @@
     "init-db": "npm run init-db --prefix backend",
     "type-check": "npm run type-check --prefix types && npm run type-check --prefix frontend && npm run type-check --prefix backend",
     "lint": "npm run lint --prefix frontend",
-    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend",
-    "clean": "npm run clean:frontend && npm run clean:backend",
+    "install:all": "npm install --workspaces --include-workspace-root",
+    "clean": "npm run clean:frontend && npm run clean:backend && npm run clean:types",
     "clean:frontend": "cd frontend && rm -rf node_modules dist",
     "clean:backend": "cd backend && rm -rf node_modules dist"
   },
