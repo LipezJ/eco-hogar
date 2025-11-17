@@ -108,6 +108,79 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Gallery Section */}
+        <section className="pb-16 md:pb-24 max-w-7xl mx-auto">
+          <div className="container mx-auto px-4 md:px-6 space-y-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="space-y-3 max-w-3xl">
+                <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium bg-primary/10 text-primary">
+                  Amigables con nuestros usuarios
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold">
+                  La experiencia EcoHogar
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Descubre cómo EcoHogar puede transformar la gestión de tus finanzas personales con una interfaz intuitiva y herramientas poderosas.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[150px] md:auto-rows-[220px] gap-4 md:gap-6">
+              <div className="relative col-span-2 row-span-2 overflow-hidden rounded-3xl border bg-card shadow-md">
+                <img
+                  src="/img/bento4.jpg"
+                  alt="Imagen ilustraiva"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-background/85 via-background/20 to-transparent"></div>
+                <div className="relative flex h-full flex-col justify-end gap-2 p-6">
+                  <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Dashboard</span>
+                  <h3 className="text-xl font-bold text-foreground">Dashboard principal con todo lo que necesitas</h3>
+                </div>
+              </div>
+
+              <div className="relative col-span-2 overflow-hidden rounded-3xl border bg-card shadow-md">
+                <img
+                  src="/img/bento2.jpg"
+                  alt="Imagen ilustraiva"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-background/80 via-background/25 to-transparent"></div>
+                <div className="relative flex h-full flex-col justify-end gap-2 p-6">
+                  <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Reportes</span>
+                  <h3 className="text-lg font-bold text-foreground">Reportes visuales amigables</h3>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-3xl border bg-card shadow-md">
+                <img
+                  src="/img/bento3.jpg"
+                  alt="Imagen ilustraiva"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-background/80 via-background/25 to-transparent"></div>
+                <div className="relative flex h-full flex-col justify-end gap-2 p-5">
+                  <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Control</span>
+                  <h3 className="text-base font-bold text-foreground">Control de gastos e ingresos</h3>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-3xl border bg-card shadow-md">
+                <img
+                  src="/img/bento1.webp"
+                  alt="Imagen ilustraiva"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-background/80 via-background/25 to-transparent"></div>
+                <div className="relative flex h-full flex-col justify-end gap-2 p-5">
+                  <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Alertas</span>
+                  <h3 className="text-base font-bold text-foreground">Alertas y recordatorios</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section id="features" className="py-20 md:py-32 bg-muted/50">
           <div className="container mx-auto px-4 md:px-6">
