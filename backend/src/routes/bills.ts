@@ -1,3 +1,11 @@
+/**
+ * Bills API routes.
+ * @route GET /api/bills
+ * @route GET /api/bills/:id
+ * @route POST /api/bills
+ * @route PUT /api/bills
+ * @route DELETE /api/bills/:id
+ */
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { bills, insertBillSchema } from '../db/schema.js';
@@ -8,7 +16,7 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
-// GET /api/bills - Listar todos los recibos
+/** Listar todos los recibos del usuario autenticado. */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -20,7 +28,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/bills/:id - Obtener un recibo por ID
+/** Obtener un recibo por ID (propiedad del usuario). */
 router.get('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -40,7 +48,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/bills - Crear nuevo recibo
+/** Crear un nuevo recibo. */
 router.post('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -78,7 +86,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/bills - Actualizar recibo
+/** Actualizar un recibo existente. */
 router.put('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -122,7 +130,7 @@ router.put('/', async (req, res) => {
   }
 });
 
-// DELETE /api/bills/:id - Eliminar recibo
+/** Eliminar un recibo por ID. */
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;

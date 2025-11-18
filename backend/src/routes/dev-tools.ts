@@ -1,3 +1,8 @@
+/**
+ * Development-only utilities.
+ * @route POST /api/dev/seed
+ * @route POST /api/dev/cleanup
+ */
 import { Router } from 'express';
 import { processBillRenewals } from '../jobs/bill-renewal.js';
 import { processNotifications } from '../services/notifications.js';
@@ -8,6 +13,7 @@ import { randomUUID } from 'node:crypto';
 
 const router = Router();
 
+/** Ejecuta manualmente el job de renovación de recibos. */
 router.post('/bill-renewal', async (req, res) => {
   try {
     const { referenceDate } = req.body ?? {};
@@ -22,6 +28,7 @@ router.post('/bill-renewal', async (req, res) => {
   }
 });
 
+/** Crea una notificación de prueba para el usuario admin. */
 router.post('/notifications/create-admin', async (_req, res) => {
   try {
     const [adminUser] = await db.select().from(users).where(eq(users.username, 'admin')).limit(1);
@@ -54,6 +61,7 @@ router.post('/notifications/create-admin', async (_req, res) => {
   }
 });
 
+/** Ejecuta manualmente el job de notificaciones. */
 router.post('/notifications/run-cron', async (req, res) => {
   try {
     const { referenceDate } = req.body ?? {};

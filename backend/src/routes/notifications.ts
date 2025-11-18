@@ -1,3 +1,8 @@
+/**
+ * Notifications API routes.
+ * @route GET /api/notifications
+ * @route POST /api/notifications/test
+ */
 import { Router } from 'express';
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
@@ -7,6 +12,7 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
+/** Listar notificaciones del usuario autenticado (20 por defecto, máx 100). */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -27,6 +33,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+/** Marcar una notificación como leída. */
 router.post('/:id/read', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -56,6 +63,7 @@ router.post('/:id/read', async (req, res) => {
   }
 });
 
+/** Marcar todas las notificaciones como leídas. */
 router.post('/read-all', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -74,6 +82,7 @@ router.post('/read-all', async (req, res) => {
   }
 });
 
+/** Eliminar una notificación específica. */
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -96,6 +105,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+/** Eliminar todas las notificaciones del usuario. */
 router.delete('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;

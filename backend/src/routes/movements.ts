@@ -1,3 +1,11 @@
+/**
+ * Movements API routes.
+ * @route GET /api/movements
+ * @route GET /api/movements/:id
+ * @route POST /api/movements
+ * @route PUT /api/movements
+ * @route DELETE /api/movements/:id
+ */
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { movements, insertMovementSchema } from '../db/schema.js';
@@ -8,6 +16,10 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
+/**
+ * Normaliza categorías con y sin tildes para evitar duplicados.
+ * @param category Categoría ingresada en el payload.
+ */
 function normalizeCategory(category: unknown) {
   if (typeof category !== 'string') return category;
   const normalized = category.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -17,7 +29,7 @@ function normalizeCategory(category: unknown) {
   return category;
 }
 
-// GET /api/movements - Listar todos los movimientos
+/** Listar todos los movimientos del usuario autenticado. */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -36,7 +48,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/movements/:id - Obtener un movimiento por ID
+/** Obtener un movimiento por ID. */
 router.get('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -62,7 +74,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/movements - Crear nuevo movimiento
+/** Crear un movimiento; opcionalmente enlaza y marca pagado un recibo. */
 router.post('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -116,7 +128,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/movements - Actualizar movimiento
+/** Actualizar un movimiento existente (y su vínculo con recibo, si aplica). */
 router.put('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -165,7 +177,7 @@ router.put('/', async (req, res) => {
   }
 });
 
-// DELETE /api/movements/:id - Eliminar movimiento
+/** Eliminar un movimiento (revierte pago de recibo si estaba vinculado). */
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;

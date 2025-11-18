@@ -1,3 +1,13 @@
+/**
+ * Debts API routes.
+ * @route GET /api/debts
+ * @route GET /api/debts/:id
+ * @route POST /api/debts
+ * @route PUT /api/debts
+ * @route DELETE /api/debts/:id
+ * @route GET /api/debts/:id/payments
+ * @route PUT /api/debts/:id/payments/:paymentId
+ */
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { debts, payments, insertDebtSchema } from '../db/schema.js';
@@ -8,7 +18,11 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
-// Función auxiliar para generar tabla de amortización
+/**
+ * Genera la tabla de amortización de una deuda (sistema francés).
+ * @param debt Deuda normalizada con amount/interestRate/dates.
+ * @returns Arreglo de cuotas programadas.
+ */
 function generateAmortizationTable(debt: any): any[] {
   const amortizationPayments: any[] = [];
   const amountNumber = Number(debt.amount);
@@ -57,6 +71,9 @@ function generateAmortizationTable(debt: any): any[] {
   return amortizationPayments;
 }
 
+/**
+ * Error controlado al sincronizar pagos (por ejemplo, evitar borrar cuotas pagadas).
+ */
 class PaymentSyncError extends Error {
   statusCode: number;
 
@@ -67,6 +84,11 @@ class PaymentSyncError extends Error {
   }
 }
 
+/**
+ * Sincroniza la tabla de pagos con la configuración de la deuda.
+ * Inserta nuevas cuotas, actualiza fechas/montos y elimina cuotas no necesarias.
+ * @throws PaymentSyncError cuando hay pagos pagados que quedarían inválidos.
+ */
 async function syncPaymentsForDebt(debt: any) {
   const existingPayments = await db
     .select()
@@ -134,7 +156,7 @@ async function syncPaymentsForDebt(debt: any) {
   }
 }
 
-// GET /api/debts - Listar todas las deudas
+/** Listar todas las deudas del usuario autenticado. */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -146,7 +168,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/debts/:id - Obtener una deuda por ID
+/** Obtener una deuda por ID. */
 router.get('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -166,7 +188,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// GET /api/debts/:id/payments - Obtener tabla de amortización de una deuda
+/** Obtener la tabla de pagos/amortización de una deuda. */
 router.get('/:id/payments', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -205,7 +227,7 @@ router.get('/:id/payments', async (req, res) => {
   }
 });
 
-// PUT /api/debts/:id/payments/:paymentId - Marcar un pago como realizado
+/** Marcar un pago específico como pagado/no pagado. */
 router.put('/:id/payments/:paymentId', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -235,7 +257,7 @@ router.put('/:id/payments/:paymentId', async (req, res) => {
   }
 });
 
-// POST /api/debts - Crear nueva deuda
+/** Crear una nueva deuda y generar sus pagos asociados. */
 router.post('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -270,7 +292,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/debts - Actualizar deuda
+/** Actualizar una deuda existente y sincronizar pagos. */
 router.put('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -315,7 +337,7 @@ router.put('/', async (req, res) => {
   }
 });
 
-// DELETE /api/debts/:id - Eliminar deuda (y sus pagos asociados)
+/** Eliminar una deuda y sus pagos asociados. */
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;

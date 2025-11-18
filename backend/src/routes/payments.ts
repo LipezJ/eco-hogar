@@ -1,3 +1,8 @@
+/**
+ * Payments API routes.
+ * @route GET /api/payments
+ * @route GET /api/payments?debtId=...
+ */
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { payments } from '../db/schema.js';
@@ -7,7 +12,7 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
-// GET /api/payments?debtId= - List payments (optionally filtered by debt)
+/** Listar pagos; se puede filtrar por debtId vía query. */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;

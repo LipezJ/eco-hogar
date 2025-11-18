@@ -1,3 +1,6 @@
+/**
+ * Servicio de presupuesto mensual y agregados financieros.
+ */
 import { randomUUID } from 'crypto';
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
@@ -5,6 +8,11 @@ import { bills, cdts, movements, monthlyBudgets, payments } from '../db/schema.j
 
 type DecimalLike = string | number | null | undefined;
 
+/**
+ * Convierte valores decimales serializados a number seguro.
+ * @param value Valor decimal en string, number o null.
+ * @returns Number seguro (0 si no es convertible).
+ */
 const toNumber = (value: DecimalLike): number => {
   if (value === null || value === undefined) return 0;
   if (typeof value === 'number') return value;
@@ -12,12 +20,25 @@ const toNumber = (value: DecimalLike): number => {
   return Number.isNaN(parsed) ? 0 : parsed;
 };
 
+/**
+ * Calcula rango UTC de inicio/fin para un mes específico.
+ * @param year Año numérico (YYYY).
+ * @param month Mes 1-12.
+ * @returns Objeto con fechas start y end en UTC.
+ */
 const getMonthDateRange = (year: number, month: number) => {
   const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
   const end = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1, 0, 0, 0));
   return { start, end };
 };
 
+/**
+ * Busca la configuración de presupuesto mensual para un usuario/mes.
+ * @param userId ID del usuario.
+ * @param year Año numérico.
+ * @param month Mes numérico (1-12).
+ * @returns Configuración encontrada o null.
+ */
 export async function findMonthlyBudget(userId: string, year: number, month: number) {
   const [existing] = await db
     .select()
@@ -26,6 +47,11 @@ export async function findMonthlyBudget(userId: string, year: number, month: num
   return existing ?? null;
 }
 
+/**
+ * Crea o actualiza la configuración de presupuesto mensual.
+ * @param params Datos del presupuesto (userId, year, month, amount, currency).
+ * @returns Registro creado o actualizado.
+ */
 export async function upsertMonthlyBudget(params: { userId: string; year: number; month: number; amount: string; currency: string }) {
   const { userId, year, month, amount, currency } = params;
   const existing = await findMonthlyBudget(userId, year, month);
@@ -63,6 +89,14 @@ export async function upsertMonthlyBudget(params: { userId: string; year: number
   return record;
 }
 
+/**
+ * Genera el resumen presupuestal mensual de un usuario,
+ * acumulando movimientos, pagos de deuda, recibos y CDTs.
+ * @param userId ID del usuario.
+ * @param year Año numérico.
+ * @param month Mes numérico (1-12).
+ * @returns Objeto con configuración y resumen detallado.
+ */
 export async function getMonthlyBudgetSummary(userId: string, year: number, month: number) {
   const { start, end } = getMonthDateRange(year, month);
   const config = await findMonthlyBudget(userId, year, month);

@@ -1,3 +1,11 @@
+/**
+ * Accounts API routes.
+ * @route GET /api/accounts
+ * @route GET /api/accounts/:id
+ * @route POST /api/accounts
+ * @route PUT /api/accounts
+ * @route DELETE /api/accounts/:id
+ */
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { accounts, insertAccountSchema } from '../db/schema.js';
@@ -8,7 +16,7 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
-// GET /api/accounts - Listar todas las cuentas
+/** Listar todas las cuentas del usuario autenticado. */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -20,7 +28,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/accounts/:id - Obtener una cuenta por ID
+/** Obtener una cuenta puntual por ID (propiedad del usuario). */
 router.get('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -40,7 +48,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/accounts - Crear nueva cuenta
+/** Crear una nueva cuenta para el usuario actual. */
 router.post('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -67,7 +75,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/accounts - Actualizar cuenta
+/** Actualizar datos de una cuenta existente. */
 router.put('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -99,7 +107,7 @@ router.put('/', async (req, res) => {
   }
 });
 
-// DELETE /api/accounts/:id - Eliminar cuenta
+/** Eliminar una cuenta del usuario por ID. */
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;

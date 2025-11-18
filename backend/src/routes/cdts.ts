@@ -1,3 +1,11 @@
+/**
+ * CDTs API routes.
+ * @route GET /api/cdts
+ * @route GET /api/cdts/:id
+ * @route POST /api/cdts
+ * @route PUT /api/cdts
+ * @route DELETE /api/cdts/:id
+ */
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { cdts, insertCdtSchema } from '../db/schema.js';
@@ -8,21 +16,30 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
-// Función auxiliar para calcular monto final con interés compuesto
+/**
+ * Calcula el monto final con interés compuesto diario.
+ * @param initialAmount Valor inicial invertido.
+ * @param annualRate Tasa anual (%).
+ * @param days Plazo en días.
+ */
 function calculateFinalAmount(initialAmount: number, annualRate: number, days: number): number {
   const dailyRate = annualRate / 100 / 365;
   const finalAmount = initialAmount * Math.pow(1 + dailyRate, days);
   return Math.round(finalAmount * 100) / 100;
 }
 
-// Función auxiliar para calcular fecha de vencimiento
+/**
+ * Calcula la fecha de vencimiento sumando días a la fecha de apertura.
+ * @param openingDate Fecha de apertura en string.
+ * @param days Plazo en días.
+ */
 function calculateDueDate(openingDate: string, days: number): Date {
   const date = new Date(openingDate);
   date.setDate(date.getDate() + days);
   return date;
 }
 
-// GET /api/cdts - Listar todos los CDTs
+/** Listar todos los CDTs del usuario autenticado. */
 router.get('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -34,7 +51,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/cdts/:id - Obtener un CDT por ID
+/** Obtener un CDT por ID (si pertenece al usuario). */
 router.get('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -54,7 +71,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/cdts - Crear nuevo CDT
+/** Crear un nuevo CDT calculando monto final y fecha de vencimiento. */
 router.post('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -94,7 +111,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/cdts/:id - Actualizar CDT
+/** Actualizar un CDT y recalcular montos si cambian los campos relevantes. */
 router.put('/', async (req, res) => {
   try {
     const userId = req.authUser!.id;
@@ -161,7 +178,7 @@ router.put('/', async (req, res) => {
   }
 });
 
-// DELETE /api/cdts/:id - Eliminar CDT
+/** Eliminar un CDT por ID. */
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.authUser!.id;

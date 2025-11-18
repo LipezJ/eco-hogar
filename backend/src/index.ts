@@ -20,7 +20,7 @@ import { startNotificationJob } from './jobs/notification-scheduler.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Core middleware stack
 app.use(cors({
   origin: process.env.CLIENT_URL ?? true,
   credentials: true,
@@ -52,6 +52,7 @@ app.use('/api/uploads', uploadsRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/notifications', notificationsRouter);
 if (process.env.ENABLE_DEV_ENDPOINTS === 'true') {
+  // Dev-only helpers: keep behind flag
   console.log('[DevTools] /api/dev habilitado');
   app.use('/api/dev', devToolsRouter);
 }
@@ -111,6 +112,7 @@ app.listen(PORT, () => {
     console.log(`\n   POST   /api/dev/bill-renewal`);
     console.log(`   POST   /api/dev/notifications/create-admin`);
   }
+  // Arrancar jobs programados
   startBillRenewalJob();
   startNotificationJob();
 });

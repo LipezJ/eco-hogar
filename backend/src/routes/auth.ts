@@ -1,3 +1,11 @@
+/**
+ * Auth API routes.
+ * @route POST /api/auth/register
+ * @route POST /api/auth/login
+ * @route GET /api/auth/session
+ * @route POST /api/auth/logout
+ * @route GET /api/auth/captcha
+ */
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
@@ -10,6 +18,7 @@ import { TOKEN_COOKIE, clearAuthCookie, createToken, setAuthCookie, verifyToken 
 
 const router = Router();
 
+/** Esquema para validar los campos del registro. */
 const registerSchema = z.object({
   username: z.string().min(3, 'El usuario debe tener al menos 3 caracteres'),
   email: z.string().email('Debe ingresar un email válido'),
@@ -19,6 +28,7 @@ const registerSchema = z.object({
   captchaCode: z.string(),
 });
 
+/** Esquema para validar la solicitud de login. */
 const loginSchema = z.object({
   username: z.string().min(3, 'Usuario inválido'),
   password: z.string().min(6, 'Contraseña inválida'),
@@ -26,26 +36,47 @@ const loginSchema = z.object({
   captchaCode: z.string(),
 });
 
+/**
+ * Elimina el hash de contraseña antes de devolver el usuario al cliente.
+ * @param user Usuario completo desde la base de datos.
+ * @returns Usuario sin el campo passwordHash.
+ */
 export function sanitizeUser(user: typeof users.$inferSelect) {
   const { passwordHash, ...rest } = user;
   return rest;
 }
 
+/**
+ * Busca un usuario por nombre de usuario.
+ * @param username Nombre de usuario.
+ */
 async function findUserByUsername(username: string) {
   const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
   return user;
 }
 
+/**
+ * Busca un usuario por email.
+ * @param email Correo electrónico.
+ */
 async function findUserByEmail(email: string) {
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return user;
 }
 
+/**
+ * Busca un usuario por ID.
+ * @param id Identificador interno.
+ */
 async function findUserById(id: string) {
   const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return user;
 }
 
+/**
+ * Crea un administrador por defecto si no existe.
+ * Solo se ejecuta al levantar el servidor.
+ */
 async function ensureDefaultAdmin() {
   const defaultUsername = 'admin';
   const defaultEmail = 'admin@example.com';
@@ -79,6 +110,10 @@ void ensureDefaultAdmin().catch((error) => {
 const captchaStore = new Map<string, { text: string; expires: number }>();
 const CAPTCHA_TTL_MS = 5 * 60 * 1000;
 
+/**
+ * Genera el captcha en SVG y texto.
+ * @returns Contenido SVG y texto plano.
+ */
 function createCaptcha() {
   const { data, text } = svgCaptcha.create({
     size: 4,
@@ -90,10 +125,21 @@ function createCaptcha() {
   return { svg: data, text };
 }
 
+/**
+ * Guarda el captcha en memoria con TTL.
+ * @param id Identificador entregado al cliente.
+ * @param text Valor de validación.
+ */
 function saveCaptcha(id: string, text: string) {
   captchaStore.set(id, { text, expires: Date.now() + CAPTCHA_TTL_MS });
 }
 
+/**
+ * Verifica si el captcha enviado es válido.
+ * @param id Identificador entregado al cliente.
+ * @param code Código ingresado.
+ * @returns true si válido, false si inválido o expirado.
+ */
 function validateCaptcha(id: string, code: string): boolean {
   const entry = captchaStore.get(id);
   if (!entry) return false;
@@ -106,6 +152,7 @@ function validateCaptcha(id: string, code: string): boolean {
   return isValid;
 }
 
+/** Obtiene un captcha fresco para el formulario de autenticación. */
 router.get('/captcha', (_req, res) => {
   const { svg, text } = createCaptcha();
   const id = randomUUID();
@@ -113,6 +160,7 @@ router.get('/captcha', (_req, res) => {
   res.json({ id, svg });
 });
 
+/** Registrar un nuevo usuario validando captcha y credenciales. */
 router.post('/register', async (req, res) => {
   try {
     const parsed = registerSchema.safeParse(req.body);
@@ -157,6 +205,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
+/** Iniciar sesión con captcha y credenciales. */
 router.post('/login', async (req, res) => {
   try {
     const parsed = loginSchema.safeParse(req.body);
@@ -191,6 +240,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+/** Obtener sesión actual usando la cookie de auth. */
 router.get('/session', async (req, res) => {
   try {
     const token = req.cookies?.[TOKEN_COOKIE];
@@ -214,6 +264,7 @@ router.get('/session', async (req, res) => {
   }
 });
 
+/** Terminar sesión y limpiar cookie. */
 router.post('/logout', (_req, res) => {
   clearAuthCookie(res);
   return res.status(204).send();

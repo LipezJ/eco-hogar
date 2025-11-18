@@ -1,3 +1,8 @@
+/**
+ * Settings API routes.
+ * @route GET /api/settings
+ * @route PUT /api/settings
+ */
 import { Router } from 'express';
 import { z } from 'zod';
 import { getMonthlyBudgetSummary, upsertMonthlyBudget } from '../services/budget.js';
@@ -7,16 +12,21 @@ import { requireAuth } from '../middleware/require-auth.js';
 const router = Router();
 router.use(requireAuth);
 
+/** Schema básico para validar mes y año. */
 const monthYearSchema = z.object({
   month: z.number().int().min(1).max(12),
   year: z.number().int().min(2000).max(2100),
 });
 
+/** Payload de presupuesto mensual (monto + moneda). */
 const budgetPayloadSchema = monthYearSchema.extend({
   amount: z.number().nonnegative(),
   currency: z.string().min(1).max(10).default('COP'),
 });
 
+/**
+ * Normaliza query params de mes/año con fallback al mes actual.
+ */
 const resolveMonthYear = (queryMonth?: string | string[], queryYear?: string | string[]) => {
   const now = new Date();
   const month = queryMonth ? Number(Array.isArray(queryMonth) ? queryMonth[0] : queryMonth) : now.getMonth() + 1;
@@ -24,6 +34,9 @@ const resolveMonthYear = (queryMonth?: string | string[], queryYear?: string | s
   return monthYearSchema.parse({ month, year });
 };
 
+/**
+ * Obtener resumen de presupuesto mensual para un mes/año.
+ */
 router.get('/budget', async (req, res) => {
   try {
     const { month, year } = resolveMonthYear(req.query.month as string, req.query.year as string);
@@ -35,6 +48,9 @@ router.get('/budget', async (req, res) => {
   }
 });
 
+/**
+ * Crear/actualizar presupuesto mensual y recalcular alertas.
+ */
 router.put('/budget', async (req, res) => {
   try {
     const parsed = budgetPayloadSchema.parse({

@@ -1,3 +1,8 @@
+/**
+ * Uploads API routes.
+ * @route POST /api/uploads
+ * @route GET /uploads/:filename
+ */
 import { Router, type Request, type Response } from 'express';
 import multer from 'multer';
 import path from 'node:path';
@@ -28,6 +33,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+/** Subir un archivo asociado a un usuario autenticado y devolver su URL. */
 router.post('/', upload.single('file'), (req: Request, res: Response) => {
   const file = req.file as UploadedFile | undefined;
   if (!file) {

@@ -1,3 +1,6 @@
+/**
+ * Servicio de generación de notificaciones para vencimientos y presupuesto.
+ */
 import { and, eq, gt, lte, ne } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
@@ -7,6 +10,7 @@ import { getMonthlyBudgetSummary } from './budget.js';
 
 const DEFAULT_DUE_SOON_DAYS = 3;
 
+/** Combina condiciones SQL ignorando las no definidas. */
 function combineConditions(...conditions: Array<SQL | undefined>) {
   const filtered = conditions.filter((condition): condition is SQL => condition !== undefined);
   if (filtered.length === 0) {
@@ -20,11 +24,13 @@ function combineConditions(...conditions: Array<SQL | undefined>) {
   return combined;
 }
 
+/** Filtro opcional por usuario; devuelve undefined si no se filtra. */
 const userFilter = (
   column: typeof bills.userId | typeof cdts.userId | typeof debts.userId | typeof monthlyBudgets.userId,
   userId?: string
 ) => (userId ? eq(column as typeof bills.userId, userId) : undefined);
 
+/** Verifica si ya existe una notificación para un recurso/evento. */
 async function notificationExists(userId: string, resourceId: string, eventType: string) {
   const [existing] = await db
     .select({ id: notifications.id })
@@ -34,6 +40,7 @@ async function notificationExists(userId: string, resourceId: string, eventType:
   return Boolean(existing);
 }
 
+/** Crea una notificación del sistema. */
 async function createNotification(params: {
   userId: string
   title: string
@@ -62,6 +69,11 @@ export interface ProcessNotificationsOptions {
   userId?: string
 }
 
+/**
+ * Procesa notificaciones para vencimientos (recibos, deudas, CDTs) y alertas de presupuesto.
+ * @param options referenceDate (default hoy) y userId opcional para filtrar.
+ * @returns Conteo de notificaciones creadas.
+ */
 export async function processNotifications(options: ProcessNotificationsOptions = {}) {
   const { referenceDate = new Date(), userId } = options;
   const dueSoonDays = Number(process.env.NOTIFICATION_DUE_SOON_DAYS ?? DEFAULT_DUE_SOON_DAYS);
@@ -86,7 +98,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
         eventType,
         type: 'alert',
         title: `Recibo vencido: ${bill.provider}`,
-        message: `El recibo de ${bill.provider} por $${Number(bill.amount).toLocaleString('es-ES')} venció el ${new Date(bill.dueDate).toLocaleDateString('es-ES')}.`,
+        message: `El recibo de ${bill.provider} por $${Number(bill.amount).toLocaleString('es-ES')} vencio el ${new Date(bill.dueDate).toLocaleDateString('es-ES')}.`,
       });
       created += 1;
     }
@@ -108,7 +120,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
         resourceId: bill.id,
         eventType,
         type: 'warning',
-        title: `Recibo próximo a vencer: ${bill.provider}`,
+        title: `Recibo proximo a vencer: ${bill.provider}`,
         message: `El recibo de ${bill.provider} vence el ${new Date(bill.dueDate).toLocaleDateString('es-ES')}.`,
       });
       created += 1;
@@ -144,7 +156,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
         eventType,
         type: 'alert',
         title: `Cuota vencida: ${payment.debtOrigin}`,
-        message: `La cuota #${payment.installmentNumber} (${Number(payment.amount).toLocaleString('es-ES')}) está vencida desde el ${new Date(payment.dueDate).toLocaleDateString('es-ES')}.`,
+        message: `La cuota #${payment.installmentNumber} (${Number(payment.amount).toLocaleString('es-ES')}) esta vencida desde el ${new Date(payment.dueDate).toLocaleDateString('es-ES')}.`,
       });
       created += 1;
     }
@@ -179,7 +191,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
         resourceId: payment.paymentId,
         eventType,
         type: 'warning',
-        title: `Cuota próxima: ${payment.debtOrigin}`,
+        title: `Cuota proxima: ${payment.debtOrigin}`,
         message: `La cuota #${payment.installmentNumber} vence el ${new Date(payment.dueDate).toLocaleDateString('es-ES')}.`,
       });
       created += 1;
@@ -202,7 +214,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
         eventType,
         type: 'alert',
         title: `CDT vencido: ${cdt.institution}`,
-        message: `El CDT en ${cdt.institution} por ${Number(cdt.finalAmount).toLocaleString('es-ES')} venció el ${new Date(cdt.dueDate).toLocaleDateString('es-ES')}.`,
+        message: `El CDT en ${cdt.institution} por ${Number(cdt.finalAmount).toLocaleString('es-ES')} vencio el ${new Date(cdt.dueDate).toLocaleDateString('es-ES')}.`,
       });
       created += 1;
     }
@@ -224,7 +236,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
         resourceId: cdt.id,
         eventType,
         type: 'warning',
-        title: `CDT próximo a vencer: ${cdt.institution}`,
+        title: `CDT proximo a vencer: ${cdt.institution}`,
         message: `El CDT en ${cdt.institution} vence el ${new Date(cdt.dueDate).toLocaleDateString('es-ES')}.`,
       });
       created += 1;
@@ -275,6 +287,7 @@ export async function processNotifications(options: ProcessNotificationsOptions 
   return { created };
 }
 
+/** Shortcut para procesar notificaciones de un solo usuario. */
 export async function processNotificationsForUser(userId: string, referenceDate = new Date()) {
   return processNotifications({ userId, referenceDate });
 }

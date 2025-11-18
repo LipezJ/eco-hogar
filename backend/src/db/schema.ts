@@ -1,3 +1,6 @@
+/**
+ * Definiciones de tablas y esquemas Zod para Drizzle.
+ */
 import { mysqlTable, varchar, decimal, boolean, datetime, int, text, mysqlEnum, uniqueIndex, index } from 'drizzle-orm/mysql-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { relations } from 'drizzle-orm';
