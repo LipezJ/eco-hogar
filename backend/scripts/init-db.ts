@@ -12,13 +12,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename); 
 
 async function main() {
-  const dbName = process.env.DATABASE_NAME || 'database';
+  const dbName = process.env.DATABASE_NAME || 'eco_hogar';
 
   // 1. Conexión "root" sin base concreta (o apuntando a `mysql`)
   const root = await mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
+    host: process.env.DATABASE_HOST || 'localhost',
+    user: process.env.DATABASE_USER || 'un_usr',
+    password: process.env.DATABASE_PASSWORD || 'una_clave',
   });
 
   // 2. Crear base si no existe
@@ -29,10 +29,10 @@ async function main() {
 
   // 3. Conectarse ya a esa base
   const pool = mysql.createPool({
-    host: process.env.DATABASE_HOST,
-    port: Number(process.env.DATABASE_PORT),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: Number(process.env.DATABASE_PORT || 3306),
+    user: process.env.DATABASE_USER || 'un_usr',
+    password: process.env.DATABASE_PASSWORD || 'una_clave',
     database: dbName,
   });
 
