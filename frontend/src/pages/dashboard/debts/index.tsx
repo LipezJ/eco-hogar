@@ -9,11 +9,12 @@ import { type Debt } from "@web-project/types/debts"
 import { useState, Suspense } from "react"
 import { PaymentsView } from "./payments"
 import DashboardLayout from "@/layouts/dashboard"
-import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch"
+import { useSuspenseQueryFetch } from "@/hooks/use-query-fetch"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { transformDebts, transformPayments } from "@/lib/api-transformers"
 import { TableLoadingSkeleton } from "@/components/loading-skeleton"
 
+/** Contenido de deudas: formulario, tabla y vista de pagos. */
 function DebtsContent({
   onViewPayments
 }: {

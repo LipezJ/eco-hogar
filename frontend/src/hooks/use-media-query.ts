@@ -1,5 +1,10 @@
 import * as React from "react"
 
+/**
+ * Evalúa una media query y devuelve true/false reactivo.
+ * @param query cadena de media query, ej. "(max-width: 768px)".
+ * @returns boolean que cambia al hacerlo el match de la media query.
+ */
 export function useMediaQuery(query: string) {
   const [value, setValue] = React.useState(false)
 

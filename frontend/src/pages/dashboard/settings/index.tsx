@@ -12,7 +12,7 @@ import { Form as FormProvider, FormControl, FormField, FormItem, FormLabel, Form
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { StatsLoadingSkeleton } from "@/components/loading-skeleton";
-import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch";
+import { useSuspenseQueryFetch } from "@/hooks/use-query-fetch";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { cn } from "@/lib/utils";
 import { BudgetUpsertSchema } from "@web-project/types/budget";

@@ -16,6 +16,7 @@ interface CaptchaState {
   svg: string;
 }
 
+/** Formulario de registro con captcha y validación básica. */
 export function RegisterForm({
   className,
   ...props

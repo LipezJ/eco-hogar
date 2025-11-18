@@ -5,7 +5,7 @@ import { Check, AlertCircle, Calendar, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { API_ENDPOINTS } from "@/lib/api-config"
-import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { useQueryFetch } from "@/hooks/use-query-fetch"
 import { transformPayment, transformPayments } from "@/lib/api-transformers"
 import { useQueryClient } from "@tanstack/react-query"
 

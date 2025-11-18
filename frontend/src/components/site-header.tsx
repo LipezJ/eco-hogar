@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { NotificationMenu } from "@/components/notification-menu"
 
+/** Header de dashboard con título, trigger de sidebar y notificaciones. */
 export function SiteHeader({ title }: { title?: string }) {
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">

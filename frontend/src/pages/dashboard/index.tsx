@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type Payment } from "@web-project/types/debts";
 import { Wallet, CreditCard, FileText, PiggyBank, TrendingUp, TrendingDown } from "lucide-react";
 import DashboardLayout from "@/layouts/dashboard";
-import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch";
+import { useSuspenseQueryFetch } from "@/hooks/use-query-fetch";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { transformMovements, transformDebts, transformBills, transformCdts, transformPayments } from "@/lib/api-transformers";
 import { Suspense } from "react";

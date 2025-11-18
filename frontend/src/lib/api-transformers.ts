@@ -5,14 +5,22 @@ import type { Movement } from '@web-project/types/movements';
 import type { Debt, Payment } from '@web-project/types/debts';
 import type { Cdt } from '@web-project/types/cdts';
 
-// Helper para convertir decimales de string a number
+/**
+ * Convierte un valor decimal del backend a number seguro.
+ * @param value decimal en string/number.
+ * @returns number parseado o 0.
+ */
 const parseDecimal = (value: any): number => {
   if (typeof value === 'number') return value;
   if (typeof value === 'string') return parseFloat(value);
   return 0;
 };
 
-// Transformar Account del backend
+/**
+ * Normaliza una cuenta (decimal a number).
+ * @param data payload bruto del backend.
+ * @returns Account tipada.
+ */
 export const transformAccount = (data: any): Account => ({
   ...data,
   balance: parseDecimal(data.balance),
@@ -22,7 +30,11 @@ export const transformAccounts = (data: any[]): Account[] => {
   return Array.isArray(data) ? data.map(transformAccount) : [];
 };
 
-// Transformar Bill del backend
+/**
+ * Normaliza un recibo (amount a number).
+ * @param data payload bruto.
+ * @returns Bill tipada.
+ */
 export const transformBill = (data: any): Bill => ({
   ...data,
   amount: parseDecimal(data.amount),
@@ -32,7 +44,11 @@ export const transformBills = (data: any[]): Bill[] => {
   return Array.isArray(data) ? data.map(transformBill) : [];
 };
 
-// Transformar Movement del backend
+/**
+ * Normaliza un movimiento.
+ * @param data payload bruto.
+ * @returns Movement tipado.
+ */
 export const transformMovement = (data: any): Movement => ({
   ...data,
   amount: parseDecimal(data.amount),
@@ -42,7 +58,11 @@ export const transformMovements = (data: any[]): Movement[] => {
   return Array.isArray(data) ? data.map(transformMovement) : [];
 };
 
-// Transformar Debt del backend
+/**
+ * Normaliza una deuda (importe y tasa a number).
+ * @param data payload bruto.
+ * @returns Debt tipada.
+ */
 export const transformDebt = (data: any): Debt => ({
   ...data,
   amount: parseDecimal(data.amount),
@@ -53,7 +73,11 @@ export const transformDebts = (data: any[]): Debt[] => {
   return Array.isArray(data) ? data.map(transformDebt) : [];
 };
 
-// Transformar Payment del backend
+/**
+ * Normaliza un pago de deuda (decimales y fechas).
+ * @param data payload bruto.
+ * @returns Payment tipado.
+ */
 export const transformPayment = (data: any): Payment => ({
   ...data,
   amount: parseDecimal(data.amount),
@@ -72,7 +96,11 @@ export const transformPayments = (data: any[]): Payment[] => {
   return Array.isArray(data) ? data.map(transformPayment) : [];
 };
 
-// Transformar CDT del backend
+/**
+ * Normaliza un CDT (decimales a number).
+ * @param data payload bruto.
+ * @returns Cdt tipado.
+ */
 export const transformCdt = (data: any): Cdt => ({
   ...data,
   initialAmount: parseDecimal(data.initialAmount),

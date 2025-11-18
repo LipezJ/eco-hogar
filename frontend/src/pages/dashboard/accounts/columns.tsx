@@ -4,6 +4,7 @@ import { TableBadge } from "@/components/id-badge"
 import { AccountsActions } from "./form"
 import { Globe, MapPin, User } from "lucide-react"
 
+/** Columnas para la tabla de cuentas. */
 export const columns: ColumnDef<Account>[] = [
   {
     accessorKey: "name",

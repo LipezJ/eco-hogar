@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
+/** Acordeón de preguntas frecuentes en landing. */
 export function FAQAccordion() {
   return (
     <Accordion type="single" collapsible className="w-full">

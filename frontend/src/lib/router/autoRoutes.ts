@@ -4,17 +4,15 @@ import { filePathToRoute } from './utils';
 // Usar Vite's import.meta.glob para obtener todos los archivos de páginas automáticamente
 const pageModules = import.meta.glob('../pages/**/*.tsx', { eager: true });
 
+/**
+ * Genera rutas automáticamente desde archivos bajo src/pages (uso interno).
+ */
 export function generateAutoRoutes(): Route[] {
   const routes: Route[] = [];
 
   Object.entries(pageModules).forEach(([filePath, module]) => {
-    // Extraer el path relativo desde pages/
     const relativePath = filePath.replace('../pages/', '');
-
-    // Convertir el path del archivo a ruta
     const routePath = filePathToRoute(relativePath);
-
-    // Obtener el componente por defecto
     const component = (module as { default: React.ComponentType<unknown> }).default;
 
     if (component) {

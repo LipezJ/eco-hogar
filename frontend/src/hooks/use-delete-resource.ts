@@ -2,9 +2,15 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface UseDeleteResourceOptions {
+  /** Query keys de React Query a invalidar tras borrar. */
   queryKeysToInvalidate?: Array<unknown[]>;
 }
 
+/**
+ * Hook para eliminar recursos vía DELETE con invalidación de caché.
+ * @param queryKeysToInvalidate listas de claves a refrescar tras el delete.
+ * @returns deleteResource(url), isDeleting y error.
+ */
 export function useDeleteResource({ queryKeysToInvalidate = [] }: UseDeleteResourceOptions = {}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<Error | null>(null);

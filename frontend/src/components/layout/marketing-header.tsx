@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { PiggyBank, Menu } from "lucide-react"
 
+/** Header público con navegación marketing y menú responsivo. */
 export function MarketingHeader() {
   const [open, setOpen] = useState(false)
 
@@ -21,14 +22,14 @@ export function MarketingHeader() {
             </Link>
           </div>
 
-  {/* Desktop Navigation - Centered */}
-  <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-    <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</a>
-    <a href="/#benefits" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Beneficios</a>
-    <a href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Precios</a>
-    <a href="/#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Preguntas frecuentes</a>
-    <Link href="/contactenos" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Contáctenos</Link>
-  </nav>
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+            <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</a>
+            <a href="/#benefits" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Beneficios</a>
+            <a href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Precios</a>
+            <a href="/#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Preguntas frecuentes</a>
+            <Link href="/contactenos" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Contáctenos</Link>
+          </nav>
 
           {/* Desktop CTA Buttons */}
           <div className="flex-1 flex items-center justify-end gap-3">

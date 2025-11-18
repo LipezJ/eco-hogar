@@ -28,6 +28,7 @@ interface CdtsReportsProps {
   cdts: Cdt[]
 }
 
+/** Reporte de CDTs: estado, montos por institución y capital vs interés. */
 // Colores para gráficos
 const COLORS = {
   activo: "hsl(142, 71%, 45%)",

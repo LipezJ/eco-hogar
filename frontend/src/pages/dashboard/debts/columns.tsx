@@ -8,6 +8,7 @@ const getDebtPayments = (debt: Debt, payments: Payment[]) => {
   return storedPayments.length > 0 ? storedPayments : generateAmortizationTable(debt);
 };
 
+/** Columnas para tabla de deudas/préstamos con cálculo de cuotas. */
 export const createColumns = (onViewPayments: (debt: Debt) => void, payments: Payment[]): ColumnDef<Debt>[] => [
   {
     accessorKey: "type",

@@ -6,6 +6,7 @@ import { AlertCircle, Clock, CheckCircle, Paperclip } from "lucide-react"
 import { API_BASE_URL } from "@/lib/api-config"
 import { Button } from "@/components/ui/button"
 
+/** Columnas para la tabla de recibos con estados y acciones. */
 export const columns: ColumnDef<Bill>[] = [
   {
     accessorKey: "provider",

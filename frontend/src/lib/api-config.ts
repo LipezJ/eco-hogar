@@ -1,7 +1,11 @@
-// API Configuration
+/**
+ * Host base de la API; configurado vía VITE_API_URL (default localhost:3000).
+ */
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// API Endpoints
+/**
+ * API Endpoints preconstruidos.
+ */
 export const API_ENDPOINTS = {
   accounts: `${API_BASE_URL}/api/accounts`,
   movements: `${API_BASE_URL}/api/movements`,

@@ -22,6 +22,7 @@ interface MovementsStatsProps {
   movements: Movement[]
 }
 
+/** Estadísticas de ingresos/egresos y top categorías. */
 // Mapeo de íconos por categoría
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   comida: ShoppingCart,

@@ -97,6 +97,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+/** Reporte de movimientos con tarjetas de resumen y gráficos. */
 export function MovementsReports({ movements }: MovementsReportsProps) {
   // Tipo para datos mensuales
   type MonthlyDataItem = {

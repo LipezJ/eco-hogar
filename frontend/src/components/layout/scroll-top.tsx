@@ -5,6 +5,7 @@ import { ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+/** Botón flotante para volver al inicio haciendo scroll suave. */
 export default function ScrollToTop() {
   const [showScrollButton, setShowScrollButton] = useState(false)
 

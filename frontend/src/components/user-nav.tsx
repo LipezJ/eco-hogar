@@ -23,6 +23,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+/**
+ * Menú de usuario en el sidebar con avatar, navegación a login y logout.
+ */
 export function NavUser() {
   const { user, logout, isLoading } = useAuth();
   const router = useRouter();

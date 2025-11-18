@@ -51,6 +51,9 @@ const UpdateBillSchemaClient = UpdateBillSchema.extend({
 type CreateBillFormValues = z.input<typeof CreateBillSchemaClient>
 type UpdateBillFormValues = z.input<typeof UpdateBillSchemaClient>
 
+/**
+ * Genera los campos del formulario de creación de recibo según estado.
+ */
 function getCreateBillFormDef(status?: string): FormFieldDef<CreateBillFormValues>[] {
   const baseFields: FormFieldDef<CreateBillFormValues>[] = [
     {
@@ -271,6 +274,7 @@ async function prepareBillPayload<T extends { status?: string; attachment?: unkn
   return nextValues;
 }
 
+/** Formulario para crear un recibo, incluye manejo de adjuntos. */
 export function CreateBillForm() {
   const { setOpen } = useContext(FormDialogContext)
   const [status, setStatus] = useState<string>("pendiente")
@@ -307,6 +311,7 @@ export function CreateBillForm() {
   )
 }
 
+/** Formulario para actualizar un recibo existente. */
 export function UpdateBillForm({ bill }: { bill: Bill }) {
   const { setOpen } = useContext(FormDialogContext)
   const [status, setStatus] = useState<string>(bill.status)

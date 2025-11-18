@@ -6,6 +6,7 @@ interface AccountsStatsProps {
   accounts: Account[]
 }
 
+/** Tarjetas de resumen de cuentas (totales por moneda y ubicación). */
 export function AccountsStats({ accounts }: AccountsStatsProps) {
   const totalsByCurrency = getTotalByCurrency(accounts)
   const totalInBase = getTotalInBase(accounts)

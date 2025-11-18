@@ -6,6 +6,11 @@ export interface UploadResponse {
   filename: string;
 }
 
+/**
+ * Sube un archivo al backend (form-data) y retorna la URL resultante.
+ * @param file archivo File a subir.
+ * @returns UploadResponse con url, path y filename.
+ */
 export async function uploadFile(file: File): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append('file', file);

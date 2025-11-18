@@ -12,6 +12,12 @@ interface AttachmentUploaderProps {
   placeholder?: string;
 }
 
+/**
+ * Uploader control que acepta imágenes/PDF y muestra estado del adjunto.
+ * @param value string (URL), File o null.
+ * @param onChange callback al seleccionar/limpiar.
+ * @param placeholder texto opcional.
+ */
 export function AttachmentUploader({ value, onChange, placeholder }: AttachmentUploaderProps) {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

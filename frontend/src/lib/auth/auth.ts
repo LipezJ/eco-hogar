@@ -8,6 +8,11 @@ interface AuthResponse {
   error?: string;
 }
 
+/**
+ * Maneja respuestas de auth; lanza error si el status no es OK.
+ * @param response Respuesta fetch.
+ * @returns Objeto con user o error.
+ */
 async function handleResponse(response: Response): Promise<AuthResponse> {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -16,6 +21,13 @@ async function handleResponse(response: Response): Promise<AuthResponse> {
   return data;
 }
 
+/**
+ * Inicia sesión con usuario/contraseña y captcha.
+ * @param username Nombre de usuario.
+ * @param password Contraseña en texto plano.
+ * @param captcha Objeto con id y código ingresado.
+ * @returns usuario autenticado.
+ */
 export async function loginRequest(
   username: string,
   password: string,
@@ -35,6 +47,15 @@ export async function loginRequest(
   return data.user;
 }
 
+/**
+ * Registra un usuario nuevo y retorna la sesión.
+ * @param name Nombre visible.
+ * @param username Nombre de usuario.
+ * @param email Correo.
+ * @param password Contraseña.
+ * @param captcha Objeto con id y código.
+ * @returns usuario autenticado recién creado.
+ */
 export async function registerRequest(
   name: string,
   username: string,
@@ -56,6 +77,10 @@ export async function registerRequest(
   return data.user;
 }
 
+/**
+ * Cierra la sesión actual.
+ * @throws Error si el backend responde distinto de 204/200.
+ */
 export async function logoutRequest(): Promise<void> {
   const res = await fetch(`${API_ENDPOINTS.auth}/logout`, {
     method: "POST",
@@ -68,6 +93,10 @@ export async function logoutRequest(): Promise<void> {
   }
 }
 
+/**
+ * Obtiene la sesión activa (o null si no hay).
+ * @returns usuario actual o null.
+ */
 export async function sessionRequest(): Promise<AuthUser | null> {
   const res = await fetch(`${API_ENDPOINTS.auth}/session`, {
     credentials: "include",

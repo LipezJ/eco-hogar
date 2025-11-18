@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/ui/data-table"
 import { SiteHeader } from "@/components/site-header"
 import { type ColumnDef } from "@tanstack/react-table"
-import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { useQueryFetch } from "@/hooks/use-query-fetch"
 import { useState } from "react"
 import { DatePickerRange } from "@/components/ui/date-picker"
 import { getCurrentFullMonthRange } from "@/lib/utils"
@@ -16,6 +16,17 @@ interface TableDatePageProps<TData, TValue> {
   exportTo?: boolean
 }
 
+/**
+ * Página de tabla con filtro de rango de fechas y acciones opcionales.
+ * @param title Título y export name.
+ * @param endpoint URL a consultar.
+ * @param queryKey clave base de caché (se agrega rango).
+ * @param staleTime ms de frescura.
+ * @param children acciones/botones.
+ * @param columns definición de columnas react-table.
+ * @param exportTo habilitar export.
+ * @returns layout con DatePickerRange y DataTable.
+ */
 export default function TableDatePage<TData, TValue>({ title, endpoint, queryKey, staleTime, children, columns, exportTo }: TableDatePageProps<TData, TValue>) {
   const [ dateRange, setDateRange ] = useState<string[]>(getCurrentFullMonthRange());
 

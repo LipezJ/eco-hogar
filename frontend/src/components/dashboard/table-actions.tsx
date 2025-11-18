@@ -5,11 +5,14 @@ export interface TableAction {
   method: string
 }
 
-
+/**
+ * Placeholder para acciones de tabla (iterar y renderizar futuras acciones).
+ */
 export function TableActions() {
   
 }
 
+/** Placeholder para una acción puntual de tabla. */
 export function TableAction() {
 
 }

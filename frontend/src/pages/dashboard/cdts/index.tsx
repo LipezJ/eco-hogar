@@ -6,12 +6,13 @@ import { Plus } from "lucide-react"
 import { FormDialog } from "@/components/form-dialog"
 import { CreateCdtForm } from "./form"
 import DashboardLayout from "@/layouts/dashboard"
-import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch"
+import { useSuspenseQueryFetch } from "@/hooks/use-query-fetch"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { transformCdts } from "@/lib/api-transformers"
 import { Suspense } from "react"
 import { TableLoadingSkeleton } from "@/components/loading-skeleton"
 
+/** Contenido de CDTs: formulario y tabla. */
 function CdtsContent() {
   const { data, refetch } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.cdts,

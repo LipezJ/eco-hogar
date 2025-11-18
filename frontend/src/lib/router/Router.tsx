@@ -8,6 +8,12 @@ interface RouterProps {
   fallback?: React.ComponentType;
 }
 
+/**
+ * Router muy simple que recorre la lista de rutas y renderiza la primera coincidencia.
+ * @param routes Conjunto de rutas declaradas.
+ * @param fallback Componente opcional para 404.
+ * @returns JSX del componente coincidente o fallback.
+ */
 export function Router({ routes, fallback: Fallback }: RouterProps) {
   const { currentPath } = useRouter();
 
@@ -32,6 +38,12 @@ interface RouteRendererProps {
   params: Record<string, string>;
 }
 
+/**
+ * Renderiza el componente y sincroniza params en window.__routerParams.
+ * @param component Componente a renderizar.
+ * @param params Parámetros dinámicos de la ruta.
+ * @returns JSX del componente.
+ */
 function RouteRenderer({ component: Component, params }: RouteRendererProps) {
   // Store params immediately and in useEffect
   window.__routerParams = params;

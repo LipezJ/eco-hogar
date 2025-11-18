@@ -18,6 +18,10 @@ const persister = createAsyncStoragePersister({
   storage: typeof window !== 'undefined' ? window.localStorage : undefined,
 })
 
+/**
+ * Proveedor de React Query con persistencia en localStorage.
+ * @param children árbol de la app.
+ */
 export const TanstackProvider = ({ children }: TanstackProviderProps) => {
   return (
     <PersistQueryClientProvider

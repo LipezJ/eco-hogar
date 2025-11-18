@@ -12,6 +12,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Proveedor de estado de autenticación (usuario y loader).
+ */
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +56,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/** Hook para consumir el contexto de autenticación. */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);

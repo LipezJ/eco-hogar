@@ -26,6 +26,7 @@ const statusOptions = AccountStatus.options.map(status => ({
   label: status.charAt(0).toUpperCase() + status.slice(1)
 }))
 
+/** Campos para crear una cuenta bancaria. */
 function getCreateAccountFormDef(): FormFieldDef<z.infer<typeof CreateAccountSchema>>[] {
   return [
     {
@@ -92,6 +93,7 @@ function getCreateAccountFormDef(): FormFieldDef<z.infer<typeof CreateAccountSch
   ]
 }
 
+/** Campos para actualizar una cuenta existente. */
 function getUpdateAccountFormDef(): FormFieldDef<z.infer<typeof UpdateAccountSchema>>[] {
   return [
     {
@@ -163,6 +165,7 @@ function getUpdateAccountFormDef(): FormFieldDef<z.infer<typeof UpdateAccountSch
   ]
 }
 
+/** Formulario para crear cuenta. */
 export function CreateAccountForm() {
   const { setOpen } = useContext(FormDialogContext)
 
@@ -192,6 +195,7 @@ export function CreateAccountForm() {
   )
 }
 
+/** Formulario para actualizar cuenta. */
 export function UpdateAccountForm({ account }: { account: Account }) {
   const { setOpen } = useContext(FormDialogContext)
 

@@ -16,6 +16,7 @@ interface CaptchaState {
   svg: string;
 }
 
+/** Formulario de login con captcha y navegación al dashboard. */
 export function LoginForm({
   className,
   ...props

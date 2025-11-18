@@ -10,6 +10,7 @@ interface DebtsStatsProps {
   payments: Payment[]
 }
 
+/** Resumen de deudas y préstamos con próximos pagos. */
 export function DebtsStats({ debts, payments }: DebtsStatsProps) {
   // Separar deudas y préstamos
   const deudas = debts.filter(d => d.type === "deuda")

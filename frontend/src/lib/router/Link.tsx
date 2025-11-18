@@ -9,6 +9,7 @@ interface LinkProps {
   onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
+/** Enlace SPA que usa `navigate` del router (previene full reload). */
 export function Link({ href, children, className, style }: LinkProps) {
   const { navigate } = useRouter();
 

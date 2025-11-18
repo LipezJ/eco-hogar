@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { useQueryFetch } from "@/hooks/use-query-fetch"
 import DashboardLayout from "@/layouts/dashboard"
 import { SiteHeader } from "@/components/site-header"
 import { API_ENDPOINTS } from "@/lib/api-config"

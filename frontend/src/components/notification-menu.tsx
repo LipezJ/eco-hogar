@@ -51,6 +51,7 @@ function formatDate(value: string) {
   return date.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })
 }
 
+/** Menú desplegable que muestra y marca notificaciones in-app. */
 export function NotificationMenu() {
   const queryClient = useQueryClient()
   const { data, isLoading } = useQuery({

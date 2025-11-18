@@ -12,6 +12,7 @@ const movementCategoryLabels: Record<string, string> = {
 
 const formatCategoryLabel = (value: string) => movementCategoryLabels[value] ?? (value.charAt(0).toUpperCase() + value.slice(1))
 
+/** Columnas para tabla de movimientos con etiquetas y adjuntos. */
 export const columns: ColumnDef<Movement>[] = [
   {
     accessorKey: "date",

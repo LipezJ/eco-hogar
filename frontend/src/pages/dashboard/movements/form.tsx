@@ -51,6 +51,7 @@ const UpdateMovementFormSchemaClient = UpdateMovementFormSchema.extend({
 type CreateMovementFormValues = z.input<typeof CreateMovementFormSchemaClient>
 type UpdateMovementFormValues = z.input<typeof UpdateMovementFormSchemaClient>
 
+/** Campos para crear un movimiento. */
 function getCreateMovementFormDef(): FormFieldDef<CreateMovementFormValues>[] {
   return ([
     {
@@ -119,9 +120,11 @@ function getCreateMovementFormDef(): FormFieldDef<CreateMovementFormValues>[] {
         />
       )
     }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ] as FormFieldDef<any>[]) as FormFieldDef<CreateMovementFormValues>[]
 }
 
+/** Campos para actualizar un movimiento. */
 function getUpdateMovementFormDef(): FormFieldDef<UpdateMovementFormValues>[] {
   const createFields = getCreateMovementFormDef() as unknown as FormFieldDef<UpdateMovementFormValues>[];
   return ([
@@ -146,6 +149,7 @@ async function prepareMovementPayload<T extends { attachment?: unknown }>(values
 }
 
 
+/** Formulario para crear movimiento. **/
 export function CreateMovementForm() {
   const { setOpen } = useContext(FormDialogContext)
 
@@ -174,6 +178,7 @@ export function CreateMovementForm() {
   )
 }
 
+/** Formulario para actualizar movimiento existente. **/
 export function UpdateMovementForm({ movement }: { movement: Movement }) {
   const { setOpen } = useContext(FormDialogContext)
 

@@ -7,12 +7,13 @@ import { FormDialog } from "@/components/form-dialog"
 import { CreateAccountForm } from "./form"
 import { AccountsStats } from "@/components/stats/accounts"
 import DashboardLayout from "@/layouts/dashboard"
-import { useSuspenseQueryFetch } from "@/hooks/user-query-fetch"
+import { useSuspenseQueryFetch } from "@/hooks/use-query-fetch"
 import { API_ENDPOINTS } from "@/lib/api-config"
 import { transformAccounts } from "@/lib/api-transformers"
 import { Suspense } from "react"
 import { PageLoadingSkeleton } from "@/components/loading-skeleton"
 
+/** Contenido principal de cuentas (stats, formulario y tabla). */
 function AccountsContent() {
   const { data, refetch } = useSuspenseQueryFetch<unknown[]>({
     url: API_ENDPOINTS.accounts,

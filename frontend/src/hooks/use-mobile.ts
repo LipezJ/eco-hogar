@@ -2,6 +2,10 @@ import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
 
+/**
+ * Retorna true si el viewport es menor al breakpoint móvil.
+ * @returns boolean reactivo (basado en matchMedia).
+ */
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 

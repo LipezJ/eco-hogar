@@ -125,6 +125,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+/** Reporte de recibos: KPIs, gráficos por estado y categoría. */
 export function BillsReports({ bills }: BillsReportsProps) {
   // Agrupar por mes
   const monthlyData = bills.reduce((acc, bill) => {

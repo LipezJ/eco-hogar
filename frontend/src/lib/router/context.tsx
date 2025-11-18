@@ -12,6 +12,10 @@ const defaultLocation: LocationState = {
   search: '',
 };
 
+/**
+ * Lee la ubicación actual del window (o defaults en SSR).
+ * @returns pathname y search actuales.
+ */
 function readWindowLocation(): LocationState {
   if (typeof window === 'undefined') {
     return defaultLocation;
@@ -23,6 +27,11 @@ function readWindowLocation(): LocationState {
   };
 }
 
+/**
+ * Normaliza un path relativo/absoluto hacia una URL usable en history.
+ * @param path ruta destino.
+ * @returns pathname+search+hash resultante.
+ */
 function resolveTarget(path: string): string {
   if (typeof window === 'undefined') return path;
 
@@ -34,6 +43,9 @@ function resolveTarget(path: string): string {
   }
 }
 
+/**
+ * Parchea pushState/replaceState para emitir eventos custom y permitir suscripción.
+ */
 function ensureHistoryPatched() {
   if (typeof window === 'undefined') return;
   if ((window as unknown as { __routerHistoryPatched?: boolean }).__routerHistoryPatched) return;
@@ -62,6 +74,11 @@ interface RouterProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Proveedor del router para manejar path, search y navegación client-side.
+ * @param children JSX hijo.
+ * @returns JSX envuelto en RouterContext.
+ */
 export function RouterProvider({ children }: RouterProviderProps) {
   ensureHistoryPatched();
 

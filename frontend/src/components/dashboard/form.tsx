@@ -14,6 +14,9 @@ import { DatePicker, DatePickerFullRange } from "@/components/ui/date-picker"
 import { useMutateForm } from "@/hooks/use-mutate-form"
 import type { Control, ControllerFieldState, ControllerRenderProps, DefaultValues, FieldValues, Path, Resolver, UseFormStateReturn } from "react-hook-form"
 
+/**
+ * Props para el componente Form genérico (usa react-hook-form + react-query).
+ */
 export interface FormProps<TFieldValues extends FieldValues = FieldValues> {
   formDefinition: FormFieldDef<TFieldValues>[]
   defaultValues?: DefaultValues<TFieldValues>
@@ -29,6 +32,21 @@ export interface FormProps<TFieldValues extends FieldValues = FieldValues> {
   transformValues?: (values: TFieldValues) => Promise<TFieldValues> | TFieldValues
 }
 
+/**
+ * Renderiza un formulario dinámico basado en formDefinition y envía la mutación configurada.
+ * @param formDefinition Campos a renderizar.
+ * @param resolver Resolver de RHF (zod, yup, etc.).
+ * @param defaultValues Valores iniciales.
+ * @param queryKey Clave principal a invalidar tras submit.
+ * @param queryKeysToInvalidate Claves adicionales a invalidar.
+ * @param url Endpoint relativo.
+ * @param method Verbo HTTP (default POST).
+ * @param onSuccess Callback post submit exitoso.
+ * @param submitButtonText Texto del botón submit.
+ * @param twoColumns Layout opcional 2 columnas en desktop.
+ * @param onFieldChange Callback por campo.
+ * @param transformValues Preprocesa valores antes de mutar.
+ */
 export function Form<TFieldValues extends FieldValues = FieldValues>({
   formDefinition,
   resolver,
@@ -97,6 +115,9 @@ export interface FormFieldDefSelectOption {
   label: string
 }
 
+/**
+ * Definición de cada campo del form dinámico.
+ */
 export interface FormFieldDef<TFieldValues extends FieldValues = FieldValues> {
   name: Path<TFieldValues>
   type?: string
@@ -118,6 +139,9 @@ interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
   onFieldChange?: (name: Path<TFieldValues>, value: unknown) => void
 }
 
+/**
+ * Renderiza un campo individual según variant/type o custom renderer.
+ */
 function FormField<TFieldValues extends FieldValues = FieldValues>(
   { control, field: { name, type, label, description, placeholder, variant, options, custom }, onFieldChange }: FormFieldProps<TFieldValues>
 ) {

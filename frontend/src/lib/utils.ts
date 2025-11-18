@@ -3,10 +3,22 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import ExcelJS from "exceljs";
 
+/**
+ * Combina clases tailwind usando clsx + twMerge.
+ * @param inputs lista de clases.
+ * @returns string final mergeado.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Formatea un número a moneda.
+ * @param amount valor numérico.
+ * @param currency código de moneda.
+ * @param locale locale para Intl.
+ * @returns string formateada.
+ */
 export function toCurrency(
   amount: number,
   currency: string = 'USD',
@@ -21,6 +33,13 @@ export function toCurrency(
   }).format(amount);
 }
 
+/**
+ * Filtro de rango de fechas para react-table (string ISO).
+ * @param row fila actual.
+ * @param columnId id de la columna.
+ * @param value tupla [from, to] en string ISO.
+ * @returns true si pasa el filtro.
+ */
 export const dateRangeFilterFn: FilterFn<unknown> = (row, columnId, value: [string, string]) => {
   if (!value || value.length !== 2) return true
   const [from, to] = value
@@ -53,6 +72,13 @@ export const dateRangeFilterFn: FilterFn<unknown> = (row, columnId, value: [stri
 }
 dateRangeFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
 
+/**
+ * Filtro multi-select para react-table.
+ * @param row fila actual.
+ * @param columnId id de la columna.
+ * @param value array de valores permitidos.
+ * @returns true si el valor de la celda está en la lista.
+ */
 export const multiSelectFilterFn: FilterFn<unknown> = (row, columnId, value: string[]) => {
   if (!value || value.length === 0) return true
 
@@ -64,6 +90,10 @@ export const multiSelectFilterFn: FilterFn<unknown> = (row, columnId, value: str
 }
 multiSelectFilterFn.autoRemove = (val: string[]) => !val || val.length === 0
 
+/**
+ * Rango completo del mes en curso en ISO.
+ * @returns tupla [startISO, endISO].
+ */
 export function getCurrentFullMonthRange() {
   const now = new Date();
 
@@ -72,6 +102,12 @@ export function getCurrentFullMonthRange() {
   return [start.toISOString(), end.toISOString()];
 }
 
+/**
+ * Exporta un arreglo de objetos a Excel.
+ * @param data filas a exportar.
+ * @param name nombre base del archivo.
+ * @returns Promise<void>.
+ */
 export async function exportToExcel(data: Record<string, string>[], name: string) {
   if (!data || data.length === 0) {
     console.warn("No hay datos para exportar.");
@@ -99,6 +135,12 @@ export async function exportToExcel(data: Record<string, string>[], name: string
   URL.revokeObjectURL(link.href);
 }
 
+/**
+ * Exporta a CSV.
+ * @param data filas a exportar.
+ * @param name nombre base del archivo.
+ * @returns void.
+ */
 export function exportToCSV(data: Record<string, string>[], name: string) {
   if (!data || data.length === 0) {
     console.warn("No hay datos para exportar.");
@@ -130,6 +172,12 @@ export function exportToCSV(data: Record<string, string>[], name: string) {
   URL.revokeObjectURL(link.href);
 }
 
+/**
+ * Exporta a JSON.
+ * @param data filas a exportar.
+ * @param name nombre base del archivo.
+ * @returns void.
+ */
 export function exportToJSON(data: Record<string, string>[], name: string) {
   if (!data || data.length === 0) {
     console.warn("No hay datos para exportar.");

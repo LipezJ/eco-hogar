@@ -25,6 +25,7 @@ interface CdtsStatsProps {
   cdts: Cdt[]
 }
 
+/** Resumen de CDTs: inversión, retorno esperado y próximos vencimientos. */
 export function CdtsStats({ cdts }: CdtsStatsProps) {
   // Estadísticas generales
   const activeCdts = cdts.filter(c => c.status === "activo")

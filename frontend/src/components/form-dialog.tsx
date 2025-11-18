@@ -18,6 +18,7 @@ interface FormDialogProps {
   className?: string
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const FormDialogContext = React.createContext<{
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -26,6 +27,14 @@ export const FormDialogContext = React.createContext<{
   setOpen: () => {}
 });
 
+/**
+ * Dialog genérico con trigger y un formulario embebido.
+ * @param title Título del modal.
+ * @param description Descripción corta.
+ * @param form Nodo del formulario a renderizar.
+ * @param children Trigger (botón/enlace).
+ * @param className clases extra al contenido.
+ */
 export function FormDialog({ title, form, description, children, className }: FormDialogProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -58,6 +67,9 @@ interface FormDialogStandaloneProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+/**
+ * Versión controlada del FormDialog (control externo de open).
+ */
 export function FormDialogStandalone({ title, description, children, open, setOpen, className }: FormDialogStandaloneProps) {
   return (
     <FormDialogContext.Provider value={{ open, setOpen }}>

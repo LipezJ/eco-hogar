@@ -5,6 +5,7 @@ import { CdtsActions } from "./form"
 import { TrendingUp, Clock, AlertCircle } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 
+/** Columnas para tabla de CDTs con progreso y alertas. */
 export const columns: ColumnDef<Cdt>[] = [
   {
     accessorKey: "institution",

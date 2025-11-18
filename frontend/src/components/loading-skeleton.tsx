@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
+/** Skeleton para tarjetas de stats. */
 export function StatsLoadingSkeleton() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -12,7 +13,7 @@ export function StatsLoadingSkeleton() {
           </CardHeader>
           <CardContent>
             <Skeleton className="h-8 w-[120px] mb-2" />
-            <Skeleton className="h-3 w-[160px]" />
+            <Skeleton className="h-3 w-40" />
           </CardContent>
         </Card>
       ))}
@@ -37,7 +38,7 @@ export function TableLoadingSkeleton() {
               <Skeleton className="h-4 w-[200px]" />
               <Skeleton className="h-4 w-[150px]" />
               <Skeleton className="h-4 w-[100px]" />
-              <Skeleton className="h-4 w-[80px]" />
+              <Skeleton className="h-4 w-20" />
             </div>
           ))}
         </div>
@@ -81,7 +82,7 @@ export function PageLoadingSkeleton() {
               <Skeleton className="h-4 w-[200px]" />
               <Skeleton className="h-4 w-[150px]" />
               <Skeleton className="h-4 w-[100px]" />
-              <Skeleton className="h-4 w-[80px]" />
+              <Skeleton className="h-4 w-20" />
             </div>
           ))}
         </div>
@@ -90,6 +91,7 @@ export function PageLoadingSkeleton() {
   )
 }
 
+/** Skeleton genérico de lista con header opcional. */
 export function ListLoadingSkeleton({ count = 5, showHeader = false }: { count?: number; showHeader?: boolean }) {
   return (
     <div className="space-y-3">

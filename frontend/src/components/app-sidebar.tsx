@@ -29,6 +29,10 @@ export type AppSidebar = {
   }[]
 }
 
+/**
+ * Barra lateral de la app con grupos de links, tema y logout.
+ * @param sidebar arreglo de grupos con items (título, url, icono).
+ */
 export function AppSidebar({ sidebar }: { sidebar: AppSidebar[] }) {
   const { logout } = useAuth()
   const router = useRouter()

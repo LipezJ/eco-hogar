@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+/** Botón/menú para alternar tema claro/oscuro/sistema. */
 export function ThemeToggle() {
   const { setTheme } = useTheme()
 

@@ -49,6 +49,7 @@ const categoryColors: Record<string, string> = {
   otros: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
 }
 
+/** Tarjetas y lista de próximos vencimientos para recibos. */
 export function BillsStats({ bills }: BillsStatsProps) {
   // Estadísticas generales
   const totalBills = bills.length

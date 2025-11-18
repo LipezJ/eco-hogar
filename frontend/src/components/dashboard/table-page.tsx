@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/ui/data-table"
 import { SiteHeader } from "@/components/site-header"
 import { type ColumnDef } from "@tanstack/react-table"
-import { useQueryFetch } from "@/hooks/user-query-fetch"
+import { useQueryFetch } from "@/hooks/use-query-fetch"
 
 interface TablePageProps<TData, TValue> {
   endpoint: string
@@ -13,6 +13,17 @@ interface TablePageProps<TData, TValue> {
   exportTo?: boolean
 }
 
+/**
+ * Página genérica con tabla, cabecera y acciones opcionales.
+ * @param title Título y export name.
+ * @param endpoint URL a consultar.
+ * @param queryKey clave de caché para React Query.
+ * @param staleTime ms de frescura.
+ * @param children acciones/botones a la derecha.
+ * @param columns definición de columnas react-table.
+ * @param exportTo habilitar exportaciones.
+ * @returns layout de página con DataTable.
+ */
 export default function TablePage<TData, TValue>({ title, endpoint, queryKey, staleTime, children, columns, exportTo }: TablePageProps<TData, TValue>) {
   const { data, refetch, isLoading } = useQueryFetch<TData[]>({
     queryKey,

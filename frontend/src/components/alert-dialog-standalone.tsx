@@ -17,6 +17,14 @@ interface AlertDialogDemoProps {
   onClose: () => void
 }
 
+/**
+ * Diálogo de confirmación reutilizable (cancelar/continuar).
+ * @param title Título del modal.
+ * @param description Mensaje descriptivo.
+ * @param open Estado abierto/cerrado.
+ * @param onAccept Handler al confirmar.
+ * @param onClose Handler al cerrar/cancelar.
+ */
 export function AlertDialogStandalone({ title, description, open, onAccept, onClose}: AlertDialogDemoProps) {
   return (
     <AlertDialog open={open}>
