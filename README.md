@@ -19,7 +19,7 @@ Guia rapida para trabajar en local con el frontend (React + Vite) y el backend (
 2. Abre `backend/.env` y ajusta:
    - `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`: deben apuntar a tu servidor MySQL. Si usas XAMPP deja `localhost`, puerto `3306`, usuario `root` y password vacio (o la que hayas puesto en phpMyAdmin).
    - `DATABASE_URL`: debe reflejar la misma informacion en formato `mysql://user:pass@host:puerto/base`.
-   - `PORT`: puerto del API, por defecto `3001`.
+   - `PORT`: puerto del API, por defecto `3000`.
    - `CLIENT_URL`: URL desde donde correra el frontend (Vite usa `http://localhost:5173`).
 3. Abre `frontend/.env` y deja `VITE_API_URL=http://localhost:3000` (o el puerto que hayas elegido para el backend).
 4. Si levantas MySQL con XAMPP:
