@@ -16,12 +16,16 @@ async function handleResponse(response: Response): Promise<AuthResponse> {
   return data;
 }
 
-export async function loginRequest(username: string, password: string): Promise<AuthUser> {
+export async function loginRequest(
+  username: string,
+  password: string,
+  captcha: { id: string; code: string }
+): Promise<AuthUser> {
   const res = await fetch(`${API_ENDPOINTS.auth}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, captchaId: captcha.id, captchaCode: captcha.code }),
   });
 
   const data = await handleResponse(res);
@@ -31,12 +35,18 @@ export async function loginRequest(username: string, password: string): Promise<
   return data.user;
 }
 
-export async function registerRequest(name: string, username: string, email: string, password: string): Promise<AuthUser> {
+export async function registerRequest(
+  name: string,
+  username: string,
+  email: string,
+  password: string,
+  captcha: { id: string; code: string }
+): Promise<AuthUser> {
   const res = await fetch(`${API_ENDPOINTS.auth}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ name, username, email, password }),
+    body: JSON.stringify({ name, username, email, password, captchaId: captcha.id, captchaCode: captcha.code }),
   });
 
   const data = await handleResponse(res);

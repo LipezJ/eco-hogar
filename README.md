@@ -51,7 +51,7 @@ Listo: con eso el backend sabra a que base conectar y el frontend a que API llam
    npm run dev
    ```
    - Frontend disponible en `http://localhost:5173`.
-   - Backend disponible en `http://localhost:3001` (o el puerto configurado en `PORT`).
+   - Backend disponible en `http://localhost:3000` (o el puerto configurado en `PORT`).
 3. Necesitas correr solo uno de los servicios? Puedes usar:
    - `npm run dev:backend` para el API.
    - `npm run dev:frontend` para la interfaz.

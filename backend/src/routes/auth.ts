@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { eq } from 'drizzle-orm';
+import svgCaptcha from 'svg-captcha';
 import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
 import { TOKEN_COOKIE, clearAuthCookie, createToken, setAuthCookie, verifyToken } from '../lib/auth-utils.js';
@@ -14,14 +15,18 @@ const registerSchema = z.object({
   email: z.string().email('Debe ingresar un email válido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
+  captchaId: z.string(),
+  captchaCode: z.string(),
 });
 
 const loginSchema = z.object({
   username: z.string().min(3, 'Usuario inválido'),
   password: z.string().min(6, 'Contraseña inválida'),
+  captchaId: z.string(),
+  captchaCode: z.string(),
 });
 
-function sanitizeUser(user: typeof users.$inferSelect) {
+export function sanitizeUser(user: typeof users.$inferSelect) {
   const { passwordHash, ...rest } = user;
   return rest;
 }
@@ -70,6 +75,44 @@ void ensureDefaultAdmin().catch((error) => {
   console.error('Error creating default admin user:', error);
 });
 
+// Captcha store en memoria
+const captchaStore = new Map<string, { text: string; expires: number }>();
+const CAPTCHA_TTL_MS = 5 * 60 * 1000;
+
+function createCaptcha() {
+  const { data, text } = svgCaptcha.create({
+    size: 4,
+    noise: 2,
+    color: true,
+    background: '#f8fafc',
+    ignoreChars: '0Oo1Il',
+  });
+  return { svg: data, text };
+}
+
+function saveCaptcha(id: string, text: string) {
+  captchaStore.set(id, { text, expires: Date.now() + CAPTCHA_TTL_MS });
+}
+
+function validateCaptcha(id: string, code: string): boolean {
+  const entry = captchaStore.get(id);
+  if (!entry) return false;
+  if (Date.now() > entry.expires) {
+    captchaStore.delete(id);
+    return false;
+  }
+  const isValid = entry.text.toLowerCase() === code.toLowerCase();
+  captchaStore.delete(id);
+  return isValid;
+}
+
+router.get('/captcha', (_req, res) => {
+  const { svg, text } = createCaptcha();
+  const id = randomUUID();
+  saveCaptcha(id, text);
+  res.json({ id, svg });
+});
+
 router.post('/register', async (req, res) => {
   try {
     const parsed = registerSchema.safeParse(req.body);
@@ -77,7 +120,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Datos inválidos' });
     }
 
-    const { username, email, password, name } = parsed.data;
+    const { username, email, password, name, captchaId, captchaCode } = parsed.data;
+
+    if (!validateCaptcha(captchaId, captchaCode)) {
+      return res.status(400).json({ error: 'Captcha inválido o expirado' });
+    }
 
     const existing = await findUserByUsername(username);
     if (existing) {
@@ -117,7 +164,12 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Credenciales inválidas' });
     }
 
-    const { username, password } = parsed.data;
+    const { username, password, captchaId, captchaCode } = parsed.data;
+
+    if (!validateCaptcha(captchaId, captchaCode)) {
+      return res.status(400).json({ error: 'Captcha inválido o expirado' });
+    }
+
     const user = await findUserByUsername(username);
 
     if (!user) {
