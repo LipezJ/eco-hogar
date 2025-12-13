@@ -1,8 +1,10 @@
 version: "3.9"
 
 services:
-  db:
-    image: mysql:8.0
+  mysql:
+    build:
+      context: .
+      dockerfile: docker/db.Dockerfile
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
@@ -20,36 +22,34 @@ services:
     ports:
       - "3306:3306"
 
-  backend:
+  api:
     build:
       context: .
-      target: backend
+      dockerfile: docker/backend.Dockerfile
     environment:
       PORT: ${PORT:-3000}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
-      DATABASE_HOST: db
+      DATABASE_HOST: mysql
     depends_on:
-      db:
+      mysql:
         condition: service_healthy
-    ports:
-      - "3000:3000"
     command: >
       sh -c "export DATABASE_PORT=$${DATABASE_PORT:-3306} &&
              export DATABASE_USER=$${DATABASE_USER:-un_usr} &&
              export DATABASE_PASSWORD=$${DATABASE_PASSWORD:-una_clave} &&
              export DATABASE_NAME=$${DATABASE_NAME:-eco_hogar} &&
-             export DATABASE_URL=\"mysql://$${DATABASE_USER}:$${DATABASE_PASSWORD}@$${DATABASE_HOST:-db}:$${DATABASE_PORT}/$${DATABASE_NAME}\" &&
+             export DATABASE_URL=\"mysql://$${DATABASE_USER}:$${DATABASE_PASSWORD}@$${DATABASE_HOST:-mysql}:$${DATABASE_PORT}/$${DATABASE_NAME}\" &&
              npm run init-db --prefix backend &&
              npm run start --prefix backend"
 
-  frontend:
+  web:
     build:
       context: .
-      target: frontend
+      dockerfile: docker/frontend.Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-/api}
     depends_on:
-      - backend
+      - api
     ports:
       - "8080:80"
 
