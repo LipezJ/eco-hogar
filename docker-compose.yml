@@ -42,10 +42,10 @@ services:
              npm run init-db --prefix backend &&
              npm run start --prefix backend"
 
-  web:
+  nginx:
     build:
       context: .
-      dockerfile: docker/frontend.Dockerfile
+      dockerfile: docker/nginx.Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-/api}
     depends_on:

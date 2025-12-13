@@ -21,13 +21,8 @@ ENV NODE_ENV=production
 RUN npm run build:types
 RUN npm run build:frontend
 
-FROM node:24-bullseye AS runner
-WORKDIR /app
-
-RUN npm install -g serve
-
-COPY --from=builder /app/frontend/dist /usr/share/app
-
-EXPOSE 80
-
-CMD ["serve", "-s", "/usr/share/app", "-l", "80"]
+FROM nginx:1.27-alpine AS runner
+ENV API_HOST=api
+ENV API_PORT=3000
+COPY docker/nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
