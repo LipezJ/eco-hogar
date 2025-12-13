@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:22-bullseye AS deps
+FROM node:24-bullseye AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -22,7 +22,7 @@ RUN npm run build:types
 RUN npm run build:backend
 RUN npm run build:frontend
 
-FROM node:22-bullseye AS backend
+FROM node:24-bullseye AS backend
 WORKDIR /app
 ENV NODE_ENV=production
 

@@ -24,9 +24,9 @@ services:
     build:
       context: .
       target: backend
-    env_file:
-      - backend/.env
     environment:
+      PORT: ${PORT:-3000}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
       DATABASE_HOST: db
     depends_on:
       db:
