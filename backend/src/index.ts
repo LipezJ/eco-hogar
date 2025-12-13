@@ -20,9 +20,15 @@ import { startNotificationJob } from './jobs/notification-scheduler.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Allowed origins for CORS (support comma-separated list via CLIENT_URLS)
+const rawOrigins = process.env.CLIENT_URLS ?? process.env.CLIENT_URL;
+const allowedOrigins = rawOrigins
+  ? rawOrigins.split(',').map((o) => o.trim()).filter(Boolean)
+  : undefined;
+
 // Core middleware stack
 app.use(cors({
-  origin: process.env.CLIENT_URL ?? true,
+  origin: allowedOrigins?.length ? allowedOrigins : true,
   credentials: true,
 }));
 app.use(express.json());

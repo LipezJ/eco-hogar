@@ -7,6 +7,8 @@ import jwt from 'jsonwebtoken';
 export const TOKEN_COOKIE = 'auth_token';
 export const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
+const IS_PROD = process.env.NODE_ENV === 'production';
+const COOKIE_SAMESITE: 'lax' | 'none' = IS_PROD ? 'none' : 'lax';
 
 /**
  * Crea un JWT firmado para un usuario.
@@ -25,8 +27,8 @@ export function createToken(userId: string) {
 export function setAuthCookie(res: Response, token: string) {
   res.cookie(TOKEN_COOKIE, token, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: COOKIE_SAMESITE,
+    secure: IS_PROD,
     maxAge: TOKEN_TTL_MS,
   });
 }
@@ -37,8 +39,8 @@ export function setAuthCookie(res: Response, token: string) {
 export function clearAuthCookie(res: Response) {
   res.clearCookie(TOKEN_COOKIE, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: COOKIE_SAMESITE,
+    secure: IS_PROD,
   });
 }
 
