@@ -1,7 +1,7 @@
 /**
- * Host base de la API; configurado vía VITE_API_URL (default localhost:3000).
+ * Host base de la API; configurado via VITE_API_URL (default /api para usar mismo host).
  */
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * API Endpoints preconstruidos.
